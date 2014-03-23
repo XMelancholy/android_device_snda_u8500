@@ -386,9 +386,6 @@ service mad /system/bin/ste_mad
     user radio
     group radio dbus_access misc
 
-#service watchdog-kicker /system/xbin/watchdog-kicker -d /dev/watchdog -t 120
-#    class main
-#    oneshot
 
 service battery_params /system/xbin/battery_params
     class main
