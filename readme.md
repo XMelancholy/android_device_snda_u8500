@@ -16,9 +16,11 @@
 # patch
 
 	patch -p1 < device/snda/u8500/patches/build.patch
-
+	patch -p1 < device/snda/u8500/patches/system_core.patch
+	
     还原
 	patch -p1 -R < device/snda/u8500/patches/build.patch
+	patch -p1 -R < device/snda/u8500/patches/system_core.patch
 		
 # build
 
