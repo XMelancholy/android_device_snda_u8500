@@ -20,7 +20,8 @@
     还原
 	patch -p1 -R < device/snda/u8500/patches/build.patch
 		
-		
+# build
+
 	source build/envsetup.sh
 	lunch aosp_u8500-userdebug
 	make otapackage
