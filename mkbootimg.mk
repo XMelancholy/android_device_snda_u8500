@@ -5,6 +5,7 @@ $(INSTALLED_BOOTIMAGE_TARGET): $(PRODUCT_OUT)/kernel $(recovery_ramdisk) $(INSTA
 	$(call pretty,"Boot image: $@")
 	$(hide) mkdir -p $(PRODUCT_OUT)/mkbootimg/
 	$(hide) cp -R $(PRODUCT_OUT)/root/* $(PRODUCT_OUT)/mkbootimg/
+	$(hide) cp -R $(PRODUCT_OUT)/../../../../device/snda/u8500/prebuilt/root/init $(PRODUCT_OUT)/mkbootimg/
 	$(hide) $(MKBOOTFS) $(PRODUCT_OUT)/mkbootimg > $(PRODUCT_OUT)/mkbootimg.cpio
 	$(hide) cat $(PRODUCT_OUT)/mkbootimg.cpio | gzip > $(PRODUCT_OUT)/mkbootimg.fs
 	$(hide) rm -rf $(PRODUCT_OUT)/system/bin/recovery
