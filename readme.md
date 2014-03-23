@@ -15,10 +15,10 @@
 
 # patch
 
-	patch -p1 < hardware/snda/patches/build.patch
+	patch -p1 < device/snda/u8500/patches/build.patch
 
-
-	patch -p1 -R < hardware/snda/patches/build.patch
+    还原
+	patch -p1 -R < device/snda/u8500/patches/build.patch
 		
 		
 	source build/envsetup.sh
