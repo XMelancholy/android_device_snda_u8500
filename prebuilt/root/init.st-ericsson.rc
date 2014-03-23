@@ -273,11 +273,6 @@ service admsrv /system/bin/admsrv
 #    user system
 #    group system audio inet net_bt net_bt_admin net_raw shell
 
-service hdmid /system/bin/hdmid
-    class main
-    socket hdmid stream 0660 system graphics
-    oneshot
-
 service ste-cg29xx_ctrl /system/bin/logwrapper /system/xbin/ste-cg29xx_ctrl -b 115200 -p 6 -l 23 -i /system/bin/cg2900-channel_init.sh /dev/ttyAMA0
     class main
     user root
