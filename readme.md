@@ -18,11 +18,13 @@
 	patch -p1 < device/snda/u8500/patches/build.patch
 	patch -p1 < device/snda/u8500/patches/hardware_libhardware_legacy.patch
 	patch -p1 < device/snda/u8500/patches/system_core.patch
+	patch -p1 < device/snda/u8500/patches/system_vold.patch
 	
     还原
 	patch -p1 -R < device/snda/u8500/patches/build.patch
 	patch -p1 -R < device/snda/u8500/patches/hardware_libhardware_legacy.patch
 	patch -p1 -R < device/snda/u8500/patches/system_core.patch
+	patch -p1 -R < device/snda/u8500/patches/system_vold.patch
 		
 # build
 
