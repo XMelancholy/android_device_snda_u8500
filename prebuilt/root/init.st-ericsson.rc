@@ -396,6 +396,3 @@ service usbid_init /system/bin/usbid_init.sh
     class main
     oneshot
 
-service zram_config /system/bin/sh /system/etc/zram_config.sh
-    class main
-    oneshot
