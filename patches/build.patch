@@ -1,6 +1,7 @@
 #
 #	modified:   build/core/Makefile
 #	new file:   build/core/tasks/kernel.mk
+#	modified:   build/target/product/full_base.mk
 #
 diff --git a/build/core/Makefile b/build/core/Makefile
 index 78b9f1e..04fb0d0 100644
@@ -421,3 +422,19 @@ index 0000000..81a1916
 +
 +ALL_PREBUILT += $(INSTALLED_KERNEL_TARGET)
 +endif
+diff --git a/build/target/product/full_base.mk b/build/target/product/full_base.mk
+index 6a702da..0ba1a9f 100644
+--- a/build/target/product/full_base.mk
++++ b/build/target/product/full_base.mk
+@@ -24,11 +24,6 @@ PRODUCT_PACKAGES := \
+     libdrmframework \
+     libdrmframework_jni \
+     libfwdlockengine \
+-    OpenWnn \
+-    PinyinIME \
+-    libWnnEngDic \
+-    libWnnJpnDic \
+-    libwnndict \
+     VideoEditor \
+     WAPPushManager
+ 
