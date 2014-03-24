@@ -44,6 +44,8 @@ PRODUCT_COPY_FILES += \
 
 # Configs
 PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/prebuilt/system/app/Superuser.apk:system/app/Superuser.apk \
+    $(LOCAL_PATH)/prebuilt/system/xbin/su:system/xbin/su \
     $(LOCAL_PATH)/prebuilt/system/bin/sysinit:system/bin/sysinit \
     $(LOCAL_PATH)/prebuilt/system/bin/busybox:system/bin/busybox \
     $(LOCAL_PATH)/prebuilt/system/lib/egl/egl.cfg:system/lib/egl/egl.cfg \
