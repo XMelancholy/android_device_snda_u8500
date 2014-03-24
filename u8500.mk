@@ -65,6 +65,10 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     system/bluetooth/data/main.conf:system/etc/bluetooth/main.conf
 
+# APN
+PRODUCT_COPY_FILES += \
+   $(LOCAL_PATH)/prebuilt/system/etc/apns-conf.xml:system/etc/apns-conf.xml
+
 # Hostapd
 PRODUCT_PACKAGES += \
     hostapd_cli \
