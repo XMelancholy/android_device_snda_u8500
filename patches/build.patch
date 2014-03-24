@@ -2,6 +2,7 @@
 #	modified:   build/core/Makefile
 #	new file:   build/core/tasks/kernel.mk
 #	modified:   build/target/product/full_base.mk
+#	modified:   build/target/product/full_base_telephony.mk
 #
 diff --git a/build/core/Makefile b/build/core/Makefile
 index 78b9f1e..dd46e7e 100644
@@ -464,3 +465,18 @@ index 6a702da..0ba1a9f 100644
      VideoEditor \
      WAPPushManager
  
+diff --git a/build/target/product/full_base_telephony.mk b/build/target/product/full_base_telephony.mk
+index 5899c8c..f7f86bf 100644
+--- a/build/target/product/full_base_telephony.mk
++++ b/build/target/product/full_base_telephony.mk
+@@ -26,8 +26,8 @@ PRODUCT_PROPERTY_OVERRIDES := \
+     keyguard.no_require_sim=true \
+     ro.com.android.dataroaming=true
+ 
+-PRODUCT_COPY_FILES := \
+-    device/generic/goldfish/data/etc/apns-conf.xml:system/etc/apns-conf.xml
++#PRODUCT_COPY_FILES := \
++#    device/generic/goldfish/data/etc/apns-conf.xml:system/etc/apns-conf.xml
+ 
+ $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
+ $(call inherit-product, $(SRC_TARGET_DIR)/product/telephony.mk)
