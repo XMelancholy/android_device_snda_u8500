@@ -45,6 +45,8 @@ PRODUCT_COPY_FILES += \
 # Configs
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/system/bin/zram_config.sh:system/bin/zram_config.sh \
+    $(LOCAL_PATH)/prebuilt/system/bin/sysinit:system/bin/sysinit \
+    $(LOCAL_PATH)/prebuilt/system/bin/busybox:system/bin/busybox \
     $(LOCAL_PATH)/prebuilt/system/lib/egl/egl.cfg:system/lib/egl/egl.cfg \
     $(LOCAL_PATH)/prebuilt/system/etc/media_codecs.xml:system/etc/media_codecs.xml \
     $(LOCAL_PATH)/prebuilt/system/etc/media_profiles.xml:system/etc/media_profiles.xml \
