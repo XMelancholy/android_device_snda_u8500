@@ -60,7 +60,7 @@ PRODUCT_COPY_FILES += \
 
 # BT Config
 PRODUCT_COPY_FILES += \
-    system/bluetooth/data/main.conf:system/etc/bluetooth
+    system/bluetooth/data/main.conf:system/etc/bluetooth/main.conf
 
 # Hostapd
 PRODUCT_PACKAGES += \
