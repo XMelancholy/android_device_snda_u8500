@@ -107,7 +107,7 @@ on post-fs-data
     chown root radio /data/misc/psdata/sterc_conf
     chown root radio /data/misc/psdata/sterc_conf_alt
 
-    # give system access to stepscc_conf
+    ## give system access to stepscc_conf
     copy -u /system/etc/psdata/stepscc_conf /data/misc/psdata/stepscc_conf
     chmod 0660 /data/misc/psdata/stepscc_conf
     chown root radio /data/misc/psdata/stepscc_conf
@@ -267,11 +267,6 @@ service admsrv /system/bin/admsrv
     group system audio inet net_bt net_bt_admin net_raw shell sdcard_rw
     ioprio rt 4
     capability NET_ADMIN NET_RAW SYS_NICE
-
-#service stedump /system/bin/logwrapper /system/bin/stedump
-#    class main
-#    user system
-#    group system audio inet net_bt net_bt_admin net_raw shell
 
 service ste-cg29xx_ctrl /system/bin/logwrapper /system/xbin/ste-cg29xx_ctrl -b 115200 -p 6 -l 23 -i /system/bin/cg2900-channel_init.sh /dev/ttyAMA0
     class main
