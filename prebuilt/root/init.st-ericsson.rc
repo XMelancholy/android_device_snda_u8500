@@ -306,7 +306,7 @@ service wpa_supplicant /system/bin/wpa_supplicant -dd -Dnl80211 -i wlan0 -c/data
     disabled
     oneshot
 
-service softap /system/bin/wpa_supplicant -dd -Dnl80211 -i wlan0 -c/data/misc/wifi/wpa_supplicant.conf
+service hostapd_bin /system/bin/hostapd -dd -Dnl80211 -i wlan0 -c/data/misc/wifi/hostapd.conf
     class main
     group wifi
     disabled
