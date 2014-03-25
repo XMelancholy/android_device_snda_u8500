@@ -28,7 +28,7 @@ ifeq ($(BOARD_WLAN_DEVICE), bcmdhd)
 L_CFLAGS += -DANDROID_P2P
 endif
 
-ifneq ($(USES_TI_MAC80211)$(BOARD_TI_SOFTAP),)
+ifeq ($(BOARD_HAVE_SNDA_WIFI),true)
 # Enable Android specific directory for control interface sockets
 L_CFLAGS += -DANDROID
 
@@ -36,12 +36,8 @@ L_CFLAGS += -DANDROID
 L_CFLAGS += -DCONFIG_CTRL_IFACE_CLIENT_DIR=\"/data/misc/wifi/sockets\"
 L_CFLAGS += -DCONFIG_CTRL_IFACE_DIR=\"/data/system/wpa_supplicant\"
 
-# Use Android specific directory for control interface sockets
-ifeq ($(USES_TI_MAC80211), true)
-L_CFLAGS += -DUSES_TI_MAC80211
-else
-L_CFLAGS += -DBOARD_TI_SOFTAP
-endif
+
+L_CFLAGS += -DSNDA_WIFI
 endif
 # To force sizeof(enum) = 4
 ifeq ($(TARGET_ARCH),arm)

@@ -14,9 +14,9 @@
 #include <sys/stat.h>
 #include <stddef.h>
 
-#if defined(USES_TI_MAC80211) || defined(BOARD_TI_SOFTAP)
+#ifdef SNDA_WIFI
 #include <cutils/sockets.h>
-#endif /* USES_TI_MAC80211 or BOARD_TI_SOFTAP*/
+#endif /* SNDA_WIFI*/
 
 #include "utils/common.h"
 #include "utils/eloop.h"
@@ -997,13 +997,13 @@ int hostapd_ctrl_iface_init(struct hostapd_data *hapd)
 	if (hapd->conf->ctrl_interface == NULL)
 		return 0;
 
-#if defined(USES_TI_MAC80211) || defined(BOARD_TI_SOFTAP)
+#ifdef SNDA_WIFI
         os_snprintf(addr.sun_path, sizeof(addr.sun_path), "wpa_%s",
                     hapd->conf->ctrl_interface);
         s = android_get_control_socket(addr.sun_path);
         if (s >= 0)
                 goto havesock;
-#endif /* USES_TI_MAC80211 or BOARD_TI_SOFTAP*/
+#endif /* SNDA_WIFI */
 
 	if (mkdir(hapd->conf->ctrl_interface, S_IRWXU | S_IRWXG) < 0) {
 		if (errno == EEXIST) {
@@ -1085,7 +1085,7 @@ int hostapd_ctrl_iface_init(struct hostapd_data *hapd)
 	}
 	os_free(fname);
 
-#if defined(USES_TI_MAC80211) || defined(BOARD_TI_SOFTAP)
+#ifdef SNDA_WIFI
 havesock:
 #endif /* USES_TI_MAC80211 or BOARD_TI_SOFTAP*/
 
