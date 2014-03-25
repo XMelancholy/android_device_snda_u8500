@@ -72,7 +72,7 @@ static int set_light_backlight (struct light_device_t *dev, struct light_state_t
 	pthread_mutex_unlock(&g_lock);
 	return err;
 }
-#ifdef 0
+#ifdef DISABLED
 static int set_light_buttons (struct light_device_t *dev, struct light_state_t const* state) {
     int err = 0;
 	int on = is_lit(state);
@@ -105,7 +105,7 @@ static int open_lights (const struct hw_module_t* module, char const* name,
 	if (0 == strcmp(LIGHT_ID_BACKLIGHT, name)) {
 		set_light = set_light_backlight;
 	}
-#ifdef 0
+#ifdef DISABLED
 	else if (0 == strcmp(LIGHT_ID_BUTTONS, name)) {
 		set_light = set_light_buttons;
 	}
