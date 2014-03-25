@@ -1,0 +1,116 @@
+#
+#	modified:   hardware/libhardware/include/hardware/fb.h
+#	modified:   hardware/libhardware/include/hardware/hwcomposer.h
+#
+diff --git a/hardware/libhardware/include/hardware/fb.h b/hardware/libhardware/include/hardware/fb.h
+index ba2f286..45c0393 100644
+--- a/hardware/libhardware/include/hardware/fb.h
++++ b/hardware/libhardware/include/hardware/fb.h
+@@ -42,18 +42,32 @@ typedef struct framebuffer_device_t {
+     const uint32_t  flags;
+ 
+     /* dimensions of the framebuffer in pixels */
++#ifdef STE_HARDWARE
++    uint32_t  width;
++    uint32_t  height;
++#else
+     const uint32_t  width;
+     const uint32_t  height;
++#endif
+ 
+     /* frambuffer stride in pixels */
++#ifdef STE_HARDWARE
++    int       stride;
++#else
+     const int       stride;
++#endif
+ 
+     /* framebuffer pixel format */
+     const int       format;
+ 
+     /* resolution of the framebuffer's display panel in pixel per inch*/
++#ifdef STE_HARDWARE
++    float     xdpi;
++    float     ydpi;
++#else
+     const float     xdpi;
+     const float     ydpi;
++#endif
+ 
+     /* framebuffer's display panel refresh rate in frames per second */
+     const float     fps;
+@@ -140,7 +154,26 @@ typedef struct framebuffer_device_t {
+      * Returns 0 on success or -errno on error.
+      */
+     int (*enableScreen)(struct framebuffer_device_t* dev, int enable);
++#ifdef STE_HARDWARE
++    /*
++     * Sets the number of degrees ccw the framebuffer shall be rotated before
++     * being sent to the display. This call may change the framebuffer's
++     * dimensions.
++     */
++    int (*rotate)(struct framebuffer_device_t* dev, unsigned int absolute_degree);
+ 
++    /*
++     * Informs gralloc about the UI rotation. This is needed in the mirroring use
++     * case to get the correct orientation on the external device, e.g. HDMI.
++     */
++    void (*UIRotationChange)(struct framebuffer_device_t* dev, int uiRotation);
++
++    /*
++     * Enables the mirroring of the main display content to an external device,
++     * e.g. HDMI.
++     */
++    void (*enableHDMIMirroring)(struct framebuffer_device_t* dev, int enable);
++#endif
+     void* reserved_proc[6];
+ 
+ } framebuffer_device_t;
+diff --git a/hardware/libhardware/include/hardware/hwcomposer.h b/hardware/libhardware/include/hardware/hwcomposer.h
+index 98e665c..89ba6a4 100644
+--- a/hardware/libhardware/include/hardware/hwcomposer.h
++++ b/hardware/libhardware/include/hardware/hwcomposer.h
+@@ -77,7 +77,21 @@ typedef struct hwc_methods {
+ 
+     int (*eventControl)(
+             struct hwc_composer_device* dev, int event, int enabled);
++#ifdef STE_HARDWARE
++    /*************************************************************************
++     * HWC_DEVICE_API_VERSION_0_3_STE
++     *************************************************************************/
+ 
++    /*
++     * This hook is vendor specific and optional.
++     *
++     * (*setParameter)() makes the hardware composer aware of the system state,
++     * e.g. hdmi plug status and ui rotation, so that it can make intelligent
++     * decisions on how to handle composed surfaces and cloning in the kernel.
++     */
++    int (*setParameter)(struct hwc_composer_device* dev,
++                int param, int value);
++#endif
+ } hwc_methods_t;
+ 
+ typedef struct hwc_rect {
+@@ -236,8 +250,19 @@ typedef struct hwc_procs {
+ typedef struct hwc_module {
+     struct hw_module_t common;
+ } hwc_module_t;
+-
+-
++#ifdef STE_HARDWARE
++/*
++ * names for setParameter()
++ */
++enum {
++    /* Specifies the UI orientation */
++    HWC_UI_ORIENTATION = 0x00000000,
++    /* Specifies if hardware rotation is used */
++    HWC_HARDWARE_ROTATION = 0x00000001,
++    /* Set the hdmi plug status */
++    HWC_HDMI_PLUGGED = 0x00000002,
++};
++#endif
+ typedef struct hwc_composer_device {
+     struct hw_device_t common;
+ 
