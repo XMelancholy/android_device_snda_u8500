@@ -308,7 +308,7 @@ service wpa_supplicant /system/bin/wpa_supplicant -dd -Dnl80211 -i wlan0 -c/data
 
 service hostapd_bin /system/bin/hostapd -dd -Dnl80211 -i wlan0 -c/data/misc/wifi/hostapd.conf
     class main
-    group wifi
+    socket wpa_wlan0 dgram 660 wifi wifi
     disabled
     oneshot
 
