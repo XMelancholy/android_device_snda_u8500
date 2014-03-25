@@ -1,10 +1,10 @@
 #
 #	modified:   system/netd/Android.mk
-#	modified:   system/netd/SoftapControllerTI.cpp
-#	modified:   system/netd/SoftapControllerTI.h
+#	new file:   system/netd/SoftapControllerTI.cpp
+#	new file:   system/netd/SoftapControllerTI.h
 #
 diff --git a/system/netd/Android.mk b/system/netd/Android.mk
-index 655038d..2df283c 100644
+index 655038d..e4c0807 100644
 --- a/system/netd/Android.mk
 +++ b/system/netd/Android.mk
 @@ -17,7 +17,6 @@ LOCAL_SRC_FILES:=                                      \
@@ -15,7 +15,7 @@ index 655038d..2df283c 100644
                    TetherController.cpp                 \
                    ThrottleController.cpp               \
                    oem_iptables_hook.cpp                \
-@@ -42,6 +41,11 @@ LOCAL_CFLAGS := -Werror=format
+@@ -42,8 +41,16 @@ LOCAL_CFLAGS := -Werror=format
  LOCAL_SHARED_LIBRARIES := libstlport libsysutils libcutils libnetutils \
                            libcrypto libhardware_legacy libmdnssd
  
@@ -26,7 +26,12 @@ index 655038d..2df283c 100644
 +endif
  ifneq ($(BOARD_HOSTAPD_DRIVER),)
    LOCAL_CFLAGS += -DHAVE_HOSTAPD
++  ifneq ($(BOARD_HOSTAPD_DRIVER_NAME),)
++    LOCAL_CFLAGS += -DHOSTAPD_DRIVER_NAME=\"$(BOARD_HOSTAPD_DRIVER_NAME)\"
++  endif
  endif
+ 
+ ifeq ($(BOARD_HAVE_BLUETOOTH),true)
 diff --git a/system/netd/SoftapControllerTI.cpp b/system/netd/SoftapControllerTI.cpp
 new file mode 100644
 index 0000000..2f62c49
