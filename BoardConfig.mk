@@ -33,7 +33,6 @@ BOARD_USES_ALSA_AUDIO := true
 
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
-BOARD_HAVE_BLUETOOTH_STE := true
 
 # Camera
 USE_CAMERA_STUB := true
