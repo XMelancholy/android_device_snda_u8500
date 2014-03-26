@@ -1,7 +1,12 @@
 #
 #	modified:   build/core/Makefile
+#	modified:   build/core/build_id.mk
+#	modified:   build/core/java.mk
 #	modified:   build/core/pathmap.mk
+#	modified:   build/core/product.mk
+#	modified:   build/core/product_config.mk
 #	new file:   build/core/tasks/kernel.mk
+#	modified:   build/core/user_tags.mk
 #	modified:   build/target/product/full_base.mk
 #	modified:   build/target/product/full_base_telephony.mk
 #
@@ -281,6 +286,29 @@ index 78b9f1e..dd46e7e 100644
  	   -s $(extensions) \
  	   -p $(HOST_OUT) \
  	   $(BUILT_TARGET_FILES_PACKAGE) $@
+diff --git a/build/core/build_id.mk b/build/core/build_id.mk
+index f2d48de..d0950ea 100644
+--- a/build/core/build_id.mk
++++ b/build/core/build_id.mk
+@@ -19,4 +19,4 @@
+ # (like "CRB01").  It must be a single word, and is
+ # capitalized by convention.
+ 
+-export BUILD_ID=JZO54M
++export BUILD_ID=XianGxin
+diff --git a/build/core/java.mk b/build/core/java.mk
+index 9a4f3a2..437fc08 100644
+--- a/build/core/java.mk
++++ b/build/core/java.mk
+@@ -43,7 +43,7 @@ ifneq ($(LOCAL_SDK_VERSION),)
+   endif
+ else
+   ifneq ($(LOCAL_NO_STANDARD_LIBRARIES),true)
+-    LOCAL_JAVA_LIBRARIES := core core-junit ext framework $(LOCAL_JAVA_LIBRARIES)
++    LOCAL_JAVA_LIBRARIES := core core-junit ext framework framework2 $(LOCAL_JAVA_LIBRARIES)
+   endif
+ endif
+ 
 diff --git a/build/core/pathmap.mk b/build/core/pathmap.mk
 index 91a7fd4..ab55fd6 100644
 --- a/build/core/pathmap.mk
@@ -293,6 +321,32 @@ index 91a7fd4..ab55fd6 100644
  	 )
  
  #
+diff --git a/build/core/product.mk b/build/core/product.mk
+index d9e4186..84a7869 100644
+--- a/build/core/product.mk
++++ b/build/core/product.mk
+@@ -60,6 +60,7 @@ endef
+ #
+ 
+ _product_var_list := \
++    PRODUCT_BUILD_PROP_OVERRIDES \
+     PRODUCT_NAME \
+     PRODUCT_MODEL \
+     PRODUCT_LOCALES \
+diff --git a/build/core/product_config.mk b/build/core/product_config.mk
+index ea3e517..dd30658 100644
+--- a/build/core/product_config.mk
++++ b/build/core/product_config.mk
+@@ -297,6 +297,9 @@ PRODUCT_PROPERTY_OVERRIDES := \
+ PRODUCT_DEFAULT_PROPERTY_OVERRIDES := \
+     $(strip $(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_DEFAULT_PROPERTY_OVERRIDES))
+ 
++PRODUCT_BUILD_PROP_OVERRIDES := \
++	$(strip $(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_BUILD_PROP_OVERRIDES))
++
+ # Should we use the default resources or add any product specific overlays
+ PRODUCT_PACKAGE_OVERLAYS := \
+     $(strip $(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_PACKAGE_OVERLAYS))
 diff --git a/build/core/tasks/kernel.mk b/build/core/tasks/kernel.mk
 new file mode 100644
 index 0000000..81a1916
@@ -462,6 +516,18 @@ index 0000000..81a1916
 +
 +ALL_PREBUILT += $(INSTALLED_KERNEL_TARGET)
 +endif
+diff --git a/build/core/user_tags.mk b/build/core/user_tags.mk
+index 24f563d..4beb54a 100644
+--- a/build/core/user_tags.mk
++++ b/build/core/user_tags.mk
+@@ -123,6 +123,7 @@ GRANDFATHERED_USER_MODULES += \
+ 	exc_dump \
+ 	fastboot \
+ 	framework \
++	framework2 \
+ 	FrameworkCoreHostTests \
+ 	frameworks-core-util-lib \
+ 	fsck_msdos \
 diff --git a/build/target/product/full_base.mk b/build/target/product/full_base.mk
 index 6a702da..0ba1a9f 100644
 --- a/build/target/product/full_base.mk
