@@ -17,6 +17,7 @@
 
 	patch -p1 < device/snda/u8500/patches/build.patch
 	patch -p1 < device/snda/u8500/patches/frameworks_av.patch
+	patch -p1 < device/snda/u8500/patches/frameworks_base.patch
 	patch -p1 < device/snda/u8500/patches/frameworks_native.patch
 	patch -p1 < device/snda/u8500/patches/hardware_libhardware.patch
 	patch -p1 < device/snda/u8500/patches/hardware_libhardware_legacy.patch
@@ -28,6 +29,7 @@
     还原
 	patch -p1 -R < device/snda/u8500/patches/build.patch
 	patch -p1 -R < device/snda/u8500/patches/frameworks_av.patch
+	patch -p1 -R < device/snda/u8500/patches/frameworks_base.patch
 	patch -p1 -R < device/snda/u8500/patches/frameworks_native.patch
 	patch -p1 -R < device/snda/u8500/patches/hardware_libhardware.patch
 	patch -p1 -R < device/snda/u8500/patches/hardware_libhardware_legacy.patch

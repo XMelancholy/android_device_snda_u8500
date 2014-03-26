@@ -1,5 +1,6 @@
 #
 #	modified:   build/core/Makefile
+#	modified:   build/core/pathmap.mk
 #	new file:   build/core/tasks/kernel.mk
 #	modified:   build/target/product/full_base.mk
 #	modified:   build/target/product/full_base_telephony.mk
@@ -280,6 +281,18 @@ index 78b9f1e..dd46e7e 100644
  	   -s $(extensions) \
  	   -p $(HOST_OUT) \
  	   $(BUILT_TARGET_FILES_PACKAGE) $@
+diff --git a/build/core/pathmap.mk b/build/core/pathmap.mk
+index 91a7fd4..ab55fd6 100644
+--- a/build/core/pathmap.mk
++++ b/build/core/pathmap.mk
+@@ -101,6 +101,7 @@ FRAMEWORKS_BASE_SUBDIRS := \
+ 	    keystore \
+ 	    icu4j \
+ 	    voip \
++	    fmradio \
+ 	 )
+ 
+ #
 diff --git a/build/core/tasks/kernel.mk b/build/core/tasks/kernel.mk
 new file mode 100644
 index 0000000..81a1916
