@@ -74,7 +74,7 @@ TARGET_PROVIDES_INIT_RC := true
 BOARD_CUSTOM_BOOTIMG_MK := device/snda/u8500/mkbootimg.mk
 
 # UMS
-BOARD_UMS_LUNFILE := "/sys/devices/soc0/musb-ux500.0/musb-hdrc/gadget/lun%d/file"
+BOARD_UMS_LUNFILE := "/sys/devices/soc0/musb-ux500.0/musb-hdrc/gadget/lun0/file"
 TARGET_USE_CUSTOM_LUN_FILE_PATH := "/sys/devices/soc0/musb-ux500.0/musb-hdrc/gadget/lun%d/file"
 
 # OTA
