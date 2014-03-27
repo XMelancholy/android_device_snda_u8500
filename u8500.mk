@@ -114,7 +114,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
    persist.sys.usb.config=mass_storage,acm,adb \
    ro.sf.lcd_density=240 \
    wifi.interface=wlan0
-#   ro.sf.hwrotation=0 \
 
 
 # This device is xhdpi.  However the platform doesn't

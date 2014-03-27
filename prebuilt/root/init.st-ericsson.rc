@@ -42,8 +42,6 @@ on fs
     # checks the factory reset triggers in sysfs and CSPSA and then formats
     # the block device belonging to /data.
     start cspsa
-    #exec /system/bin/logwrapper /system/bin/factoryreset -f /sys/devices/soc0/reset_reason -r factory-reset -c CSPSA0 -p 0xfffffffc:31 /dev/block/mmcblk0p5
-
 
 on post-fs
 
@@ -131,13 +129,9 @@ on post-fs-data
 
     # Setup paths used for socket communication with the wpa supplicant.
     mkdir /data/system 0775 system system
-    #mkdir /data/system/wpa_supplicant 0770 wifi wifi
     chown system system /data/system
-    #chown wifi wifi /data/system/wpa_supplicant
 
-    #mkdir /data/misc/wifi 0770 wifi wifi
     mkdir /data/misc/wifi/sockets 0770 wifi wifi
-    #chmod 0770 /data/misc/wifi/sockets
     chown wifi wifi /data/misc/wifi/sockets
 
     # give system access to wpa_supplicant.conf for backup and restore
@@ -164,9 +158,6 @@ on post-fs-data
 
 on early-boot
 
-    # Launch core services in case charging mode is entered
-    #start watchdog-kicker
-
     # Prepare modem
     class_start modem-u8500
     class_start modem-core
@@ -181,26 +172,12 @@ on boot
     # Set timeout value for rmnet stats.
     write /sys/devices/virtual/net/rmnet0/timeout_suspend 5000000
 
-    #chown system system /sys/class/leds/lp5521_pri:channel0/brightness
-    #chown system system /sys/class/leds/lp5521_pri:channel1/brightness
-    #chown system system /sys/class/leds/lp5521_pri:channel2/brightness
-    #chown system system /sys/class/leds/lp5521_pri:channel0/device/engine1_load
-    #chown system system /sys/class/leds/lp5521_pri:channel0/device/engine2_load
-    #chown system system /sys/class/leds/lp5521_pri:channel0/device/engine3_load
-    #chown system system /sys/class/leds/lp5521_pri:channel0/device/engine1_mode
-    #chown system system /sys/class/leds/lp5521_pri:channel0/device/engine2_mode
-    #chown system system /sys/class/leds/lp5521_pri:channel0/device/engine3_mode
-    #chown system system /sys/class/i2c-dev/i2c-2/device/2-005c/enable
-    #chown system system /sys/class/i2c-dev/i2c-2/device/2-0029/power_state
     chown system system /sys/class/i2c-dev/i2c-2/device/2-001e/iio:device2/mode
     chown system system /sys/class/i2c-dev/i2c-2/device/2-001e/iio:device2/sampling_frequency
     chown system system /sys/class/i2c-dev/i2c-2/device/2-001e/iio:device2/magn_raw
     chown system system /sys/class/i2c-dev/i2c-2/device/2-001e/iio:device2/in_magn_x_scale
     chown system system /sys/class/i2c-dev/i2c-2/device/2-001e/iio:device2/in_magn_y_scale
     chown system system /sys/class/i2c-dev/i2c-2/device/2-001e/iio:device2/in_magn_z_scale
-    #chown system system /sys/class/i2c-dev/i2c-2/device/2-0018/iio:device0/mode
-    #chown system system /sys/class/i2c-dev/i2c-2/device/2-0018/iio:device0/in_accel_scale
-    #chown system system /sys/class/i2c-dev/i2c-2/device/2-0018/iio:device0/sampling_frequency
     chown system system /sys/class/i2c-dev/i2c-2/device/2-0019/iio:device0/mode
     chown system system /sys/class/i2c-dev/i2c-2/device/2-0019/iio:device0/in_accel_scale
     chown system system /sys/class/i2c-dev/i2c-2/device/2-0019/iio:device0/accel_raw
@@ -242,9 +219,6 @@ on boot
 
     # Define support for SIM card hot swap
     setprop icc.hotswap supported
-
-    # Define interface name for wlan
-    #setprop wifi.interface wlan0
 
     # Install cw1200_core WLAN module
     insmod /system/lib/modules/cw1200_core.ko
@@ -297,11 +271,6 @@ service copsd /system/bin/copsdaemon
     class modem-core
     user root
     group system
-
-# Modem_log_relay
-#service modem_log_relay /system/bin/modem_log_relay --ctrl_port=2001 --data_port=2002 --inv_port=2003 --report_port=2005
-#    class modem
-#    user root
 
 service admsrv /system/bin/admsrv
     class main
@@ -440,14 +409,6 @@ service mad /system/bin/ste_mad
     user radio
     group radio dbus_access misc
 
-
-#service battery_params /system/xbin/battery_params
-#    class main
-#    user system
-#    group system
-#    oneshot
-
 service usbid_init /system/bin/usbid_init.sh
     class main
     oneshot
-
