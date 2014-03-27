@@ -112,10 +112,9 @@ PRODUCT_PACKAGES += \
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \
    media.aac_51_output_enabled=1 \
-   persist.sys.usb.config=mass_storage,acm,adb \
+   persist.sys.usb.config=mtp,adb \
    ro.sf.lcd_density=240 \
    wifi.interface=wlan0
-
 
 # This device is xhdpi.  However the platform doesn't
 # currently contain all of the bitmaps at xhdpi density so
