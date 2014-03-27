@@ -120,6 +120,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     copybit.montblanc
 
+# libsensors
+PRODUCT_PACKAGES += \
+    sensors.montblanc
+
 # libblt_hw
 PRODUCT_PACKAGES += \
     libblt_hw
