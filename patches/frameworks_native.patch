@@ -766,7 +766,7 @@ index 4062340..c4bb008 100644
              recomputeVisibleRegions = true;
              return;
 diff --git a/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp b/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
-index 51fcce4..f964999 100644
+index 51fcce4..b9e1f75 100644
 --- a/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
 +++ b/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
 @@ -445,7 +445,9 @@ void SurfaceFlinger::onMessageReceived(int32_t what)
@@ -795,7 +795,7 @@ index 51fcce4..f964999 100644
              glClear(GL_COLOR_BUFFER_BIT);
          } else {
              // screen is already cleared here
-+#ifdef STE_HARDWARE
++#ifndef STE_HARDWARE
              if (!mWormholeRegion.isEmpty()) {
                  // can happen with SurfaceView
                  drawWormhole();
