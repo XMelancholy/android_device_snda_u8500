@@ -6,16 +6,9 @@ bin/chargemode
 bin/cn_server
 bin/cops_cmd
 bin/copsdaemon
-#bin/cspsa2nwm
 bin/cspsa-server
-#bin/cspsa-cmd
-#bin/nwm2cspsa
-#bin/factoryreset
-#bin/flash_test
-#bin/ite_nmf
 bin/lbsd
 bin/lbsstelp
-#bin/modem_log_relay
 bin/modem-supervisor
 bin/msa
 bin/psccd
@@ -35,7 +28,6 @@ etc/adm.sqlite-u9540_ab9540_v1
 etc/AT/manuf_id.cfg
 etc/AT/model_id.cfg
 etc/AT/system_id.cfg
-#etc/firmware/av8100.fw
 etc/firmware/CG29XX_0200_patch.fw
 etc/firmware/CG29XX_0200_settings.fw
 etc/firmware/CG29XX_0700_patch.fw
@@ -107,7 +99,6 @@ lib/libalsactrl.so
 lib/libals.so
 lib/libarchive.so
 lib/libarchive_fe.so
-#lib/libasf.so
 lib/libbassapp.so
 lib/libblt_hw.so
 lib/libcamera_flash.so
@@ -231,7 +222,6 @@ usr/share/camera/config_file/omnivision_ov5640_pri_l8540.dat
 usr/share/camera/config_file/omnivision_ov5640_sec.dat
 usr/share/camera/config_file/omnivision_ov5640_sec_l8540.dat
 usr/share/camera/config_file/sony_isx006.dat
-#usr/share/camera/st_readHwReg.ko
 usr/share/camera/isp_fw/libste_isp8500_firmware_IMX072_primary.so
 usr/share/camera/isp_fw/libste_isp8500_firmware_IMX072_secondary.so
 usr/share/camera/tuning/ChrLin-010045.nmx
@@ -250,8 +240,6 @@ usr/share/camera/tuning/TunVidPre-010045.xml
 usr/share/camera/tuning/TunVidPre-020045.xml
 usr/share/camera/tuning/TunVidRec-010045.xml
 usr/share/camera/tuning/TunVidRec-020045.xml
-#usr/share/mm-valid/imaging/ite_nmf/script/postlogelementsewarp.pl
-#usr/share/mm-valid/imaging/ite_nmf/script/setup_sdcard
 usr/share/nmf/repository/mmdsp_8500_v2/_ev/common/portstate.elf4nmf
 usr/share/nmf/repository/mmdsp_8500_v2/_ev/emptythisbuffer.elf4nmf
 usr/share/nmf/repository/mmdsp_8500_v2/_ev/eventhandler.elf4nmf
@@ -554,5 +542,4 @@ usr/share/charge/res/pic_3.rle
 usr/share/charge/res/pic_4.rle
 usr/share/charge/res/pic_5.rle
 usr/share/charge/res/snda.rle
-#xbin/battery_params
 xbin/ste-cg29xx_ctrl
