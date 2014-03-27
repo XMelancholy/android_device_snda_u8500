@@ -117,6 +117,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     hwcomposer.montblanc
 
+# libcopybit
+PRODUCT_PACKAGES += \
+    copybit.montblanc
+
 # libblt_hw
 PRODUCT_PACKAGES += \
     libblt_hw
