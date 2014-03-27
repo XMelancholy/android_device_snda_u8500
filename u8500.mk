@@ -113,7 +113,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
    media.aac_51_output_enabled=1 \
    persist.sys.usb.config=mass_storage,acm,adb \
    ro.sf.lcd_density=240 \
-   ro.sf.hwrotation=0
+   wifi.interface=wlan0
+#   ro.sf.hwrotation=0 \
 
 
 # This device is xhdpi.  However the platform doesn't
