@@ -113,6 +113,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     gralloc.montblanc
 
+# libhwcomposer
+PRODUCT_PACKAGES += \
+    hwcomposer.montblanc
+
 # libblt_hw
 PRODUCT_PACKAGES += \
     libblt_hw
