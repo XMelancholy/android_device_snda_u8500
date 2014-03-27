@@ -35,7 +35,8 @@ char const *const BUTTON_BACKLIGHT_FILE =  "/sys/class/leds/button-backlight/bri
 static pthread_once_t g_init = PTHREAD_ONCE_INIT;
 static pthread_mutex_t g_lock = PTHREAD_MUTEX_INITIALIZER;
 
-static int write_int (const char *path, int value) {
+static int write_int (const char *path, int value)
+{
 	int fd;
 	static int already_warned = 0;
 
@@ -56,36 +57,38 @@ static int write_int (const char *path, int value) {
 	return written == -1 ? -errno : 0;
 }
 
-static int is_lit (struct light_state_t const* state) {
+static int is_lit (struct light_state_t const* state)
+{
 	return state->color & 0x00ffffff;
 }
 
-static int rgb_to_brightness (struct light_state_t const* state) {
+static int rgb_to_brightness (struct light_state_t const* state)
+{
 	int color = state->color & 0x00ffffff;
 	return ((77*((color>>16)&0x00ff))
 			+ (150*((color>>8)&0x00ff)) + (29*(color&0x00ff))) >> 8;
 }
 
-static int set_light_backlight (struct light_device_t *dev, struct light_state_t const *state) {
+static int set_light_backlight (struct light_device_t *dev, struct light_state_t const *state)
+{
+	int err = 0;
+	int brightness = rgb_to_brightness(state);
 	pthread_mutex_lock(&g_lock);
-	int err = write_int(LCD_BACKLIGHT_FILE, rgb_to_brightness(state));
+	err = write_int(LCD_BACKLIGHT_FILE, brightness);
 	pthread_mutex_unlock(&g_lock);
 	return err;
 }
-#ifdef DISABLED
-static int set_light_buttons (struct light_device_t *dev, struct light_state_t const* state) {
-    int err = 0;
+
+static int set_light_buttons (struct light_device_t *dev, struct light_state_t const* state)
+{
+	int err = 0;
 	int on = is_lit(state);
 	pthread_mutex_lock(&g_lock);
-    if(is_lit(state))
-        err = write_int(BUTTON_BACKLIGHT_FILE, 1);
-    else
-        err = write_int(BUTTON_BACKLIGHT_FILE, 0);
+	err = write_int(BUTTON_BACKLIGHT_FILE, on?180:0);
 	pthread_mutex_unlock(&g_lock);
-
-	return 0;
+	return err;
 }
-#endif
+
 void init_globals () {
 	pthread_mutex_init (&g_lock, NULL);
 }
@@ -105,11 +108,9 @@ static int open_lights (const struct hw_module_t* module, char const* name,
 	if (0 == strcmp(LIGHT_ID_BACKLIGHT, name)) {
 		set_light = set_light_backlight;
 	}
-#ifdef DISABLED
 	else if (0 == strcmp(LIGHT_ID_BUTTONS, name)) {
 		set_light = set_light_buttons;
 	}
-#endif
 	else {
 		return -EINVAL;
 	}
