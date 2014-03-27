@@ -48,7 +48,9 @@
 #define HWMEM_PATH ("/dev/" HWMEM_DEFAULT_DEVICE_NAME)
 #define COMPDEV_PATH "/dev/comp0"
 
+#ifdef ENABLE_HDMI
 #define HDMID_SOCKET_LISTEN_PATH "/dev/socket/hdmid"
+#endif
 
 /*
  * Only 2 buffers are needed, one for blitting and one for display HW.
@@ -60,12 +62,14 @@
 #define CACHED_LAYERS_SIZE 16
 
 
+#ifdef ENABLE_HDMI
 typedef struct hwc_hdmi_setting {
     bool                 hdmi_plugged;
     bool                 resolutionchanged;
     int                  hdmid_sockfd;
     struct compdev_rect  res;
 } hwc_hdmi_settings_t;
+#endif
 
 static int hwcomposer_device_open(const struct hw_module_t *module,
         const char *name, struct hw_device_t **device);
@@ -139,7 +143,9 @@ struct hwcomposer_context {
     int overlay_layers;
     int framebuffer_layers;
 #endif
+#ifdef ENABLE_HDMI
     hwc_hdmi_settings_t hdmi_settings;
+#endif
     bool pending_rotation;
     buffer_handle_t *cached_layers;
     size_t cached_layers_count;
@@ -562,6 +568,7 @@ static bool bufferIsHWMEM(const struct gralloc_module_t *gralloc,
     return ret;
 }
 
+#ifdef ENABLE_HDMI
 static void get_hdmi_resolution(__u16 width, __u16 height,
         struct compdev_rect *hdmi_res)
 {
@@ -739,6 +746,7 @@ int open_hdmid_socket(void)
 exit:
     return ret;
 }
+#endif
 
 
 /*initializes and clears the layers_cache, also used for clearing the cache */
@@ -953,19 +961,24 @@ static int hwcomposer_prepare(struct hwc_composer_device *dev, hwc_layer_list_t*
                     __u16 height;
                     struct compdev_rect hdmi_res;
 
+#ifdef ENABLE_HDMI
                     /* Video layer found */
                     ctx->videoplayback = true;
                     if (ctx->hdmi_settings.resolutionchanged ||
                             !ctx->hdmi_settings.hdmi_plugged)
                         break;
+#endif
 
                     /* Convert to known resolution */
                     width = ctx->gralloc->perform(ctx->gralloc,
                             GRALLOC_MODULE_PERFORM_GET_BUF_WIDTH, layer->handle);
                     height = ctx->gralloc->perform(ctx->gralloc,
                             GRALLOC_MODULE_PERFORM_GET_BUF_HEIGHT, layer->handle);
+#ifdef ENABLE_HDMI
                     get_hdmi_resolution(width, height, &hdmi_res);
+#endif
 
+#ifdef ENABLE_HDMI
                     /* Update hdmid with information on preferred resolution */
                     if (ctx->hdmi_settings.res.width != hdmi_res.width ||
                             ctx->hdmi_settings.res.height != hdmi_res.height) {
@@ -980,6 +993,7 @@ static int hwcomposer_prepare(struct hwc_composer_device *dev, hwc_layer_list_t*
                         ctx->hdmi_settings.res.height = hdmi_res.height;
                         ctx->hdmi_settings.resolutionchanged = true;
                     }
+#endif
                 }
             }
 
@@ -1141,6 +1155,7 @@ static int hwcomposer_prepare(struct hwc_composer_device *dev, hwc_layer_list_t*
     }
 #endif
 
+#ifdef ENABLE_HDMI
     if ((!ctx->videoplayback || !ctx->hdmi_settings.hdmi_plugged) &&
             ctx->hdmi_settings.resolutionchanged) {
         /* Send a request to HDMIDaemon to update the resolution */
@@ -1153,6 +1168,7 @@ static int hwcomposer_prepare(struct hwc_composer_device *dev, hwc_layer_list_t*
         ctx->hdmi_settings.res.width = 0;
         ctx->hdmi_settings.res.height = 0;
     }
+#endif
 
 exit:
     pthread_mutex_unlock(&ctx->hwc_mutex);
@@ -1330,9 +1346,11 @@ static int hwcomposer_setparameter(struct hwc_composer_device *dev,
             ctx->hardware_rotation = value;
             ctx->pending_rotation = true;
             break;
+#ifdef ENABLE_HDMI
         case HWC_HDMI_PLUGGED:
             ctx->hdmi_settings.hdmi_plugged = value > 0 ? true : false;
             break;
+#endif
         default:
             ALOGI_IF(DEBUG_STE_HWCOMPOSER, "%s: No such parameter: %d",
                     __func__, param);
@@ -1631,7 +1649,9 @@ static int hwcomposer_close(struct hw_device_t *dev)
 
         close(ctx->compdev);
         close(ctx->hwmem);
+#ifdef ENABLE_HDMI
         close(ctx->hdmi_settings.hdmid_sockfd);
+#endif
 
         if (ctx->cached_layers != NULL)
             free(ctx->cached_layers);
@@ -1716,9 +1736,11 @@ static int hwcomposer_device_open(const struct hw_module_t *module,
             goto worker_error;
         }
 
+#ifdef ENABLE_HDMI
         ctx->hdmi_settings.hdmid_sockfd = open_hdmid_socket();
         if (ctx->hdmi_settings.hdmid_sockfd < 0)
             ALOGE("Failed to open communication channel to hdmid");
+#endif
 
         *device = &ctx->dev.common;
         pthread_mutex_unlock(&ctx->hwc_mutex);
