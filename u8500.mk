@@ -109,6 +109,14 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    lights.montblanc
    
+# libgralloc
+PRODUCT_PACKAGES += \
+    gralloc.montblanc
+
+# libblt_hw
+PRODUCT_PACKAGES += \
+    libblt_hw
+
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \
    media.aac_51_output_enabled=1 \
