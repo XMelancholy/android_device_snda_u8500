@@ -26,7 +26,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include "vsync_monitor.h"
-#include "../libgralloc/gralloc_stericsson_ext.h"
+#include "gralloc_stericsson_ext.h"
 #include "../include/hwmem.h"
 #include "../include/compdev.h"
 
