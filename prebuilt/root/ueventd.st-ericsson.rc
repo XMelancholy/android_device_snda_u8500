@@ -51,4 +51,6 @@
 
 # Trusted Eexecution Engine
 /dev/tee                  0666   root       system
+
+# wifi tethering
 /dev/rfkill               0660   wifi       wifi
