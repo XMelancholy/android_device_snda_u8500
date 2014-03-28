@@ -290,6 +290,7 @@ static int activate_gyr(int enable)
 	return ret;
 }
 
+#ifdef TSL27713_SENSOR
 static int tslFd = -1;
 static int power_on_tsl27713()
 {
@@ -415,6 +416,96 @@ static int activate_prox(int enable)
 	
 	return ret;
 }
+#else
+
+static int activate_lux(int enable)
+{
+	int ret = -1;
+	pthread_attr_t attr;
+	pthread_t lux_thread = -1;
+
+	if (enable) {
+		if (count_lux == 0) {
+			ret = write_cmd(PATH_POWER_LUX, BH1780GLI_ENABLE, 2);
+
+			if (ret != -ENODEV) {
+				lux_thread_exit = 0;
+				pthread_attr_init(&attr);
+				/*
+				 * Create thread in detached state, so that we
+				 * need not join to clear its resources
+				 */
+				pthread_attr_setdetachstate(&attr,
+						PTHREAD_CREATE_DETACHED);
+				ret = pthread_create(&lux_thread, &attr,
+						lux_getdata, NULL);
+				pthread_attr_destroy(&attr);
+				count_lux++;
+			}
+		} else {
+			count_lux++;
+		}
+	} else {
+		if (count_lux == 0)
+			return 0;
+		count_lux--;
+		if (count_lux == 0) {
+			/*
+			 * Enable lux_thread_exit to exit the thread
+			 */
+			lux_thread_exit = 1;
+			write_cmd(PATH_POWER_LUX, BH1780GLI_DISABLE, 2);
+		}
+	}
+	return ret;
+}
+
+
+static int activate_prox(int enable)
+{
+	int ret = -1;
+	pthread_attr_t attr;
+	pthread_t prox_thread = -1;
+
+	if (enable) {
+		if (count_prox == 0) {
+			/*
+			 * check for the file path
+			 * Initialize prox_thread_exit flag
+			 * every time thread is created
+			 */
+			if ((ret = open(PATH_INTR_PROX, O_RDONLY)) < 0)
+				return ret;
+			close(ret);
+			prox_thread_exit = 0;
+			pthread_attr_init(&attr);
+			/*
+			 * Create thread in detached state, so that we
+			 * need not join to clear its resources
+			 */
+			pthread_attr_setdetachstate(&attr,
+					PTHREAD_CREATE_DETACHED);
+			ret = pthread_create(&prox_thread, &attr,
+					proximity_getdata, NULL);
+			pthread_attr_destroy(&attr);
+			count_prox++;
+		} else {
+			count_prox++;
+		}
+	} else {
+		if (count_prox == 0)
+			return 0;
+		count_prox--;
+		if (count_prox == 0) {
+			/*
+			 * Enable prox_thread_exit to exit the thread
+			 */
+			prox_thread_exit = 1;
+		}
+	}
+	return ret;
+}
+#endif
 
 static int activate_orientation(int enable)
 {
@@ -884,6 +975,7 @@ void *orien_getdata()
 	return NULL;
 }
 
+#ifdef TSL27713_SENSOR
 Sensor_lux stlux_val;
 
 static int poll_light(sensors_event_t *values)
@@ -999,10 +1091,10 @@ void *proximity_getdata()
 						}
 						pthread_mutex_unlock( &mutex_proxval );
 					}
-//#ifdef DYRON_DEUBG_TSL27713					
+#ifdef DYRON_DEUBG_TSL27713
 					ALOGD("%s: tsl27713 type = %#x, MISC = %#x   DISTANCE = %#x, val = %#x==============", 
 						__func__, ev.type == EV_ABS, ev.code == ABS_MISC, ev.code == ABS_DISTANCE, ev.value);
-//#endif
+#endif
 				}
 			}
 		}
@@ -1012,6 +1104,88 @@ void *proximity_getdata()
 	   ALOGD("\n /dev/input/event0 is not a valid device");
 	return NULL;
 }
+#else
+static int poll_light(sensors_event_t *values)
+{
+	int fd;
+	char buf[8];
+	float reading;
+	int ret;
+
+	fd = open(PATH_DATA_LUX, O_RDONLY);
+	if (fd < 0) {
+		ALOGE("Error in opening %s file", PATH_DATA_LUX);
+		return -ENODEV;
+	}
+	memset(buf, 0x00, sizeof(buf));
+	lseek(fd, 0, SEEK_SET);
+	read(fd, buf, 8);
+	reading = atof(buf);
+
+	/* make assignment only when activated and value has changed*/
+	if ((last_light_data != reading) && (count_lux)) {
+		values->type = SENSOR_TYPE_LIGHT;
+		values->sensor = HANDLE_LIGHT;
+		values->light = reading;
+		last_light_data = reading;
+		values->version = sizeof(struct sensors_event_t);
+		ret = 0;
+	} else {
+		ret = -1;
+	}
+
+	close(fd);
+	return ret;
+}
+
+void *proximity_getdata()
+{
+	int fd = -1,retval = -1;
+	fd_set read_set;
+	struct input_event ev;
+	struct timeval tv;
+	int size = sizeof(struct input_event);
+	sensors_event_t data;
+
+	/* Initialize the structures */
+	memset(&ev, 0x00, sizeof(ev));
+	memset(&tv, 0x00, sizeof(tv));
+	/* open input device */
+	if ((fd = open(PATH_INTR_PROX, O_RDONLY)) > 0) {
+		while (!prox_thread_exit) {
+			/* Intialize the read descriptor */
+			FD_ZERO(&read_set);
+			FD_SET(fd,&read_set);
+			/* Wait up to 0.5 seconds. */
+			tv.tv_sec = 0 ;
+			tv.tv_usec = 500000;
+			retval = select(fd+1, &read_set, NULL, NULL, &tv);
+			if (retval > 0 && count_prox) {
+				/* FD_ISSET(0, &rfds) will be true. */
+				if (FD_ISSET(fd, &read_set)) {
+					read(fd, &ev, size );
+					if (11 == ev.code) {
+						data.sensor = HANDLE_PROXIMITY;
+						data.type = SENSOR_TYPE_PROXIMITY;
+						data.version = sizeof(struct sensors_event_t);
+						if (ev.value == 1)
+							data.distance = 0.0f;
+						else
+							data.distance = 50.0f;
+						/* queue the element */
+						add_queue(HANDLE_PROXIMITY, data);
+					}
+				}
+			}
+		}
+		close(fd);
+	}
+	else
+	   ALOGD("STE libsensors: /dev/input/event0 is not a valid device\n");
+	return NULL;
+}
+
+#endif
 
 void *lux_getdata()
 {
@@ -1084,6 +1258,7 @@ static void set_accel_path()
 	 * check the board and Accelerometer CHIP ID
 	 * and set the paths accordingly
 	 */
+#ifdef SENSORS_U8500
 	if (acc_id == LSM303DLH_CHIP_ID) {
 		strncpy(sensor_data.path_mode, PATH_MODE_ACC, (MAX_LENGTH - 1));
 		strncpy(sensor_data.path_range, PATH_RANGE_ACC, (MAX_LENGTH - 1));
@@ -1096,6 +1271,7 @@ static void set_accel_path()
 		strncpy(sensor_data.path_data, PATH_DATA_DLHC_ACC, (MAX_LENGTH - 1));
 		strcpy(sensor_data.magn_range, LSM303DLHC_M_RANGE_4_0G);
 	}
+#endif
 }
 
 static int m_open_sensors(const struct hw_module_t *module,
