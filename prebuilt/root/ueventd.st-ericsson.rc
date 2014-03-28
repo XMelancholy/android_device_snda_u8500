@@ -41,7 +41,7 @@
 /dev/clone0               0666   system     graphics
 
 # Taos ambient light and proximity sensors
-/dev/tsl27713                    0666   system     system
+/dev/tsl27713             0666   system     system
 
 # AT USB device - used by ATC
 /dev/ttyGS0               0060   root       radio
