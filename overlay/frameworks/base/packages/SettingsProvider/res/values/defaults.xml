@@ -21,9 +21,6 @@
     <bool name="def_screen_brightness_automatic_mode">true</bool>
 
     <fraction name="def_window_animation_scale">0%</fraction>
-    <fraction name="def_window_transition_scale">0%</fraction>
-
-    <!-- disable gps -->
-    <string name="def_location_providers_allowed" translatable="false">null</string>
+    <fraction name="def_window_transition_scale">100%</fraction>
 
 </resources>
