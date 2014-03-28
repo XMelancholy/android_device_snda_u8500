@@ -20,9 +20,6 @@ index b4a6a7c..94fee2e 100644
  
  LOCAL_SRC_FILES += wifi/wifi.c
  
-+ifeq ($(BOARD_HAVE_SNDA_WIFI),true)
-+LOCAL_CFLAGS += -DSNDA_WIFI
-+endif
  LOCAL_SHARED_LIBRARIES += libnetutils
 diff --git a/hardware/libhardware_legacy/wifi/wifi.c b/hardware/libhardware_legacy/wifi/wifi.c
 index 5a42e2d..ddfd187 100644
@@ -37,18 +34,6 @@ index 5a42e2d..ddfd187 100644
  static const char IFACE_DIR[]           = "/data/system/wpa_supplicant";
  #ifdef WIFI_DRIVER_MODULE_PATH
  static const char DRIVER_MODULE_NAME[]  = WIFI_DRIVER_MODULE_NAME;
-@@ -105,7 +103,11 @@ static const char P2P_PROP_NAME[]       = "init.svc.p2p_supplicant";
- static const char SUPP_CONFIG_TEMPLATE[]= "/system/etc/wifi/wpa_supplicant.conf";
- static const char SUPP_CONFIG_FILE[]    = "/data/misc/wifi/wpa_supplicant.conf";
- static const char P2P_CONFIG_FILE[]     = "/data/misc/wifi/p2p_supplicant.conf";
-+#ifndef SNDA_WIFI
- static const char CONTROL_IFACE_PATH[]  = "/data/misc/wifi/sockets";
-+#else
-+static const char CONTROL_IFACE_PATH[]  = "/data/system/wpa_supplicant";
-+#endif
- static const char MODULE_FILE[]         = "/proc/modules";
- 
- static const char SUPP_ENTROPY_FILE[]   = WIFI_ENTROPY_FILE;
 @@ -238,7 +240,9 @@ int wifi_load_driver()
          return -1;
  
@@ -60,20 +45,3 @@ index 5a42e2d..ddfd187 100644
          property_set(DRIVER_PROP_NAME, "ok");
      }
      else {
-@@ -361,12 +365,15 @@ int update_ctrl_interface(const char *config_file) {
-         free(pbuf);
-         return 0;
-     }
--
-+#ifndef SNDA_WIFI
-     if (!strcmp(config_file, SUPP_CONFIG_FILE)) {
-         property_get("wifi.interface", ifc, WIFI_TEST_INTERFACE);
-     } else {
-         strcpy(ifc, CONTROL_IFACE_PATH);
-     }
-+#else
-+        strcpy(ifc, CONTROL_IFACE_PATH);
-+#endif
-     if ((sptr = strstr(pbuf, "ctrl_interface="))) {
-         char *iptr = sptr + strlen("ctrl_interface=");
-         int ilen = 0;
