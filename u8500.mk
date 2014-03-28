@@ -59,9 +59,15 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/system/etc/omxloaders:system/etc/omxloaders \
     $(LOCAL_PATH)/prebuilt/system/etc/ste_modem.sh:system/etc/ste_modem.sh \
     $(LOCAL_PATH)/prebuilt/system/etc/vold.fstab:system/etc/vold.fstab \
+    $(LOCAL_PATH)/prebuilt/system/etc/init.d/01stesetup:system/etc/init.d/01stesetup \
+    $(LOCAL_PATH)/prebuilt/system/etc/init.d/10wireless:system/etc/init.d/10wireless \
     $(LOCAL_PATH)/prebuilt/system/etc/wifi/p2p_supplicant.conf:system/etc/wifi/p2p_supplicant.conf \
     $(LOCAL_PATH)/prebuilt/system/etc/wifi/hostapd.conf:system/etc/wifi/hostapd.conf \
     $(LOCAL_PATH)/prebuilt/system/etc/wifi/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf
+
+# APN
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/prebuilt/system/etc/apns-conf.xml:system/etc/apns-conf.xml
 
 # ALSA Configs
 PRODUCT_COPY_FILES += \
@@ -87,10 +93,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     system/bluetooth/data/main.conf:system/etc/bluetooth/main.conf
 
-# APN
-PRODUCT_COPY_FILES += \
-   $(LOCAL_PATH)/prebuilt/system/etc/apns-conf.xml:system/etc/apns-conf.xml
-
 # Hostapd
 PRODUCT_PACKAGES += \
     hostapd_cli \
@@ -98,53 +100,53 @@ PRODUCT_PACKAGES += \
 
 # Libasound
 PRODUCT_PACKAGES += \
-   libasound
+    libasound
 
 # A2DP and USB
 PRODUCT_PACKAGES += \
-   audio.a2dp.default \
-   audio.usb.default
+    audio.a2dp.default \
+    audio.usb.default
 
 # Lights
 PRODUCT_PACKAGES += \
-   lights.montblanc
+    lights.montblanc
    
 # libgralloc
 PRODUCT_PACKAGES += \
-   gralloc.montblanc
+    gralloc.montblanc
 
 # libhwcomposer
 PRODUCT_PACKAGES += \
-   hwcomposer.montblanc
+    hwcomposer.montblanc
 
 # libcopybit
 PRODUCT_PACKAGES += \
-   copybit.montblanc
+    copybit.montblanc
 
 # libsensors
 PRODUCT_PACKAGES += \
-   sensors.montblanc
+    sensors.montblanc
 
 # libblt_hw
 PRODUCT_PACKAGES += \
-   libblt_hw
+    libblt_hw
 
 # libu300-ril
 PRODUCT_PACKAGES += \
-   libu300-ril \
-   libu300-parser \
-   ril_config
+    libu300-ril \
+    libu300-parser \
+    ril_config
 
 # busybox
 PRODUCT_PACKAGES += \
-   busybox
+    busybox
 
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \
-   media.aac_51_output_enabled=1 \
-   persist.sys.usb.config=mtp,adb \
-   ro.sf.lcd_density=240 \
-   wifi.interface=wlan0
+    media.aac_51_output_enabled=1 \
+    persist.sys.usb.config=mtp,adb \
+    ro.sf.lcd_density=240 \
+    wifi.interface=wlan0
 
 # This device is xhdpi.  However the platform doesn't
 # currently contain all of the bitmaps at xhdpi density so
