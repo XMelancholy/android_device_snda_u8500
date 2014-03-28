@@ -47,6 +47,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/system/app/Superuser.apk:system/app/Superuser.apk \
     $(LOCAL_PATH)/prebuilt/system/xbin/su:system/xbin/su \
+    $(LOCAL_PATH)/prebuilt/system/bin/sysinit:system/bin/sysinit \
     $(LOCAL_PATH)/prebuilt/system/bin/usbid_init.sh:system/bin/usbid_init.sh \
     $(LOCAL_PATH)/prebuilt/system/lib/egl/egl.cfg:system/lib/egl/egl.cfg \
     $(LOCAL_PATH)/prebuilt/system/etc/media_codecs.xml:system/etc/media_codecs.xml \
