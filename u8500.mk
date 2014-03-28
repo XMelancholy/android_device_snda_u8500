@@ -47,7 +47,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/system/app/Superuser.apk:system/app/Superuser.apk \
     $(LOCAL_PATH)/prebuilt/system/xbin/su:system/xbin/su \
-    $(LOCAL_PATH)/prebuilt/system/bin/busybox:system/bin/busybox \
     $(LOCAL_PATH)/prebuilt/system/bin/usbid_init.sh:system/bin/usbid_init.sh \
     $(LOCAL_PATH)/prebuilt/system/lib/egl/egl.cfg:system/lib/egl/egl.cfg \
     $(LOCAL_PATH)/prebuilt/system/etc/media_codecs.xml:system/etc/media_codecs.xml \
@@ -111,29 +110,33 @@ PRODUCT_PACKAGES += \
    
 # libgralloc
 PRODUCT_PACKAGES += \
-    gralloc.montblanc
+   gralloc.montblanc
 
 # libhwcomposer
 PRODUCT_PACKAGES += \
-    hwcomposer.montblanc
+   hwcomposer.montblanc
 
 # libcopybit
 PRODUCT_PACKAGES += \
-    copybit.montblanc
+   copybit.montblanc
 
 # libsensors
 PRODUCT_PACKAGES += \
-    sensors.montblanc
+   sensors.montblanc
 
 # libblt_hw
 PRODUCT_PACKAGES += \
-    libblt_hw
+   libblt_hw
 
 # libu300-ril
 PRODUCT_PACKAGES += \
-    libu300-ril \
-    libu300-parser \
-    ril_config
+   libu300-ril \
+   libu300-parser \
+   ril_config
+
+# busybox
+PRODUCT_PACKAGES += \
+   busybox
 
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \
