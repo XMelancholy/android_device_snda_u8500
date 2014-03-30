@@ -28,7 +28,7 @@ ifeq ($(BOARD_WLAN_DEVICE), bcmdhd)
 L_CFLAGS += -DANDROID_P2P
 endif
 
-ifeq ($(BOARD_HAVE_SNDA_WIFI),true)
+ifneq ($(BOARD_HAVE_SNDA_WIFI),)
 # Enable Android specific directory for control interface sockets
 L_CFLAGS += -DANDROID
 

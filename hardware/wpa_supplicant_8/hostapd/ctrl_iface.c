@@ -1087,7 +1087,7 @@ int hostapd_ctrl_iface_init(struct hostapd_data *hapd)
 
 #ifdef SNDA_WIFI
 havesock:
-#endif /* USES_TI_MAC80211 or BOARD_TI_SOFTAP*/
+#endif /* SNDA_WIFI */
 
 	hapd->ctrl_sock = s;
 	eloop_register_read_sock(s, hostapd_ctrl_iface_receive, hapd,
