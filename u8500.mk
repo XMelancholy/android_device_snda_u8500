@@ -46,9 +46,6 @@ PRODUCT_COPY_FILES += \
 
 # Configs
 PRODUCT_COPY_FILES += \
-   $(LOCAL_PATH)/prebuilt/system/app/Superuser.apk:system/app/Superuser.apk \
-   $(LOCAL_PATH)/prebuilt/system/xbin/su:system/xbin/su \
-   $(LOCAL_PATH)/prebuilt/system/bin/sysinit:system/bin/sysinit \
    $(LOCAL_PATH)/prebuilt/system/bin/usbid_init.sh:system/bin/usbid_init.sh \
    $(LOCAL_PATH)/prebuilt/system/lib/egl/egl.cfg:system/lib/egl/egl.cfg \
    $(LOCAL_PATH)/prebuilt/system/etc/media_codecs.xml:system/etc/media_codecs.xml \
@@ -66,10 +63,6 @@ PRODUCT_COPY_FILES += \
    $(LOCAL_PATH)/prebuilt/system/etc/wifi/p2p_supplicant.conf:system/etc/wifi/p2p_supplicant.conf \
    $(LOCAL_PATH)/prebuilt/system/etc/wifi/hostapd.conf:system/etc/wifi/hostapd.conf \
    $(LOCAL_PATH)/prebuilt/system/etc/wifi/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf
-
-# APN
-PRODUCT_COPY_FILES += \
-   $(LOCAL_PATH)/prebuilt/system/etc/apns-conf.xml:system/etc/apns-conf.xml
 
 # ALSA Configs
 PRODUCT_COPY_FILES += \
