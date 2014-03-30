@@ -1,2 +1,2 @@
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/full_u8500.mk  $(LOCAL_DIR)/aosp.mk
+    $(LOCAL_DIR)/full_u8500.mk
