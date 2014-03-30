@@ -58,6 +58,7 @@ PRODUCT_COPY_FILES += \
    $(LOCAL_PATH)/prebuilt/system/etc/cspsa.conf:system/etc/cspsa.conf \
    $(LOCAL_PATH)/prebuilt/system/etc/dbus.conf:system/etc/dbus.conf \
    $(LOCAL_PATH)/prebuilt/system/etc/omxloaders:system/etc/omxloaders \
+   $(LOCAL_PATH)/prebuilt/system/etc/ril_config:system/etc/ril_config \
    $(LOCAL_PATH)/prebuilt/system/etc/ste_modem.sh:system/etc/ste_modem.sh \
    $(LOCAL_PATH)/prebuilt/system/etc/vold.fstab:system/etc/vold.fstab \
    $(LOCAL_PATH)/prebuilt/system/etc/init.d/01stesetup:system/etc/init.d/01stesetup \
@@ -135,12 +136,6 @@ PRODUCT_PACKAGES += \
 # libblt_hw
 PRODUCT_PACKAGES += \
    libblt_hw
-
-# libu300-ril
-PRODUCT_PACKAGES += \
-   libu300-ril \
-   libu300-parser \
-   ril_config
 
 # FileExplorer
 #PRODUCT_PACKAGES += \
