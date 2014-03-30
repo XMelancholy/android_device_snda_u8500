@@ -147,8 +147,8 @@ PRODUCT_PACKAGES += \
    busybox
 
 # FileExplorer
-PRODUCT_PACKAGES += \
-   FileExplorer
+#PRODUCT_PACKAGES += \
+#   FileExplorer
 
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \
