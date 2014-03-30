@@ -1,43 +1,34 @@
 # Android_device_snda_u8500
 
-	mkdir aospjb
-	cd aospjb
-	repo init -u https://android.googlesource.com/platform/manifest -b android-4.1.2_r2.1
+Getting Started :
 
-	mkdir -p device/snda/u8500
-	git clone https://github.com/XMelancholy/android_device_snda_u8500.git -b android-4.1.2_r2.1 device/snda/u8500
+		curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > /root/bin/repo
+		chmod 755 /root/bin/repo
+		mkdir cm10
+		cd cm10
+		repo init -u git://github.com/CyanogenMod/android.git -b jellybean
+		repo sync
 
-	mkdir -p vendor/snda/u8500
-	git clone https://github.com/XMelancholy/android_vendor_snda_u8500 vendor/snda/u8500
+		mkdir -p device/snda/u8500
+		git clone https://github.com/XMelancholy/android_device_snda_u8500.git -b cm10 device/snda/u8500
 
-	mkdir -p kernel/snda
-	git clone https://github.com/XMelancholy/android_kernel_snda_u8500 kernel/snda/u8500
 
-# patch
+Now connect your phone which have runing CM10 :
 
-	patch -p1 < device/snda/u8500/patches/build.patch
-	patch -p1 < device/snda/u8500/patches/frameworks_av.patch
-	patch -p1 < device/snda/u8500/patches/frameworks_native.patch
-	patch -p1 < device/snda/u8500/patches/hardware_libhardware.patch
-	patch -p1 < device/snda/u8500/patches/hardware_libhardware_legacy.patch
-	patch -p1 < device/snda/u8500/patches/system_core.patch
-	patch -p1 < device/snda/u8500/patches/system_extras.patch
-	patch -p1 < device/snda/u8500/patches/system_netd.patch
-	patch -p1 < device/snda/u8500/patches/system_vold.patch
-	
-    还原
-	patch -p1 -R < device/snda/u8500/patches/build.patch
-	patch -p1 -R < device/snda/u8500/patches/frameworks_av.patch
-	patch -p1 -R < device/snda/u8500/patches/frameworks_native.patch
-	patch -p1 -R < device/snda/u8500/patches/hardware_libhardware.patch
-	patch -p1 -R < device/snda/u8500/patches/hardware_libhardware_legacy.patch
-	patch -p1 -R < device/snda/u8500/patches/system_core.patch
-	patch -p1 -R < device/snda/u8500/patches/system_extras.patch
-	patch -p1 -R < device/snda/u8500/patches/system_netd.patch
-	patch -p1 -R < device/snda/u8500/patches/system_vold.patch
-		
-# build
+		cd device/snda/u8500
+		./extract-files.sh
 
-	source build/envsetup.sh
-	lunch aosp_u8500-userdebug
-	make otapackage
+		mkdir -p kernel/snda
+		git clone https://github.com/XMelancholy/android_kernel_snda_u8500 kernel/snda/u8500
+
+Download CM prebuilts : 
+
+		./vendor/cm/get-prebuilts cd
+
+You are ready to build :
+
+		source build/envsetup.sh
+		lunch cm_u8500-userdebug
+		make otapackage
+
+ENJOY!
