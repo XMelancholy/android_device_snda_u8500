@@ -68,6 +68,7 @@ WIFI_DRIVER_LOADER_DELAY := 1000000
 BOARD_HAS_NO_SELECT_BUTTON := true
 BOARD_USES_MMCUTILS := true
 TARGET_RECOVERY_INITRC := device/snda/u8500/recovery/init.rc
+BOARD_CUSTOM_GRAPHICS := ../../../device/snda/u8500/recovery/graphics.c
 
 # Custom boot
 TARGET_PROVIDES_INIT_RC := true
