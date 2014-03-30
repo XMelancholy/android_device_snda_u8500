@@ -2,8 +2,8 @@
 
 Getting Started :
 
-		curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > /root/bin/repo
-		chmod 755 /root/bin/repo
+		curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+		chmod 755 ~/bin/repo
 		mkdir cm10
 		cd cm10
 		repo init -u git://github.com/CyanogenMod/android.git -b jellybean
