@@ -145,6 +145,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    busybox
 
+# FileExplorer
+PRODUCT_PACKAGES += \
+   FileExplorer
+
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \
    media.aac_51_output_enabled=1 \
