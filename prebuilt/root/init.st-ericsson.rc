@@ -25,8 +25,9 @@ on init
     write /proc/sys/kernel/sched_rt_period_us 10000000
     write /proc/sys/kernel/sched_rt_runtime_us 9500000
 
-    # create /tmp directory needed by psccd and CSPSA
-    mkdir /tmp
+    # STE: create /tmp directory needed by psccd and CSPSA
+    # ...but make it a symlink so that sysmon may use it also
+    symlink /dev/socket /tmp
 
     # mount debugfs in order for Audio ADM component to retrieve debug information
     mkdir /debug
@@ -77,7 +78,7 @@ on post-fs
     chown radio radio /modemfs/PERM/PROT/PPVALUES.DAT
     chmod 0644 /modemfs/PERM/PROT/PPVALUES.DAT
 
-    # Set permissions for wake locks before services are launched that use them
+    # STE: Set permissions for wake locks before services are launched that use them
     chown system system /sys/power/state
     chown system system /sys/power/wakeup_count
     chown radio system /sys/power/wake_lock
@@ -92,80 +93,62 @@ on post-fs-data
     mkdir /data/misc/hcid 0770 bluetooth bluetooth
     mkdir /data/misc/psdata
 
-    # give system access to ril_config
-    copy -u /system/etc/ril_config /data/misc/ril_config
-    chmod 0660 /data/misc/ril_config
-    chown root radio /data/misc/ril_config
-
-    # Create directory for STE OMX debug logs
-    mkdir /data/ste-debug 0777 root root
-
-    # give system access to sterc_script when enabling usb nap
-    copy -u /system/etc/psdata/sterc_conf /data/misc/psdata/sterc_conf
-    copy -u /system/etc/psdata/sterc_script_connect /data/misc/psdata/sterc_script_connect
-    copy -u /system/etc/psdata/sterc_script_disconnect /data/misc/psdata/sterc_script_disconnect
-    copy -u /system/etc/psdata/sterc_conf_alt /data/misc/psdata/sterc_conf_alt
-    copy -u /system/etc/psdata/sterc_script_connect_alt /data/misc/psdata/sterc_script_connect_alt
-    copy -u /system/etc/psdata/sterc_script_connect_dun /data/misc/psdata/sterc_script_connect_dun
-    copy -u /system/etc/psdata/sterc_script_disconnect_dun /data/misc/psdata/sterc_script_disconnect_dun
-    chmod 0660 /data/misc/psdata/sterc_conf
-    chmod 0500 /data/misc/psdata/sterc_script_connect
-    chmod 0500 /data/misc/psdata/sterc_script_disconnect
-    chmod 0660 /data/misc/psdata/sterc_conf_alt
-    chmod 0500 /data/misc/psdata/sterc_script_connect_alt
-    chmod 0500 /data/misc/psdata/sterc_script_connect_dun
-    chmod 0500 /data/misc/psdata/sterc_script_disconnect_dun
-    chown root radio /data/misc/psdata/sterc_conf
-    chown root radio /data/misc/psdata/sterc_conf_alt
-
-    # give system access to stepscc_conf
-    copy -u /system/etc/psdata/stepscc_conf /data/misc/psdata/stepscc_conf
-    chmod 0660 /data/misc/psdata/stepscc_conf
-    chown root radio /data/misc/psdata/stepscc_conf
 
     mkdir /data/misc/telephony_log_levels
     chmod 0660 /data/misc/telephony_log_levels
     chown root radio /data/misc/telephony_log_levels
 
+    # Create directory for STE OMX debug logs
+    mkdir /data/ste-debug 0777 root root
     # Setup paths used for socket communication with the wpa supplicant.
     mkdir /data/system 0775 system system
     chown system system /data/system
 
     mkdir /data/misc/wifi/sockets 0770 wifi wifi
-    chown wifi wifi /data/misc/wifi/sockets
 
     # give system access to wpa_supplicant.conf for backup and restore
     chmod 0770 /data/misc/wifi/wpa_supplicant.conf
-    chown wifi wifi /data/misc/wifi/wpa_supplicant.conf
-
-    copy -u /system/etc/wifi/hostapd.conf /data/misc/wifi/hostapd.conf
-    chmod 0660 /data/misc/wifi/hostapd.conf
-    chown wifi wifi /data/misc/wifi/hostapd.conf
 
     # Setup paths used for socket communication with the dhcp daemon(dhcpd)
     mkdir /data/misc/dhcp 0770 dhcp dhcp
     chown dhcp dhcp /data/misc/dhcp
 
-    # Modem Log Relay runs as system
+    # STE: Modem Log Relay runs as system
     chown system system /dev/db8500-modem-trace
     chmod 0600 /dev/db8500-modem-trace
     chown system system /dev/dbx500_mloader_fw
     chmod 0600 /dev/dbx500_mloader_fw
 
-    # set proper access to modem storage pipe
+    # STE: set proper access to modem storage pipe
     chown radio radio /dev/rpc
     chmod 0600 /dev/rpc
 
+    # Create Directory for Caching files for camera
+    mkdir /data/tuning 0700 media camera
+
+    # Permissions for init.d script
+    chmod 0755 /system/etc/init.d/01stesetup
+    chmod 0755 /system/etc/init.d/10wireless
+
+    # Permissions for rfkill
+    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
+    chmod 664 /sys/class/rfkill/rfkill0/state
+
+    # Permissions for urandom
+    #chown wifi wifi /dev/urandom
+    #chmod 664 dev/urandom
+
 on early-boot
 
-    # Prepare modem
+    # Start the offline charging
+    exec /system/bin/chargemode
+
+    # STE: Prepare modem
     class_start modem-u8500
     class_start modem-core
 
-    # Enable autonomous power management in CM
+    # STE: Enable autonomous power management in CM
     write /sys/module/cm/parameters/enable_auto_pm 1
-
-    exec /system/bin/chargemode
 
 on boot
 
@@ -211,13 +194,13 @@ on boot
     chown audio audio /sys/devices/system/cpu/usecase/low-power-audio
     chown audio audio /dev/shm
 
-    # Set radio device and parameters permissions
+    # ST-Ericsson Set radio device and parameters permissions
     chown system system /sys/module/radio_cg2900/parameters/band
     chown system system /sys/module/radio_cg2900/parameters/grid
     chmod 0660 /sys/module/radio_cg2900/parameters/band
     chmod 0660 /sys/module/radio_cg2900/parameters/grid
 
-    # Define support for SIM card hot swap
+    # STE: Define support for SIM card hot swap
     setprop icc.hotswap supported
 
     # Install cw1200_core WLAN module
@@ -230,11 +213,8 @@ on boot
     class_start modem
     class_start default
 
-    # Enable wide-band speech for Bluetooth
+    # STE: Enable wide-band speech for Bluetooth
     setprop bt.hfp.wideband 1
-
-    # Create Directory for Caching files for camera
-    mkdir /data/tuning 0700 media camera
 
 # Crash Safe Parameter Storage Area, serving production parameter requests from clients.
 # Configuration is read from file "/etc/cspsa.conf" and each found area spawns a CSPSA server
@@ -254,19 +234,19 @@ service phonet-netdev /system/bin/ifconfig upnlink0 up
     class main
     oneshot
 
-# Copy RF trim data from CSPSA, and start the Modem Storage Agent (MSA) service
+# STE: Start the Modem Storage Agent (MSA) service
 service modem /system/bin/sh /system/etc/ste_modem.sh
     class modem-u8500
     user radio
     group radio system
     capability NET_ADMIN
 
-# Modem-supervisor
+# STE: Modem-supervisor
 service modem-supervisor /system/bin/modem-supervisor -r -f /dev/dbx500_mloader_fw -i /sys/devices/platform/ab8500-i2c.0/chip_id -c monitor
     class modem-u8500
     user root
 
-# Creating Modem Security daemon
+# STE: Creating Modem Security daemon
 service copsd /system/bin/copsdaemon
     class modem-core
     user root
@@ -285,27 +265,16 @@ service ste-cg29xx_ctrl /system/xbin/ste-cg29xx_ctrl -b 115200 -p 6 -l 23 -i /sy
     group bluetooth net_bt_admin misc root system
     oneshot
 
-# DHCP client for Bluetooth PANU
-service dhcpcd_bnep0 /system/bin/dhcpcd -dABKL
-    class main
-    disabled
-    oneshot
-
-service iprenew_bnep0 /system/bin/dhcpcd -n
-    class main
-    disabled
-    oneshot
-
 service lbsd /system/bin/lbsd
     class main
     user root
-    disabled
     group radio
+    disabled
 
 on property:dev.bootcomplete=1
     start lbsd
 
-service wpa_supplicant /system/bin/wpa_supplicant -Dnl80211 -iwlan0 \
+service wpa_supplicant /system/bin/logwrapper /system/bin/wpa_supplicant -Dnl80211 -iwlan0 \
     -puse_p2p_group_interface=1 -c/data/misc/wifi/wpa_supplicant.conf \
     -e/data/misc/wifi/entropy.bin -ddd
     class main
@@ -319,12 +288,22 @@ service hostapd_bin /system/bin/hostapd -d /data/misc/wifi/hostapd.conf
     disabled
     oneshot
 
-service dhcpcd_wlan0 /system/bin/dhcpcd -dABKL
+service dhcpcd_wlan0 /system/bin/dhcpcd -aABKL
     class main
     disabled
     oneshot
 
 service iprenew_wlan0 /system/bin/dhcpcd -n
+    class main
+    disabled
+    oneshot
+
+service dhcpcd_bnep0 /system/bin/dhcpcd -dABKL
+    class main
+    disabled
+    oneshot
+
+service iprenew_bnep0 /system/bin/dhcpcd -n
     class main
     disabled
     oneshot
@@ -339,26 +318,26 @@ service iprenew_p2p /system/bin/dhcpcd -n
     disabled
     oneshot
 
-service dhcpcd_fix rm /data/misc/dhcp/*
-    user root
-    disabled
-    oneshot
+#service dhcpcd_fix rm /data/misc/dhcp/*
+#    user root
+#    disabled
+#    oneshot
 
 on property:init.svc.wpa_supplicant=stopped
     stop dhcpcd
-    start dhcpcd_fix
+#    start dhcpcd_fix
 
 on property:init.svc.dhcpcd=stopped
     stop dhcpcd
-    start dhcpcd_fix
+#    start dhcpcd_fix
 
-# C&N service daemon
+# STE, C&N service daemon
 service cn_server /system/bin/cn_server
     class modem-core
     user root
     group radio misc
 
-# PS connection control
+# STE, PS connection control
 service init_stepscc /system/bin/sh /data/misc/psdata/stepscc_init.sh
     class main
     oneshot
@@ -368,7 +347,7 @@ service psccd /system/bin/psccd -f -c /data/misc/psdata/stepscc_conf
     user root
     group radio inet
 
-# PS routing control
+# STE, PS routing control
 service init_sterc /system/bin/sh /data/misc/psdata/sterc_init.sh
     class main
     oneshot
@@ -379,31 +358,31 @@ service stercd /system/bin/stercd -d 9 -r /data/misc/psdata/sterc_script_connect
     group radio
     oneshot
 
-# SIM daemon
+# STE, SIM daemon
 service simd /system/bin/simd
     class modem-core
     user root
     group radio
 
-# SIMPB daemon
+# STE, SIMPB daemon
 service simpbd /system/bin/simpbd
     class modem-core
     user root
     group radio
 
-# SMS Server control
+# STE, SMS Server control
 service sms_server /system/bin/sms_server
     class modem
     user root
     group radio
 
-# AT daemon
+# STE, AT daemon
 service atd /system/bin/at_core -mode normal -serial ttyGS0
     class modem
     user root
     group radio audio system
 
-# Modem Access daemon
+# STE, Modem Access daemon
 service mad /system/bin/ste_mad
     class modem
     user radio
