@@ -127,6 +127,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    sensors.montblanc
 
+# libpower
+PRODUCT_PACKAGES += \
+   power.montblanc
+
 # libblt_hw
 PRODUCT_PACKAGES += \
    libblt_hw
