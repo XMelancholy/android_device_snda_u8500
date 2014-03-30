@@ -142,10 +142,6 @@ PRODUCT_PACKAGES += \
    libu300-parser \
    ril_config
 
-# busybox
-PRODUCT_PACKAGES += \
-   busybox
-
 # FileExplorer
 #PRODUCT_PACKAGES += \
 #   FileExplorer
