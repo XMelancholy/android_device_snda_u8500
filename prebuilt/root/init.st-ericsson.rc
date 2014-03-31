@@ -134,10 +134,6 @@ on post-fs-data
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
     chmod 664 /sys/class/rfkill/rfkill0/state
 
-    # Permissions for urandom
-    #chown wifi wifi /dev/urandom
-    #chmod 664 dev/urandom
-
 on early-boot
 
     # Start the offline charging
@@ -318,18 +314,18 @@ service iprenew_p2p /system/bin/dhcpcd -n
     disabled
     oneshot
 
-service dhcpcd_fix rm /data/misc/dhcp/*
-    user root
-    disabled
-    oneshot
+#service dhcpcd_fix rm /data/misc/dhcp/*
+#    user root
+#    disabled
+#    oneshot
 
 on property:init.svc.wpa_supplicant=stopped
     stop dhcpcd
-    start dhcpcd_fix
+#    start dhcpcd_fix
 
 on property:init.svc.dhcpcd=stopped
     stop dhcpcd
-    start dhcpcd_fix
+#    start dhcpcd_fix
 
 # STE, C&N service daemon
 service cn_server /system/bin/cn_server
