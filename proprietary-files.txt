@@ -128,6 +128,7 @@ lib/libnmfee.so
 lib/libnmftimer.so
 lib/libphonet.so
 lib/libpscc.so
+lib/libril.so
 lib/libshmnetlnk.so
 lib/libsms_server.so
 lib/libspeech_processing.so

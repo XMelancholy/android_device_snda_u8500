@@ -1,270 +1,41 @@
 #
-#	new file:   frameworks/native/data/etc/com.stericsson.hardware.fm.receiver.xml
-#	new file:   frameworks/native/data/etc/com.stericsson.hardware.fm.transmitter.xml
 #	modified:   frameworks/native/include/gui/SurfaceTexture.h
-#	modified:   frameworks/native/include/media/openmax/OMX_IVCommon.h
 #	modified:   frameworks/native/include/ui/PixelFormat.h
-#	modified:   frameworks/native/include/ui/Region.h
 #	modified:   frameworks/native/libs/gui/SurfaceTexture.cpp
-#	modified:   frameworks/native/libs/ui/PixelFormat.cpp
-#	modified:   frameworks/native/opengl/include/EGL/eglext.h
-#	modified:   frameworks/native/opengl/libs/EGL/eglApi.cpp
-#	modified:   frameworks/native/opengl/libs/EGL/egl_display.cpp
-#	modified:   frameworks/native/opengl/libs/EGL/egl_entries.in
-#	modified:   frameworks/native/services/surfaceflinger/DisplayHardware/DisplayHardware.cpp
-#	modified:   frameworks/native/services/surfaceflinger/Layer.cpp
-#	modified:   frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
 #
-diff --git a/frameworks/native/data/etc/com.stericsson.hardware.fm.receiver.xml b/frameworks/native/data/etc/com.stericsson.hardware.fm.receiver.xml
-new file mode 100644
-index 0000000..13092fa
---- /dev/null
-+++ b/frameworks/native/data/etc/com.stericsson.hardware.fm.receiver.xml
-@@ -0,0 +1,20 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<!-- Copyright (C) 2009 The Android Open Source Project
-+
-+     Licensed under the Apache License, Version 2.0 (the "License");
-+     you may not use this file except in compliance with the License.
-+     You may obtain a copy of the License at
-+
-+          http://www.apache.org/licenses/LICENSE-2.0
-+
-+     Unless required by applicable law or agreed to in writing, software
-+     distributed under the License is distributed on an "AS IS" BASIS,
-+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+     See the License for the specific language governing permissions and
-+     limitations under the License.
-+-->
-+
-+<!-- This is the standard feature indicating that the device includes FM receiver. -->
-+<permissions>
-+    <feature name="com.stericsson.hardware.fm.receiver" />
-+</permissions>
-diff --git a/frameworks/native/data/etc/com.stericsson.hardware.fm.transmitter.xml b/frameworks/native/data/etc/com.stericsson.hardware.fm.transmitter.xml
-new file mode 100644
-index 0000000..9b51c03
---- /dev/null
-+++ b/frameworks/native/data/etc/com.stericsson.hardware.fm.transmitter.xml
-@@ -0,0 +1,20 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<!-- Copyright (C) 2009 The Android Open Source Project
-+
-+     Licensed under the Apache License, Version 2.0 (the "License");
-+     you may not use this file except in compliance with the License.
-+     You may obtain a copy of the License at
-+
-+          http://www.apache.org/licenses/LICENSE-2.0
-+
-+     Unless required by applicable law or agreed to in writing, software
-+     distributed under the License is distributed on an "AS IS" BASIS,
-+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+     See the License for the specific language governing permissions and
-+     limitations under the License.
-+-->
-+
-+<!-- This is the standard feature indicating that the device includes FM transmitter. -->
-+<permissions>
-+    <feature name="com.stericsson.hardware.fm.transmitter" />
-+</permissions>
 diff --git a/frameworks/native/include/gui/SurfaceTexture.h b/frameworks/native/include/gui/SurfaceTexture.h
-index 2635e2f..d6eba6c 100644
+index ec73f95..2e55ae7 100644
 --- a/frameworks/native/include/gui/SurfaceTexture.h
 +++ b/frameworks/native/include/gui/SurfaceTexture.h
-@@ -30,18 +30,23 @@
- #include <utils/String8.h>
- #include <utils/Vector.h>
- #include <utils/threads.h>
--
-+#ifdef STE_HARDWARE
-+#include <hardware/copybit.h>
-+#include <gui/IGraphicBufferAlloc.h>
-+#endif
- #define ANDROID_GRAPHICS_SURFACETEXTURE_JNI_ID "mSurfaceTexture"
- 
- namespace android {
- // ----------------------------------------------------------------------------
- 
--
- class String8;
- 
- class SurfaceTexture : public virtual RefBase,
-         protected BufferQueue::ConsumerListener {
- public:
-+#ifdef STE_HARDWARE
-+    enum { NUM_BLIT_BUFFER_SLOTS = 2 };
-+#endif
-     struct FrameAvailableListener : public virtual RefBase {
-         // onFrameAvailable() is called each time an additional frame becomes
-         // available for consumption. This means that frames that are queued
-@@ -90,6 +95,17 @@ public:
-     // This call may only be made while the OpenGL ES context to which the
-     // target texture belongs is bound to the calling thread.
+@@ -100,6 +100,12 @@ public:
      status_t updateTexImage();
-+#ifdef STE_HARDWARE
+ 
+ #ifdef STE_HARDWARE
++#ifdef STE_SNDA_HARDWARE
 +    // A surface that uses a non-native format requires conversion of
 +    // its buffers. This conversion can be deferred until the layer
 +    // based on this surface is drawn.
 +    status_t updateTexImage(bool deferConversion);
-+
-+    // convert() performs the deferred texture conversion as scheduled
-+    // by updateTexImage(bool deferConversion).
-+    // The method returns immediately if no conversion is necessary.
-+    status_t convert();
 +#endif
- 
-     // setBufferCountServer set the buffer count. If the client has requested
-     // a buffer count using setBufferCount, the server-buffer count will
-@@ -248,12 +264,21 @@ private:
-         virtual ~BufferRejecter() { }
-     };
-     friend class Layer;
-+#ifdef STE_HARDWARE
-+    status_t updateTexImage(BufferRejecter* rejecter, bool deferConversion);
-+#else
-     status_t updateTexImage(BufferRejecter* rejecter);
--
-+#endif
-     // createImage creates a new EGLImage from a GraphicBuffer.
-     EGLImageKHR createImage(EGLDisplay dpy,
-             const sp<GraphicBuffer>& graphicBuffer);
-+#ifdef STE_HARDWARE
-+    // returns TRUE if buffer needs color format conversion
-+    bool conversionIsNeeded(const sp<GraphicBuffer>& graphicBuffer);
- 
-+    // converts buffer to a suitable color format
-+    status_t convert(sp<GraphicBuffer> &srcBuf, sp<GraphicBuffer> &dstBuf);
-+#endif
-     // freeBufferLocked frees up the given buffer slot.  If the slot has been
-     // initialized this will release the reference to the GraphicBuffer in that
-     // slot and destroy the EGLImage in that slot.  Otherwise it has no effect.
-@@ -349,6 +374,10 @@ private:
-         // to EGL_NO_SYNC_KHR when the buffer is created and (optionally, based
-         // on a compile-time option) set to a new sync object in updateTexImage.
-         EGLSyncKHR mFence;
-+#ifdef STE_HARDWARE
-+        // mEglDisplay is the EGLDisplay used to create mEglImage.
-+        EGLDisplay mEglDisplay;
-+#endif
-     };
- 
-     // mEglDisplay is the EGLDisplay with which this SurfaceTexture is currently
-@@ -356,6 +385,39 @@ private:
-     // current display when updateTexImage is called for the first time and when
-     // attachToContext is called.
-     EGLDisplay mEglDisplay;
-+#ifdef STE_HARDWARE
-+    // mBlitEngine is the handle to the copybit device which will be used in
-+    // case color transform is needed before the EGL image is created.
-+    copybit_device_t* mBlitEngine;
-+
-+    // mBlitSlots contains several buffers which will
-+    // be rendered alternately in case color transform is needed (instead
-+    // of rendering the buffers in mSlots).
-+    EGLSlot mBlitSlots[NUM_BLIT_BUFFER_SLOTS];
-+    // mGraphicBufferAlloc is the connection to SurfaceFlinger that is used to
-+    // allocate new GraphicBuffer objects.
-+    sp<IGraphicBufferAlloc> mGraphicBufferAlloc;
-+
-+
-+    // mNextBlitSlot is the index of the blitter buffer (in mBlitSlots) which
-+    // will be used in the next color transform.
-+    int mNextBlitSlot;
-+
-+    // mConversionSrcSlot designates the slot where source buffer
-+    // for the last deferred updateTexImage is located.
-+    int mConversionSrcSlot;
-+
-+    // mConversionBltSlot designates the slot where destination buffer
-+    // for the last deferred updateTexImage is located.
-+    int mConversionBltSlot;
-+
-+    // mNeedsConversion indicates that a format conversion is necessary
-+    // before the layer based on this surface is drawn.
-+    // This flag is set whenever updateTexImage() with deferred conversion
-+    // is called. It is cleared once the layer is drawn,
-+    // or when updateTexImage() w/o deferred conversion is called.
-+    bool mNeedsConversion;
-+#endif
- 
-     // mEglContext is the OpenGL ES context with which this SurfaceTexture is
-     // currently associated.  It is initialized to EGL_NO_CONTEXT and gets set
-diff --git a/frameworks/native/include/media/openmax/OMX_IVCommon.h b/frameworks/native/include/media/openmax/OMX_IVCommon.h
-index 8bb4ded..5df525c 100644
---- a/frameworks/native/include/media/openmax/OMX_IVCommon.h
-+++ b/frameworks/native/include/media/openmax/OMX_IVCommon.h
-@@ -159,6 +159,7 @@ typedef enum OMX_COLOR_FORMATTYPE {
-     OMX_COLOR_FormatAndroidOpaque = 0x7F000789,
-     OMX_TI_COLOR_FormatYUV420PackedSemiPlanar = 0x7F000100,
-     OMX_QCOM_COLOR_FormatYVU420SemiPlanar = 0x7FA30C00,
-+    OMX_STE_COLOR_FormatYUV420PackedSemiPlanarMB = 0x7FA00000,
-     OMX_COLOR_FormatMax = 0x7FFFFFFF
- } OMX_COLOR_FORMATTYPE;
- 
+     // convert() performs the deferred texture conversion as scheduled
+     // by updateTexImage(bool deferConversion).
+     // The method returns immediately if no conversion is necessary.
 diff --git a/frameworks/native/include/ui/PixelFormat.h b/frameworks/native/include/ui/PixelFormat.h
-index 9f3e267..856b46a 100644
+index 62eb9b4..7ca9fbd 100644
 --- a/frameworks/native/include/ui/PixelFormat.h
 +++ b/frameworks/native/include/ui/PixelFormat.h
-@@ -64,6 +64,14 @@ enum {
-     PIXEL_FORMAT_RGBA_5551   = HAL_PIXEL_FORMAT_RGBA_5551,  // 16-bit ARGB
-     PIXEL_FORMAT_RGBA_4444   = HAL_PIXEL_FORMAT_RGBA_4444,  // 16-bit ARGB
-     PIXEL_FORMAT_A_8         = 8,                           // 8-bit A
-+#ifdef STE_HARDWARE
-+    // Added Support for YUV42XMBN,
-+    // Required for Copybit CC acceleration
-+    PIXEL_FORMAT_YCBCR42XMBN = HAL_PIXEL_FORMAT_YCBCR42XMBN,
-+    PIXEL_FORMAT_YCbCr_420_SP = HAL_PIXEL_FORMAT_YCbCr_420_SP,
-+    PIXEL_FORMAT_YCbCr_420_P = HAL_PIXEL_FORMAT_YCbCr_420_P,
+@@ -70,6 +70,9 @@ enum {
+     PIXEL_FORMAT_YCBCR42XMBN = HAL_PIXEL_FORMAT_YCBCR42XMBN,
+     PIXEL_FORMAT_YCbCr_420_SP = HAL_PIXEL_FORMAT_YCbCr_420_SP,
+     PIXEL_FORMAT_YCbCr_420_P = HAL_PIXEL_FORMAT_YCbCr_420_P,
++#ifdef STE_SNDA_HARDWARE
 +    PIXEL_FORMAT_YCbCr_422_I = HAL_PIXEL_FORMAT_YCbCr_422_I,
 +#endif
+ #endif
  };
  
- typedef int32_t PixelFormat;
-diff --git a/frameworks/native/include/ui/Region.h b/frameworks/native/include/ui/Region.h
-index f242f18..2dd3d4f 100644
---- a/frameworks/native/include/ui/Region.h
-+++ b/frameworks/native/include/ui/Region.h
-@@ -23,7 +23,9 @@
- #include <utils/Vector.h>
- 
- #include <ui/Rect.h>
--
-+#ifdef STE_HARDWARE
-+#include <hardware/copybit.h>
-+#endif
- namespace android {
- // ---------------------------------------------------------------------------
- 
-@@ -195,6 +197,27 @@ Region& Region::operator -= (const Region& rhs) {
- Region& Region::operator += (const Point& pt) {
-     return translateSelf(pt.x, pt.y);
- }
-+#ifdef STE_HARDWARE
-+// ---------------------------------------------------------------------
-+
-+struct region_iterator : public copybit_region_t {
-+    region_iterator(const Region& region)
-+        : b(region.begin()), e(region.end()) {
-+        this->next = iterate;
-+    }
-+private:
-+    static int iterate(copybit_region_t const * self, copybit_rect_t* rect) {
-+        region_iterator const* me = static_cast<region_iterator const*>(self);
-+        if (me->b != me->e) {
-+            *reinterpret_cast<Rect*>(rect) = *me->b++;
-+            return 1;
-+        }
-+        return 0;
-+    }
-+    mutable Region::const_iterator b;
-+    Region::const_iterator const e;
-+};
-+#endif
- // ---------------------------------------------------------------------------
- }; // namespace android
- 
 diff --git a/frameworks/native/libs/gui/SurfaceTexture.cpp b/frameworks/native/libs/gui/SurfaceTexture.cpp
-index 55be4bc..c805a66 100644
+index 21f3112..7d458de 100644
 --- a/frameworks/native/libs/gui/SurfaceTexture.cpp
 +++ b/frameworks/native/libs/gui/SurfaceTexture.cpp
 @@ -27,7 +27,9 @@
@@ -278,545 +49,74 @@ index 55be4bc..c805a66 100644
  #include <gui/IGraphicBufferAlloc.h>
  #include <gui/ISurfaceComposer.h>
  #include <gui/SurfaceComposerClient.h>
-@@ -119,12 +121,20 @@ SurfaceTexture::SurfaceTexture(GLuint tex, bool allowSynchronousMode,
-     mEglDisplay(EGL_NO_DISPLAY),
-     mEglContext(EGL_NO_CONTEXT),
-     mAbandoned(false),
-+#ifdef STE_HARDWARE
-+    mNextBlitSlot(0),
-+    mNeedsConversion(false),
-+#endif
-     mCurrentTexture(BufferQueue::INVALID_BUFFER_SLOT),
-     mAttached(true)
- {
-     // Choose a name using the PID and a process-unique ID.
-     mName = String8::format("unnamed-%d-%d", getpid(), createProcessUniqueId());
-     ST_LOGV("SurfaceTexture");
-+#ifdef STE_HARDWARE
-+    sp<ISurfaceComposer> composer(ComposerService::getComposerService());
-+    mGraphicBufferAlloc = composer->createGraphicBufferAlloc();
-+#endif
-     if (bufferQueue == 0) {
-         ST_LOGV("Creating a new BufferQueue");
-         mBufferQueue = new BufferQueue(allowSynchronousMode);
-@@ -135,7 +145,19 @@ SurfaceTexture::SurfaceTexture(GLuint tex, bool allowSynchronousMode,
- 
-     memcpy(mCurrentTransformMatrix, mtxIdentity,
-             sizeof(mCurrentTransformMatrix));
-+#ifdef STE_HARDWARE
-+    for (int i = 0; i < NUM_BLIT_BUFFER_SLOTS; i++) {
-+        mBlitSlots[i].mEglImage = EGL_NO_IMAGE_KHR;
-+        mBlitSlots[i].mEglDisplay = EGL_NO_DISPLAY;
-+    }
- 
-+    hw_module_t const* module;
-+    mBlitEngine = 0;
-+    if (hw_get_module(COPYBIT_HARDWARE_MODULE_ID, &module) == 0) {
-+        copybit_open(module, &mBlitEngine);
-+    }
-+    ALOGE_IF(!mBlitEngine, "\nCannot open copybit mBlitEngine=%p", mBlitEngine);
-+#endif
-     // Note that we can't create an sp<...>(this) in a ctor that will not keep a
-     // reference once the ctor ends, as that would cause the refcount of 'this'
-     // dropping to 0 at the end of the ctor.  Since all we need is a wp<...>
-@@ -159,6 +181,11 @@ SurfaceTexture::~SurfaceTexture() {
-     ST_LOGV("~SurfaceTexture");
- 
-     abandon();
-+#ifdef STE_HARDWARE
-+    if (mBlitEngine) {
-+        copybit_close(mBlitEngine);
-+    }
-+#endif
- }
- 
- status_t SurfaceTexture::setBufferCountServer(int bufferCount) {
-@@ -176,10 +203,21 @@ status_t SurfaceTexture::setDefaultBufferSize(uint32_t w, uint32_t h)
- }
- 
- status_t SurfaceTexture::updateTexImage() {
-+#ifdef STE_HARDWARE
-+    return SurfaceTexture::updateTexImage(NULL, false);
-+#else
-     return SurfaceTexture::updateTexImage(NULL);
-+#endif
+@@ -218,7 +220,11 @@ status_t SurfaceTexture::updateTexImage() {
+ #define STE_DEFERDBG 0
+ #endif
  }
 -
 +#ifdef STE_HARDWARE
 +status_t SurfaceTexture::updateTexImage(bool deferConversion) {
 +    return SurfaceTexture::updateTexImage(NULL, deferConversion);
 +}
-+#define STE_DEFERDBG 0
-+status_t SurfaceTexture::updateTexImage(BufferRejecter* rejecter, bool deferConversion) {
-+#else
++#endif
+ #ifndef STE_HARDWARE
  status_t SurfaceTexture::updateTexImage(BufferRejecter* rejecter) {
-+#endif
-     ATRACE_CALL();
-     ST_LOGV("updateTexImage");
-     Mutex::Autolock lock(mMutex);
-@@ -241,7 +279,7 @@ status_t SurfaceTexture::updateTexImage(BufferRejecter* rejecter) {
-             glBindTexture(mTexTarget, mTexName);
-             return NO_ERROR;
+ #else
+@@ -314,7 +320,11 @@ status_t SurfaceTexture::updateTexImage(BufferRejecter* rejecter, bool deferConv
          }
--
-+#ifndef STE_HARDWARE
-         // Update the GL texture object. We may have to do this even when
-         // item.mGraphicBuffer == NULL, if we destroyed the EGLImage when
-         // detaching from a context but the buffer has not been re-allocated.
-@@ -260,7 +298,103 @@ status_t SurfaceTexture::updateTexImage(BufferRejecter* rejecter) {
-                 }
-             }
-         }
+ #else
+         EGLImageKHR image;
++#ifndef STE_SNDA_HARDWARE
+         EGLDisplay dpy = eglGetCurrentDisplay();
 +#else
-+        EGLImageKHR image;
 +        sp<GraphicBuffer> graphicBuffer;
-+        if (conversionIsNeeded(mEGLSlots[buf].mGraphicBuffer)) {
-+            mNeedsConversion = deferConversion;
-+            // If color conversion is needed we can't use the graphic buffers
-+            // located in mSlots for the textures (wrong color format). Instead
-+            // color convert it into a buffer in mBlitSlots and use that instead.
-+            image = mBlitSlots[mNextBlitSlot].mEglImage;
-+
-+            // If there exists an image already, make sure that
-+            // the dimensions match the current source buffer.
-+            // Otherwise, destroy the buffer and let a new one be allocated.
-+            if (image != EGL_NO_IMAGE_KHR &&
-+                    mEGLSlots[buf].mGraphicBuffer != NULL &&
-+                    mBlitSlots[mNextBlitSlot].mGraphicBuffer != NULL) {
-+                sp<GraphicBuffer> &srcBuf = mEGLSlots[buf].mGraphicBuffer;
-+                sp<GraphicBuffer> &bltBuf =
-+                    mBlitSlots[mNextBlitSlot].mGraphicBuffer;
-+                if (srcBuf->getWidth() != bltBuf->getWidth() ||
-+                        srcBuf->getHeight() != bltBuf->getHeight()) {
-+                    eglDestroyImageKHR(mBlitSlots[mNextBlitSlot].mEglDisplay,
-+                        image);
-+                    mBlitSlots[mNextBlitSlot].mEglImage = EGL_NO_IMAGE_KHR;
-+                    mBlitSlots[mNextBlitSlot].mGraphicBuffer = NULL;
-+                    image = EGL_NO_IMAGE_KHR;
-+                }
-+            }
-+
-+            if (image == EGL_NO_IMAGE_KHR) {
-+                sp<GraphicBuffer> &srcBuf = mEGLSlots[buf].mGraphicBuffer;
-+                status_t res = 0;
-+
-+                sp<GraphicBuffer> blitBuffer(
-+                        mGraphicBufferAlloc->createGraphicBuffer(
-+                                srcBuf->getWidth(), srcBuf->getHeight(),
-+                                PIXEL_FORMAT_RGBA_8888, srcBuf->getUsage(),
-+                                &res));
-+                if (blitBuffer == 0) {
-+                    ST_LOGE("updateTexImage: SurfaceComposer::createGraphicBuffer failed");
-+                    return NO_MEMORY;
-+                }
-+                if (res != NO_ERROR) {
-+                    ST_LOGW("updateTexImage: SurfaceComposer::createGraphicBuffer error=%#04x", res);
-+                }
-+                mBlitSlots[mNextBlitSlot].mGraphicBuffer = blitBuffer;
-+
-+                image = createImage(dpy, blitBuffer);
-+                mBlitSlots[mNextBlitSlot].mEglImage = image;
-+                mBlitSlots[mNextBlitSlot].mEglDisplay = dpy;
-+            }
-+
-+            if (deferConversion) {
-+                mConversionSrcSlot = buf;
-+                mConversionBltSlot = mNextBlitSlot;
-+                graphicBuffer = mEGLSlots[buf].mGraphicBuffer;
-+                // At this point graphicBuffer and image do not point
-+                // at matching buffers. This is intentional as this
-+                // surface might end up being taken care of by HWComposer,
-+                // which needs access to the original buffer.
-+                // GL however, is fed an EGLImage that is created from
-+                // a conversion buffer. It will have its
-+                // content updated once the surface is actually drawn
-+                // in Layer::onDraw()
-+            } else {
-+                if (convert(mEGLSlots[buf].mGraphicBuffer,
-+                        mBlitSlots[mNextBlitSlot].mGraphicBuffer) != OK) {
-+                    ALOGE("updateTexImage: convert failed");
-+                    return UNKNOWN_ERROR;
-+                }
-+                graphicBuffer = mBlitSlots[mNextBlitSlot].mGraphicBuffer;
-+            }
- 
-+            // mBlitSlots contains several buffers (NUM_BLIT_BUFFER_SLOTS),
-+            // advance (potentially wrap) the index
-+            mNextBlitSlot = (mNextBlitSlot + 1) % NUM_BLIT_BUFFER_SLOTS;
-+        } else {
-+            mNeedsConversion = false;
-+            image = mEGLSlots[buf].mEglImage;
-+            graphicBuffer = mEGLSlots[buf].mGraphicBuffer;
-+            if (image == EGL_NO_IMAGE_KHR) {
-+                if (graphicBuffer == 0) {
-+                    ST_LOGE("updateTexImage: buffer at slot %d is null", buf);
-+                    err = BAD_VALUE;
-+                } else {
-+                    image = createImage(dpy, graphicBuffer);
-+                    mEGLSlots[buf].mEglImage = image;
-+                    mEGLSlots[buf].mEglDisplay = dpy;
-+                    if (image == EGL_NO_IMAGE_KHR) {
-+                        // NOTE: if dpy was invalid, createImage() is guaranteed to
-+                        // fail. so we'd end up here.
-+                        err = UNKNOWN_ERROR;
-+                    }
-+                }
-+            }
-+        }
 +#endif
-         if (err == NO_ERROR) {
-             GLint error;
-             while ((error = glGetError()) != GL_NO_ERROR) {
-@@ -310,7 +444,11 @@ status_t SurfaceTexture::updateTexImage(BufferRejecter* rejecter) {
- 
-         // Update the SurfaceTexture state.
-         mCurrentTexture = buf;
-+#ifndef STE_HARDWARE
-         mCurrentTextureBuf = mEGLSlots[buf].mGraphicBuffer;
-+#else
-+		mCurrentTextureBuf = graphicBuffer;
-+#endif
-         mCurrentCrop = item.mCrop;
-         mCurrentTransform = item.mTransform;
-         mCurrentScalingMode = item.mScalingMode;
-@@ -503,8 +641,18 @@ bool SurfaceTexture::isExternalFormat(uint32_t format)
-     case HAL_PIXEL_FORMAT_YV12:
-     // Legacy/deprecated YUV formats
-     case HAL_PIXEL_FORMAT_YCbCr_422_SP:
-+#ifdef STE_HARDWARE
-+    case HAL_PIXEL_FORMAT_YCbCr_420_SP:
-+#else
-     case HAL_PIXEL_FORMAT_YCrCb_420_SP:
-+#endif
-     case HAL_PIXEL_FORMAT_YCbCr_422_I:
-+#ifdef STE_HARDWARE
-+    case HAL_PIXEL_FORMAT_YCrCb_422_SP:
-+    case HAL_PIXEL_FORMAT_YCrCb_422_P:
-+    case HAL_PIXEL_FORMAT_YCrCb_420_SP:
-+    case HAL_PIXEL_FORMAT_YCrCb_420_P:
-+#endif
-         return true;
-     }
- 
-@@ -736,7 +884,16 @@ void SurfaceTexture::abandon() {
-         for (int i =0; i < BufferQueue::NUM_BUFFER_SLOTS; i++) {
-             freeBufferLocked(i);
-         }
+         if (conversionIsNeeded(mEGLSlots[buf].mGraphicBuffer)) {
+             mNeedsConversion = deferConversion;
+             // If color conversion is needed we can't use the graphic buffers
+@@ -357,8 +367,9 @@ status_t SurfaceTexture::updateTexImage(BufferRejecter* rejecter, bool deferConv
+                     ST_LOGW("updateTexImage: SurfaceComposer::createGraphicBuffer error=%#04x", res);
+                 }
+                 mBlitSlots[mNextBlitSlot].mGraphicBuffer = blitBuffer;
 -
-+#ifdef STE_HARDWARE
-+        for (int i = 0; i < NUM_BLIT_BUFFER_SLOTS; i++) {
-+            mBlitSlots[i].mGraphicBuffer = 0;
-+            if (mBlitSlots[i].mEglImage != EGL_NO_IMAGE_KHR) {
-+                eglDestroyImageKHR(mBlitSlots[i].mEglDisplay, mBlitSlots[i].mEglImage);
-+                mBlitSlots[i].mEglImage = EGL_NO_IMAGE_KHR;
-+                mBlitSlots[i].mEglDisplay = EGL_NO_DISPLAY;
-+            }
-+        }
++#ifndef STE_SNDA_HARDWARE
+                 EGLDisplay dpy = eglGetCurrentDisplay();
 +#endif
-         // disconnect from the BufferQueue
-         mBufferQueue->consumerDisconnect();
-         mBufferQueue.clear();
-@@ -838,7 +995,85 @@ void SurfaceTexture::dump(String8& result, const char* prefix,
-         mBufferQueue->dump(result, prefix, buffer, SIZE);
-     }
- }
-+#ifdef STE_HARDWARE
-+bool SurfaceTexture::conversionIsNeeded(const sp<GraphicBuffer>& graphicBuffer) {
-+    int fmt = graphicBuffer->getPixelFormat();
-+    return (fmt == PIXEL_FORMAT_YCBCR42XMBN)
-+            || (fmt == PIXEL_FORMAT_YCbCr_420_P)
+                 image = createImage(dpy, blitBuffer);
+                 mBlitSlots[mNextBlitSlot].mEglImage = image;
+                 mBlitSlots[mNextBlitSlot].mEglDisplay = dpy;
+@@ -392,14 +403,20 @@ status_t SurfaceTexture::updateTexImage(BufferRejecter* rejecter, bool deferConv
+             image = mEGLSlots[buf].mEglImage ;
+             item.mGraphicBuffer = mEGLSlots[buf].mGraphicBuffer;
+             if (image == EGL_NO_IMAGE_KHR) {
++#ifndef STE_SNDA_HARDWARE
+                 EGLDisplay dpy = eglGetCurrentDisplay();
++#endif	
+                 if (item.mGraphicBuffer == 0) {
+                     ST_LOGE("buffer at slot %d is null", buf);
+                     return BAD_VALUE;
+                 }
+                 image = createImage(dpy, item.mGraphicBuffer);
+                 mEGLSlots[buf].mEglImage = image;
++#ifndef STE_SNDA_HARDWARE
+                 mEglDisplay = dpy;
++#else		
++				mEGLSlots[buf].mEglDisplay = dpy;
++#endif
+                 if (image == EGL_NO_IMAGE_KHR) {
+                     // NOTE: if dpy was invalid, createImage() is guaranteed to
+                     // fail. so we'd end up here.
+@@ -1019,7 +1036,12 @@ void SurfaceTexture::dump(String8& result, const char* prefix,
+ #ifdef STE_HARDWARE
+ bool SurfaceTexture::conversionIsNeeded(const sp<GraphicBuffer>& graphicBuffer) {
+     int fmt = graphicBuffer->getPixelFormat();
+-    return (fmt == PIXEL_FORMAT_YCBCR42XMBN) || (fmt == PIXEL_FORMAT_YCbCr_420_P);
++    return (fmt == PIXEL_FORMAT_YCBCR42XMBN) || (fmt == PIXEL_FORMAT_YCbCr_420_P)
++#ifdef STE_SNDA_HARDWARE
 +            || (fmt == PIXEL_FORMAT_YCbCr_420_SP)
-+            || (fmt == PIXEL_FORMAT_YCbCr_422_I);
-+}
-+
-+status_t SurfaceTexture::convert() {
-+    if (!mNeedsConversion)
-+        return NO_ERROR;
-+
-+    if (mConversionBltSlot < 0 ||
-+            mConversionBltSlot >= NUM_BLIT_BUFFER_SLOTS ||
-+            mConversionSrcSlot < 0 ||
-+            mConversionSrcSlot >= BufferQueue::NUM_BUFFER_SLOTS) {
-+        ALOGE_IF(STE_DEFERDBG, "%s: Incorrect setup for deferred "
-+            "texture conversion:\n"
-+            "mConversionSrcSlot=%d mConversionBltSlot=%d", __FUNCTION__,
-+            mConversionSrcSlot, mConversionBltSlot);
-+        return BAD_VALUE;
-+    }
-+
-+    if (mEGLSlots[mConversionSrcSlot].mGraphicBuffer == NULL) {
-+        ALOGI_IF(STE_DEFERDBG, "%s: NULL source for deferred texture conversion.",
-+            __FUNCTION__);
-+        return OK;
-+    }
-+
-+    if (mBlitSlots[mConversionBltSlot].mGraphicBuffer == NULL) {
-+        ALOGI_IF(STE_DEFERDBG, "%s: NULL destination for deferred "
-+            "texture conversion.", __FUNCTION__);
-+        return OK;
-+    }
-+    return convert(mEGLSlots[mConversionSrcSlot].mGraphicBuffer,
-+        mBlitSlots[mConversionBltSlot].mGraphicBuffer);
-+}
- 
-+status_t SurfaceTexture::convert(sp<GraphicBuffer> &srcBuf, sp<GraphicBuffer> &dstBuf) {
-+    copybit_image_t dstImg;
-+    dstImg.w = dstBuf->getWidth();
-+    dstImg.h = dstBuf->getHeight();
-+    dstImg.format = dstBuf->getPixelFormat();
-+    dstImg.handle = (native_handle_t*) dstBuf->getNativeBuffer()->handle;
-+
-+    copybit_image_t srcImg;
-+    srcImg.w = srcBuf->getWidth();
-+    srcImg.h = srcBuf->getHeight();
-+    srcImg.format = srcBuf->getPixelFormat();
-+    srcImg.base = NULL;
-+    srcImg.handle = (native_handle_t*) srcBuf->getNativeBuffer()->handle;
-+
-+    copybit_rect_t dstCrop;
-+    dstCrop.l = 0;
-+    dstCrop.t = 0;
-+    dstCrop.r = dstBuf->getWidth();
-+    dstCrop.b = dstBuf->getHeight();
-+
-+    copybit_rect_t srcCrop;
-+    srcCrop.l = 0;
-+    srcCrop.t = 0;
-+    srcCrop.r = srcBuf->getWidth();
-+    srcCrop.b = srcBuf->getHeight();
-+
-+    region_iterator clip(Region(Rect(dstCrop.r, dstCrop.b)));
-+    mBlitEngine->set_parameter(mBlitEngine, COPYBIT_TRANSFORM, 0);
-+    mBlitEngine->set_parameter(mBlitEngine, COPYBIT_PLANE_ALPHA, 0xFF);
-+    mBlitEngine->set_parameter(mBlitEngine, COPYBIT_DITHER, COPYBIT_ENABLE);
-+
-+    int err = mBlitEngine->stretch(
-+            mBlitEngine, &dstImg, &srcImg, &dstCrop, &srcCrop, &clip);
-+    if (err != 0) {
-+        ALOGE("\nError: Blit stretch operation failed (err:%d)\n", err);
-+        return UNKNOWN_ERROR;
-+    }
-+    return OK;
-+}
++            || (fmt == PIXEL_FORMAT_YCbCr_422_I)
 +#endif
- static void mtxMul(float out[16], const float a[16], const float b[16]) {
-     out[0] = a[0]*b[0] + a[4]*b[1] + a[8]*b[2] + a[12]*b[3];
-     out[1] = a[1]*b[0] + a[5]*b[1] + a[9]*b[2] + a[13]*b[3];
-diff --git a/frameworks/native/libs/ui/PixelFormat.cpp b/frameworks/native/libs/ui/PixelFormat.cpp
-index 3ced41d..ade9b03 100644
---- a/frameworks/native/libs/ui/PixelFormat.cpp
-+++ b/frameworks/native/libs/ui/PixelFormat.cpp
-@@ -100,11 +100,25 @@ status_t getPixelFormatInfo(PixelFormat format, PixelFormatInfo* info)
-     // YUV format from the HAL are handled here
-     switch (format) {
-     case HAL_PIXEL_FORMAT_YCbCr_422_SP:
-+#ifdef STE_HARDWARE
-+    case HAL_PIXEL_FORMAT_YCrCb_422_SP:
-+    case HAL_PIXEL_FORMAT_YCbCr_422_P:
-+    case HAL_PIXEL_FORMAT_CbYCrY_422_I:
-+#endif
-     case HAL_PIXEL_FORMAT_YCbCr_422_I:
-         info->bitsPerPixel = 16;
-         goto done;
-     case HAL_PIXEL_FORMAT_YCrCb_420_SP:
-     case HAL_PIXEL_FORMAT_YV12:
-+#ifdef STE_HARDWARE
-+    case HAL_PIXEL_FORMAT_YCbCr_420_SP:
-+    case HAL_PIXEL_FORMAT_YCbCr_420_SP_TILED:
-+    case HAL_PIXEL_FORMAT_YCrCb_420_SP_TILED:
-+    case HAL_PIXEL_FORMAT_YCbCr_420_P:
-+    case HAL_PIXEL_FORMAT_YCbCr_420_I:
-+    case HAL_PIXEL_FORMAT_CbYCrY_420_I:
-+    case HAL_PIXEL_FORMAT_YCBCR42XMBN:
-+#endif
-         info->bitsPerPixel = 12;
-      done:
-         info->format = format;
-diff --git a/frameworks/native/opengl/include/EGL/eglext.h b/frameworks/native/opengl/include/EGL/eglext.h
-index 2d41aa7..ebe56fd 100644
---- a/frameworks/native/opengl/include/EGL/eglext.h
-+++ b/frameworks/native/opengl/include/EGL/eglext.h
-@@ -236,6 +236,7 @@ struct ANativeWindowBuffer;
- 
- /* EGL_NV_system_time
-  */
-+#ifndef STE_HARDWARE
- #ifndef EGL_NV_system_time
- #define EGL_NV_system_time 1
- typedef khronos_int64_t EGLint64NV;
-@@ -247,6 +248,7 @@ EGLAPI EGLuint64NV EGLAPIENTRY eglGetSystemTimeNV(void);
- typedef EGLuint64NV (EGLAPIENTRYP PFNEGLGETSYSTEMTIMEFREQUENCYNVPROC)(void);
- typedef EGLuint64NV (EGLAPIENTRYP PFNEGLGETSYSTEMTIMENVPROC)(void);
- #endif
-+#endif
- 
- /* EGL_ANDROID_blob_cache
-  */
-diff --git a/frameworks/native/opengl/libs/EGL/eglApi.cpp b/frameworks/native/opengl/libs/EGL/eglApi.cpp
-index 1bc4eb7..e535606 100644
---- a/frameworks/native/opengl/libs/EGL/eglApi.cpp
-+++ b/frameworks/native/opengl/libs/EGL/eglApi.cpp
-@@ -70,10 +70,12 @@ static const extention_map_t sExtentionMap[] = {
-             (__eglMustCastToProperFunctionPointerType)&eglCreateImageKHR },
-     { "eglDestroyImageKHR",
-             (__eglMustCastToProperFunctionPointerType)&eglDestroyImageKHR },
-+#ifndef STE_HARDWARE
-     { "eglGetSystemTimeFrequencyNV",
-             (__eglMustCastToProperFunctionPointerType)&eglGetSystemTimeFrequencyNV },
-     { "eglGetSystemTimeNV",
-             (__eglMustCastToProperFunctionPointerType)&eglGetSystemTimeNV },
-+#endif
- };
- 
- // accesses protected by sExtensionMapMutex
-@@ -1195,6 +1197,7 @@ EGLBoolean eglGetSyncAttribKHR(EGLDisplay dpy, EGLSyncKHR sync,
- // ----------------------------------------------------------------------------
- // NVIDIA extensions
- // ----------------------------------------------------------------------------
-+#ifndef STE_HARDWARE
- EGLuint64NV eglGetSystemTimeFrequencyNV()
- {
-     clearError();
-@@ -1230,3 +1233,4 @@ EGLuint64NV eglGetSystemTimeNV()
- 
-     return setErrorQuiet(EGL_BAD_DISPLAY, 0);
++	;
  }
-+#endif
-\ No newline at end of file
-diff --git a/frameworks/native/opengl/libs/EGL/egl_display.cpp b/frameworks/native/opengl/libs/EGL/egl_display.cpp
-index a46aa38..537f2e6 100644
---- a/frameworks/native/opengl/libs/EGL/egl_display.cpp
-+++ b/frameworks/native/opengl/libs/EGL/egl_display.cpp
-@@ -52,7 +52,9 @@ static char const * const sExtensionString  =
-         "EGL_KHR_gl_texture_cubemap_image "
-         "EGL_KHR_gl_renderbuffer_image "
-         "EGL_KHR_fence_sync "
-+#ifndef STE_HARDWARE
-         "EGL_NV_system_time "
-+#endif
-         "EGL_ANDROID_image_native_buffer "      // mandatory
-         ;
  
-diff --git a/frameworks/native/opengl/libs/EGL/egl_entries.in b/frameworks/native/opengl/libs/EGL/egl_entries.in
-index 9feb716..4968748 100644
---- a/frameworks/native/opengl/libs/EGL/egl_entries.in
-+++ b/frameworks/native/opengl/libs/EGL/egl_entries.in
-@@ -64,10 +64,10 @@ EGL_ENTRY(EGLBoolean, eglSetSwapRectangleANDROID, EGLDisplay, EGLSurface, EGLint
- EGL_ENTRY(EGLClientBuffer, eglGetRenderBufferANDROID, EGLDisplay, EGLSurface)
- 
- /* NVIDIA extensions */
--
-+#ifndef STE_HARDWARE
- EGL_ENTRY(EGLuint64NV, eglGetSystemTimeFrequencyNV, void)
- EGL_ENTRY(EGLuint64NV, eglGetSystemTimeNV, void)
--
-+#endif
- /* IMG extensions */
- 
- EGL_ENTRY(EGLBoolean, eglHibernateProcessIMG, void)
-diff --git a/frameworks/native/services/surfaceflinger/DisplayHardware/DisplayHardware.cpp b/frameworks/native/services/surfaceflinger/DisplayHardware/DisplayHardware.cpp
-index bb93215..8284bc8 100644
---- a/frameworks/native/services/surfaceflinger/DisplayHardware/DisplayHardware.cpp
-+++ b/frameworks/native/services/surfaceflinger/DisplayHardware/DisplayHardware.cpp
-@@ -456,6 +456,10 @@ void DisplayHardware::flip(const Region& dirty) const
-     if (mHwc->initCheck() == NO_ERROR) {
-         mHwc->commit();
-     } else {
-+#ifdef STE_HARDWARE
-+        // Make sure the swapbuffer call is done in sync
-+        mNativeWindow->compositionComplete();
-+#endif
-         eglSwapBuffers(dpy, surface);
-     }
-     checkEGLErrors("eglSwapBuffers");
-diff --git a/frameworks/native/services/surfaceflinger/Layer.cpp b/frameworks/native/services/surfaceflinger/Layer.cpp
-index 4062340..c4bb008 100644
---- a/frameworks/native/services/surfaceflinger/Layer.cpp
-+++ b/frameworks/native/services/surfaceflinger/Layer.cpp
-@@ -316,7 +316,17 @@ void Layer::setPerFrameData(hwc_layer_t* hwcl) {
- void Layer::onDraw(const Region& clip) const
- {
-     ATRACE_CALL();
--
-+#ifdef STE_HARDWARE
-+    // Convert the texture to a native format if need be.
-+    // convert() returns immediately if no conversion is necessary.
-+    if (mSurfaceTexture != NULL) {
-+        status_t res = mSurfaceTexture->convert();
-+        if (res != NO_ERROR) {
-+            ALOGE("Layer::onDraw: texture conversion failed. "
-+                "Texture content for this layer will not be initialized.");
-+        }
-+    }
-+#endif
-     if (CC_UNLIKELY(mActiveBuffer == 0)) {
-         // the texture has not been created yet, this Layer has
-         // in fact never been drawn into. This happens frequently with
-@@ -623,8 +633,11 @@ void Layer::lockPageFlip(bool& recomputeVisibleRegions)
- 
- 
-         Reject r(mDrawingState, currentState(), recomputeVisibleRegions);
--
-+#ifndef STE_HARDWARE
-         if (mSurfaceTexture->updateTexImage(&r) < NO_ERROR) {
-+#else
-+	if (mSurfaceTexture->updateTexImage(&r, true) < NO_ERROR) {
-+#endif
-             // something happened!
-             recomputeVisibleRegions = true;
-             return;
-diff --git a/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp b/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
-index 51fcce4..b9e1f75 100644
---- a/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
-+++ b/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
-@@ -445,7 +445,9 @@ void SurfaceFlinger::onMessageReceived(int32_t what)
-                 // repaint the framebuffer (if needed)
-                 handleRepaint();
-                 // inform the h/w that we're done compositing
-+#ifndef STE_HARDWARE
-                 hw.compositionComplete();
-+#endif
-                 postFramebuffer();
-             } else {
-                 // pretend we did the post
-@@ -833,9 +835,10 @@ void SurfaceFlinger::handleRepaint()
- 
-     // set the frame buffer
-     const DisplayHardware& hw(graphicPlane(0).displayHardware());
-+#ifndef STE_HARDWARE
-     glMatrixMode(GL_MODELVIEW);
-     glLoadIdentity();
--
-+#endif
-     uint32_t flags = hw.getFlags();
-     if (flags & DisplayHardware::SWAP_RECTANGLE) {
-         // we can redraw only what's dirty, but since SWAP_RECTANGLE only
-@@ -917,10 +920,12 @@ void SurfaceFlinger::composeSurfaces(const Region& dirty)
-             glClear(GL_COLOR_BUFFER_BIT);
-         } else {
-             // screen is already cleared here
-+#ifndef STE_HARDWARE
-             if (!mWormholeRegion.isEmpty()) {
-                 // can happen with SurfaceView
-                 drawWormhole();
-             }
-+#endif
-         }
- 
-         /*
-@@ -2648,9 +2653,15 @@ sp<GraphicBuffer> GraphicBufferAlloc::createGraphicBuffer(uint32_t w, uint32_t h
-         if (err == NO_MEMORY) {
-             GraphicBuffer::dumpAllocationsToSystemLog();
-         }
-+#ifndef STE_HARDWARE
-         ALOGE("GraphicBufferAlloc::createGraphicBuffer(w=%d, h=%d) "
-              "failed (%s), handle=%p",
-                 w, h, strerror(-err), graphicBuffer->handle);
-+#else
-+        ALOGE("GraphicBufferAlloc::createGraphicBuffer(w=%d, h=%d, format=%#x) "
-+             "failed (%s), handle=%p",
-+               w, h, format, strerror(-err), graphicBuffer->handle);
-+#endif
-         return 0;
-     }
-     return graphicBuffer;
+ status_t SurfaceTexture::convert() {
