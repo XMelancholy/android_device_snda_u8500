@@ -38,7 +38,7 @@ Our step is optional!!! Use only if you going to sync CM 10 source code daily, t
 
 Download CM prebuilts : 
 
-		./vendor/cm/get-prebuilts cd
+		./vendor/cm/get-prebuilts
 
 You are ready to build :
 
