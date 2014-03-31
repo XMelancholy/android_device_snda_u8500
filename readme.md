@@ -22,6 +22,7 @@ Now connect your phone which have runing CM10 :
 
 
 Patch android source code :
+
 		patch -p1 < hardware/semc/patches/framework_av.patch
 		patch -p1 < hardware/semc/patches/framework_base.patch
 
