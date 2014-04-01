@@ -34,6 +34,7 @@ BOARD_USES_ALSA_AUDIO := true
 
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
+BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/snda/u8500/hardware/bluetooth
 
 # Camera
 USE_CAMERA_STUB := true
