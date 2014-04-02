@@ -84,6 +84,11 @@ PRODUCT_COPY_FILES += \
    $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/surround71.conf:system/usr/share/alsa/pcm/surround71.conf \
    $(LOCAL_PATH)/hardware/libasound/src/conf/alsa.conf:system/usr/share/alsa/alsa.conf
 
+# New cn_binary needed for mobile network for cm11
+# cn_binary source build for kk ,jb cn_binary it's not work
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/prebuilt/system/bin/cn_server:system/bin/cn_server
+
 # BT Config
 PRODUCT_COPY_FILES += \
    system/bluetooth/data/main.conf:system/etc/bluetooth/main.conf \
@@ -142,6 +147,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    libnetcmdiface
 
+# Netlink
+PRODUCT_PACKAGES += \
+    libnl_2
+
 # FileExplorer
 #PRODUCT_PACKAGES += \
 #   FileExplorer
@@ -152,6 +161,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
    persist.sys.usb.config=mtp,adb \
    ro.sf.lcd_density=240 \
    wifi.interface=wlan0
+
+# kitkat bootloop fix. More info http://source.android.com/devices/tuning.html
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.zygote.disable_gl_preload=1
 
 # This device is xhdpi.  However the platform doesn't
 # currently contain all of the bitmaps at xhdpi density so

@@ -23,17 +23,31 @@ Now connect your phone which have runing CM10 :
 
 Patch android source code :
 
-		patch -p1 < device/snda/u8500/patches/framework_av.patch
-		patch -p1 < device/snda/u8500/patches/framework_base.patch
+		patch -p1 < device/snda/u8500/patches/bionic.patch
+		patch -p1 < device/snda/u8500/patches/frameworks_av.patch
+		patch -p1 < device/snda/u8500/patches/frameworks_base.patch
+		patch -p1 < device/snda/u8500/patches/frameworks_native.patch
+		patch -p1 < device/snda/u8500/patches/hardware_libhardware.patch
+		patch -p1 < device/snda/u8500/patches/system_core.patch
+
+
 
 Our step is optional!!! Use only if you going to sync CM 10 source code daily, than simple revert each patch before you sync CM 10 source code :
 
-		patch -p1 -R < device/snda/u8500/patches/framework_av.patch
-		patch -p1 -R < device/snda/u8500/patches/framework_base.patch
+		patch -p1 -R < device/snda/u8500/patches/bionic.patch
+		patch -p1 -R < device/snda/u8500/patches/frameworks_av.patch
+		patch -p1 -R < device/snda/u8500/patches/frameworks_base.patch
+		patch -p1 -R < device/snda/u8500/patches/frameworks_native.patch
+		patch -p1 -R < device/snda/u8500/patches/hardware_libhardware.patch
+		patch -p1 -R < device/snda/u8500/patches/system_core.patch
 		repo forall -p -c 'git checkout -f'
 		repo sync
-		patch -p1 < device/snda/u8500/patches/framework_av.patch
-		patch -p1 < device/snda/u8500/patches/framework_base.patch
+		patch -p1 < device/snda/u8500/patches/bionic.patch
+		patch -p1 < device/snda/u8500/patches/frameworks_av.patch
+		patch -p1 < device/snda/u8500/patches/frameworks_base.patch
+		patch -p1 < device/snda/u8500/patches/frameworks_native.patch
+		patch -p1 < device/snda/u8500/patches/hardware_libhardware.patch
+		patch -p1 < device/snda/u8500/patches/system_core.patch
 
 
 Download CM prebuilts : 

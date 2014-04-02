@@ -13,6 +13,8 @@ debug.sf.hw=1
 # This gives bad performace for deferred renderers
 # such as Mali.
 hwui.render_dirty_regions=false
+# disable dirty regions invalidation
+debug.hwui.render_dirty_regions=false
 
 # STE: Low power audio - enable ULP mode
 ste.nmf.autoidle=1
