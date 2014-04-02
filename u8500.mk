@@ -57,7 +57,6 @@ PRODUCT_COPY_FILES += \
    $(LOCAL_PATH)/prebuilt/system/etc/omxloaders:system/etc/omxloaders \
    $(LOCAL_PATH)/prebuilt/system/etc/ril_config:system/etc/ril_config \
    $(LOCAL_PATH)/prebuilt/system/etc/ste_modem.sh:system/etc/ste_modem.sh \
-   $(LOCAL_PATH)/prebuilt/system/etc/vold.fstab:system/etc/vold.fstab \
    $(LOCAL_PATH)/prebuilt/system/etc/init.d/01stesetup:system/etc/init.d/01stesetup \
    $(LOCAL_PATH)/prebuilt/system/etc/init.d/10wireless:system/etc/init.d/10wireless \
    $(LOCAL_PATH)/prebuilt/system/etc/wifi/p2p_supplicant.conf:system/etc/wifi/p2p_supplicant.conf \
@@ -88,14 +87,6 @@ PRODUCT_COPY_FILES += \
 # cn_binary source build for kk ,jb cn_binary it's not work
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/system/bin/cn_server:system/bin/cn_server
-
-# BT Config
-PRODUCT_COPY_FILES += \
-   system/bluetooth/data/main.conf:system/etc/bluetooth/main.conf \
-   system/bluetooth/data/audio.conf:system/etc/bluetooth/audio.conf \
-   system/bluetooth/data/blacklist.conf:system/etc/bluetooth/blacklist.conf \
-   system/bluetooth/data/input.conf:system/etc/bluetooth/input.conf \
-   system/bluetooth/data/network.conf:system/etc/bluetooth/network.conf
 
 # Hostapd
 PRODUCT_PACKAGES += \
@@ -130,10 +121,6 @@ PRODUCT_PACKAGES += \
 # libcopybit
 PRODUCT_PACKAGES += \
    copybit.montblanc
-
-# libsensors
-PRODUCT_PACKAGES += \
-   sensors.montblanc
 
 # libpower
 PRODUCT_PACKAGES += \
