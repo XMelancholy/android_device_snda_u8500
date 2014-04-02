@@ -2,19 +2,31 @@
 #       Commented out lines are kept for reference.
 
 import /init.${ro.hardware}.usb.rc
+on early-init
+    mkdir /mnt 0775 root system
+    mkdir /mnt/shell 0700 shell shell
+    mkdir /mnt/media_rw 0700 media_rw media_rw
+    mkdir /storage 0751 root sdcard_r
+
+    # storage directories
+    mkdir /mnt/media_rw/sdcard0 0700 media_rw media_rw
+
+    # fuse storage directories
+    mkdir /storage/sdcard0 0700 root root
+
+    export EXTERNAL_STORAGE /storage/sdcard0
+
+    # for backwards compatibility
+    symlink /storage/sdcard0 /sdcard
+    symlink /storage/sdcard0 /mnt/sdcard
+
+    chmod 0644 /proc/cmdline
 
 on init
 
     # setup the global environment
     export OMX_STE_ENS_COMPONENTS_DIR /system/lib/ste_omxcomponents/
     export OMX_BELLAGIO_LOADER_REGISTRY /system/etc/omxloaders
-
-
-    export EXTERNAL_STORAGE /storage/sdcard0
-    mkdir /storage 0775 system system
-    mkdir /storage/sdcard0 0775 system system
-    symlink /storage/sdcard0 /mnt/sdcard
-    symlink /storage/sdcard0 /sdcard
 
     mkdir /modemfs 0771 system system
 
@@ -32,6 +44,31 @@ on init
     # mount debugfs in order for Audio ADM component to retrieve debug information
     mkdir /debug
     mount debugfs none /debug
+    # make files in /sys/ non-writable for OTHERS
+    chmod 220 /sys/ab8500_chargalg/chargalg
+    chown system system /sys/ab8500_chargalg/chargalg
+    chmod 664 /sys/devices/sensor00/fn54/fifoindex
+    chmod 664 /sys/devices/sensor00/fn54/get_report
+    chmod 664 /sys/devices/sensor00/fn54/no_auto_cal
+    chmod 664 /sys/devices/sensor00/fn54/status
+    chmod 664 /sys/devices/sensor00/fn54/reporttype
+    chmod 220 /sys/devices/sensor00/fn34/rescanPDT
+    chmod 664 /sys/devices/sensor00/fn34/blocknum
+    chmod 664 /sys/devices/sensor00/fn34/cmd
+    chmod 664 /sys/devices/sensor00/fn34/bootloaderid
+    chmod 664 /sys/devices/sensor00/fn34/data
+    chmod 664 /sys/devices/sensor00/fn11/relreport
+    chmod 664 /sys/devices/sensor00/fn11/swap
+    chmod 664 /sys/devices/sensor00/fn11/offset
+    chmod 664 /sys/devices/sensor00/fn11/clip
+    chmod 664 /sys/devices/sensor00/fn11/flip
+    chmod 220 /sys/devices/sensor00/fn01/reset
+    chmod 664 /sys/devices/sensor00/fn01/reportrate
+    chmod 664 /sys/devices/sensor00/fn01/nosleep
+    chmod 664 /sys/devices/sensor00/fn01/chargerinput
+    chmod 664 /sys/devices/sensor00/fn01/sleepmode
+    chmod 664 /sys/devices/sensor00/enabled
+    chmod 664 /sys/devices/sensor00/hasbsr
 
 on fs
 
@@ -86,6 +123,11 @@ on post-fs
     chmod 0660 /sys/power/state
     chmod 0660 /sys/power/wake_lock
     chmod 0660 /sys/power/wake_unlock
+    # STE Camera permissions
+    chown media  system   dev/mmio_camera
+    chown media  system   dev/camera_flash
+    chmod 0660 dev/camera_flash
+    chmod 0660 dev/mmio_camera
 
 on post-fs-data
 
@@ -161,7 +203,74 @@ on early-boot
     write /sys/module/cm/parameters/enable_auto_pm 1
 
 on boot
+    # STE permissions 
+    chown system graphics dev/ape_opp
+    chown system graphics dev/b2r2_blt
+    chown media  system   dev/cm_channel
+    chown media  system   dev/cm_control
+    chown media  system   dev/cm_sia_trace
+    chown media  system   dev/cm_sva_trace
+    chown system graphics dev/comp0
+    chown system graphics dev/ddr_opp
+    chown media  system   dev/hwmem
+    chown media  system   dev/i2c-2
+    chown system graphics dev/mali
+    chown audio  audio    dev/modemaudio
+    chown root   wifi     dev/rfkill
+    chown media  system   dev/stm
+    chown root   system   dev/tee
+    chown system system   dev/tsl27713
 
+    chmod 0666 dev/ape_opp
+    chmod 0666 dev/b2r2_blt
+    chmod 0660 dev/cm_channel
+    chmod 0660 dev/cm_control
+    chmod 0444 dev/cm_sia_trace
+    chmod 0444 dev/cm_sva_trace
+    chmod 0666 dev/comp0
+    chmod 0660 dev/ddr_opp
+    chmod 0666 dev/hwmem
+    chmod 0660 dev/i2c-2
+    chmod 0666 dev/mali
+    chmod 0660 dev/modemaudio
+    chmod 0660 dev/rfkill
+    chmod 0660 dev/stm
+    chmod 0666 dev/tee
+    chmod 0666 dev/tsl27713
+
+# ST-Ericsson Connectivity Controller interfaces
+    chown system system   dev/cg2900_audio
+    chown system system   dev/cg2900_bt_acl
+    chown system system   dev/cg2900_bt_cmd
+    chown system system   dev/cg2900_bt_evt
+    chown system system   dev/cg2900_core
+    chown system system   dev/cg2900_core_test
+    chown system system   dev/cg2900_debug
+    chown system system   dev/cg2900_fm_audio
+    chown system system   dev/cg2900_fm_radio
+    chown gps    gps      dev/cg2900_gnss
+    chown system system   dev/cg2900_hci_logger
+    chown system system   dev/cg2900_hci_raw
+    chown system system   dev/cg2900_ste_tools
+    chown system system   dev/cg2900_vs_audio
+
+    chmod 0660 dev/cg2900_audio
+    chmod 0660 dev/cg2900_bt_acl
+    chmod 0660 dev/cg2900_bt_cmd
+    chmod 0660 dev/cg2900_bt_evt
+    chmod 0660 dev/cg2900_core
+    chmod 0660 dev/cg2900_core_test
+    chmod 0660 dev/cg2900_debug
+    chmod 0660 dev/cg2900_fm_audio
+    chmod 0660 dev/cg2900_fm_radio
+    chmod 0660 dev/cg2900_gnss
+    chmod 0660 dev/cg2900_hci_logger
+    chmod 0660 dev/cg2900_hci_raw
+    chmod 0660 dev/cg2900_ste_tools
+    chmod 0660 dev/cg2900_vs_audio
+    # STE Permissions for Liblights.
+    chown system system /sys/class/leds/lcd-backlight/brightness
+    chown system system /sys/class/leds/button-backlight/brightness
     # Set timeout value for rmnet stats.
     write /sys/devices/virtual/net/rmnet0/timeout_suspend 5000000
 
@@ -416,3 +525,7 @@ on propery:init.svc.hciattach=running
 
 #on property:init.svc.bluetoothd=running
 #     write /sys/class/rfkill/rfkill1/state 1
+service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard0 /storage/sdcard0
+    class late_start
+    disabled
+    
