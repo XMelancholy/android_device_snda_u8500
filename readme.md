@@ -4,15 +4,15 @@ Getting Started :
 
 		curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
 		chmod 755 ~/bin/repo
-		mkdir cm10
-		cd cm10
-		repo init -u git://github.com/CyanogenMod/android.git -b jellybean
+		mkdir cm11
+		cd cm11
+		repo init -u git://github.com/CyanogenMod/android.git -b cm11.0
 		repo sync
 
 		mkdir -p device/snda/u8500
-		git clone https://github.com/XMelancholy/android_device_snda_u8500.git -b cm10 device/snda/u8500
+		git clone https://github.com/XMelancholy/android_device_snda_u8500.git -b cm11.0 device/snda/u8500
 
-Now connect your phone which have runing CM10 :
+Now connect your phone which have runing CM11 :
 
 		cd device/snda/u8500
 		./extract-files.sh
@@ -32,7 +32,7 @@ Patch android source code :
 
 
 
-Our step is optional!!! Use only if you going to sync CM 10 source code daily, than simple revert each patch before you sync CM 10 source code :
+Our step is optional!!! Use only if you going to sync CM 11 source code daily, than simple revert each patch before you sync CM 10 source code :
 
 		patch -p1 -R < device/snda/u8500/patches/bionic.patch
 		patch -p1 -R < device/snda/u8500/patches/frameworks_av.patch
