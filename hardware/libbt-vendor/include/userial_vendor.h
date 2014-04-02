@@ -28,10 +28,10 @@
 
 /* Variables to identify the platform */
 /*BT HS UART TTY DEVICE */
-#define BT_HS_UART_DEVICE "/dev/ttyHS0"
+#define BT_HS_UART_DEVICE "/dev/ttyAMA0"
 /*BT RIVA-SMD CHANNELS */
-#define APPS_RIVA_BT_ACL_CH  "/dev/smd2"
-#define APPS_RIVA_BT_CMD_CH  "/dev/smd3"
+#define APPS_RIVA_BT_ACL_CH  "/dev/ttyAMA1"
+#define APPS_RIVA_BT_CMD_CH  "//dev/ttyAMA2"
 
 typedef enum
 {

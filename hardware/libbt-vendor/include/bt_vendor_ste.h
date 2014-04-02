@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef BT_VENDOR_QCOM_H
-#define BT_VENDOR_QCOM_H
+#ifndef BT_VENDOR_STE_H
+#define BT_VENDOR_STE_H
 
 #include "bt_vendor_lib.h"
 #include "vnd_buildcfg.h"
@@ -36,5 +36,5 @@ extern bt_hci_transport_device_type bt_hci_transport_device;
 
 extern bt_vendor_callbacks_t *bt_vendor_cbacks;
 
-#endif /* BT_VENDOR_BRCM_H */
+#endif /* BT_VENDOR_STE_H */
 
