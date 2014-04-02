@@ -138,6 +138,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    libblt_hw
 
+# bcmdhd_net_iface
+PRODUCT_PACKAGES += \
+   libnetcmdiface
+
 # FileExplorer
 #PRODUCT_PACKAGES += \
 #   FileExplorer
