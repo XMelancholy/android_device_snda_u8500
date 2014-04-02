@@ -86,7 +86,11 @@ PRODUCT_COPY_FILES += \
 
 # BT Config
 PRODUCT_COPY_FILES += \
-   system/bluetooth/data/main.conf:system/etc/bluetooth/main.conf
+   system/bluetooth/data/main.conf:system/etc/bluetooth/main.conf \
+   system/bluetooth/data/audio.conf:system/etc/bluetooth/audio.conf \
+   system/bluetooth/data/blacklist.conf:system/etc/bluetooth/blacklist.conf \
+   system/bluetooth/data/input.conf:system/etc/bluetooth/input.conf \
+   system/bluetooth/data/network.conf:system/etc/bluetooth/network.conf
 
 # Hostapd
 PRODUCT_PACKAGES += \
@@ -101,6 +105,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    audio.a2dp.default \
    audio.usb.default
+
+# BT Vendor
+PRODUCT_PACKAGES += \
+   libbt-vendor
 
 # Lights
 PRODUCT_PACKAGES += \
