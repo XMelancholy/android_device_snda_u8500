@@ -31,7 +31,7 @@
 #define BT_HS_UART_DEVICE "/dev/ttyAMA0"
 /*BT RIVA-SMD CHANNELS */
 #define APPS_RIVA_BT_ACL_CH  "/dev/ttyAMA1"
-#define APPS_RIVA_BT_CMD_CH  "//dev/ttyAMA2"
+#define APPS_RIVA_BT_CMD_CH  "/dev/ttyAMA2"
 
 typedef enum
 {
