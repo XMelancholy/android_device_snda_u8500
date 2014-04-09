@@ -72,32 +72,25 @@ class EdifyGenerator(object):
     """Assert that the current system build fingerprint is one of *fp."""
     if not fp:
       raise ValueError("must specify some fingerprints")
-    cmd = (
-           ' ||\n    '.join([('file_getprop("/system/build.prop", '
+    cmd = ('assert(' +
+           ' ||\0'.join([('file_getprop("/system/build.prop", '
                          '"ro.build.fingerprint") == "%s"')
                         % i for i in fp]) +
-           ' ||\n    abort("Package expects build fingerprint of %s; this '
-           'device has " + getprop("ro.build.fingerprint") + ".");'
-           ) % (" or ".join(fp),)
-    self.script.append(cmd)
+           ');')
+    self.script.append(self._WordWrap(cmd))
 
-  def AssertOlderBuild(self, timestamp, timestamp_text):
+  def AssertOlderBuild(self, timestamp):
     """Assert that the build on the device is older (or the same as)
     the given timestamp."""
-    self.script.append(
-        ('(!less_than_int(%s, getprop("ro.build.date.utc"))) || '
-         'abort("Can\'t install this package (%s) over newer '
-         'build (" + getprop("ro.build.date") + ").");'
-         ) % (timestamp, timestamp_text))
+    self.script.append(('assert(!less_than_int(%s, '
+                        'getprop("ro.build.date.utc")));') % (timestamp,))
 
   def AssertDevice(self, device):
     """Assert that the device identifier is the given string."""
     cmd = ('assert(' +
            ' || \0'.join(['getprop("ro.product.device") == "%s" || getprop("ro.build.product") == "%s"'
                          % (i, i) for i in device.split(",")]) +
-           ' || abort("This package is for \\"%s\\" devices; '
-           'this is a \\"" + getprop("ro.product.device") + "\\".");'
-           ');') % device
+           ');')
     self.script.append(self._WordWrap(cmd))
 
   def AssertSomeBootloader(self, *bootloaders):
@@ -134,10 +127,9 @@ class EdifyGenerator(object):
     """Check that the given file (or MTD reference) has one of the
     given *sha1 hashes, checking the version saved in cache if the
     file does not match."""
-    self.script.append(
-        'apply_patch_check("%s"' % (filename,) +
-        "".join([', "%s"' % (i,) for i in sha1]) +
-        ') || abort("\\"%s\\" has unexpected contents.");' % (filename,))
+    self.script.append('assert(apply_patch_check("%s"' % (filename,) +
+                       "".join([', "%s"' % (i,) for i in sha1]) +
+                       '));')
 
   def FileCheck(self, filename, *sha1):
     """Check that the given file (or MTD reference) has one of the
@@ -149,8 +141,7 @@ class EdifyGenerator(object):
   def CacheFreeSpaceCheck(self, amount):
     """Check that there's at least 'amount' space that can be made
     available on /cache."""
-    self.script.append(('apply_patch_space(%d) || abort("Not enough free space '
-                        'on /system to apply patches.");') % (amount,))
+    self.script.append("assert(apply_patch_space(%d));" % (amount,))
 
   def Mount(self, mount_point):
     """Mount the partition with the given mount_point."""
@@ -202,11 +193,6 @@ class EdifyGenerator(object):
     cmd = "delete(" + ",\0".join(['"%s"' % (i,) for i in file_list]) + ");"
     self.script.append(self._WordWrap(cmd))
 
-  def RenameFile(self, srcfile, tgtfile):
-    """Moves a file from one location to another."""
-    if self.info.get("update_rename_support", False):
-      self.script.append('rename("%s", "%s");' % (srcfile, tgtfile))
-
   def ApplyPatch(self, srcfile, tgtfile, tgtsize, tgtsha1, *patchpairs):
     """Apply binary patches (in *patchpairs) to the given srcfile to
     produce tgtfile (which may be "-" to indicate overwriting the
@@ -246,33 +232,14 @@ class EdifyGenerator(object):
       else:
         raise ValueError("don't know how to write \"%s\" partitions" % (p.fs_type,))
 
-  def SetPermissions(self, fn, uid, gid, mode, selabel, capabilities):
+  def SetPermissions(self, fn, uid, gid, mode):
     """Set file ownership and permissions."""
-    if not self.info.get("use_set_metadata", False):
-      self.script.append('set_perm(%d, %d, 0%o, "%s");' % (uid, gid, mode, fn))
-    else:
-      if capabilities is None: capabilities = "0x0"
-      cmd = 'set_metadata("%s", "uid", %d, "gid", %d, "mode", 0%o, ' \
-          '"capabilities", %s' % (fn, uid, gid, mode, capabilities)
-      if selabel is not None:
-        cmd += ', "selabel", "%s"' % ( selabel )
-      cmd += ');'
-      self.script.append(cmd)
+    self.script.append('set_perm(%d, %d, 0%o, "%s");' % (uid, gid, mode, fn))
 
-  def SetPermissionsRecursive(self, fn, uid, gid, dmode, fmode, selabel, capabilities):
+  def SetPermissionsRecursive(self, fn, uid, gid, dmode, fmode):
     """Recursively set path ownership and permissions."""
-    if not self.info.get("use_set_metadata", False):
-      self.script.append('set_perm_recursive(%d, %d, 0%o, 0%o, "%s");'
-                         % (uid, gid, dmode, fmode, fn))
-    else:
-      if capabilities is None: capabilities = "0x0"
-      cmd = 'set_metadata_recursive("%s", "uid", %d, "gid", %d, ' \
-          '"dmode", 0%o, "fmode", 0%o, "capabilities", %s' \
-          % (fn, uid, gid, dmode, fmode, capabilities)
-      if selabel is not None:
-        cmd += ', "selabel", "%s"' % ( selabel )
-      cmd += ');'
-      self.script.append(cmd)
+    self.script.append('set_perm_recursive(%d, %d, 0%o, 0%o, "%s");'
+                       % (uid, gid, dmode, fmode, fn))
 
   def MakeSymlinks(self, symlink_list):
     """Create symlinks, given a list of (dest, link) pairs."""
