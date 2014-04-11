@@ -81,6 +81,9 @@ on fs
     # the block device belonging to /data.
     start cspsa
 
+    # FIX modem
+    exec /system/bin/msa -l stdout
+
 on post-fs
 
     chown radio radio /modemfs
@@ -371,11 +374,16 @@ service phonet-netdev /system/bin/ifconfig upnlink0 up
     oneshot
 
 # STE: Start the Modem Storage Agent (MSA) service
-service modem /system/bin/sh /system/etc/ste_modem.sh
+#service modem /system/bin/sh /system/etc/ste_modem.sh
+#    class modem-u8500
+#    user radio
+#    group radio system
+#    capability NET_ADMIN
+
+service modem /system/bin/msa -l stdout
     class modem-u8500
     user radio
-    group radio system
-    capability NET_ADMIN
+    group radio
 
 # STE: Modem-supervisor
 service modem-supervisor /system/bin/modem-supervisor -r -f /dev/dbx500_mloader_fw -i /sys/devices/platform/ab8500-i2c.0/chip_id -c monitor
@@ -409,6 +417,7 @@ service lbsd /system/bin/lbsd
 
 on property:dev.bootcomplete=1
     start lbsd
+
 service p2p_supplicant /system/bin/wpa_supplicant \
     -iwlan0 -Dnl80211 -c/data/misc/wifi/p2p_supplicant.conf \
     -e/data/misc/wifi/entropy.bin \
