@@ -81,8 +81,6 @@ on fs
     # the block device belonging to /data.
     start cspsa
 
-    # FIX modem
-    exec /system/bin/msa -l stdout
 
 on post-fs
 
@@ -380,6 +378,7 @@ service phonet-netdev /system/bin/ifconfig upnlink0 up
 #    group radio system
 #    capability NET_ADMIN
 
+# FIX modem
 service modem /system/bin/msa -l stdout
     class modem-u8500
     user radio
