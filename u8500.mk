@@ -136,7 +136,11 @@ PRODUCT_PACKAGES += \
 
 # Netlink
 PRODUCT_PACKAGES += \
-    libnl_2
+   libnl_2
+
+# Libaudioparameter
+PRODUCT_PACKAGES += \
+   libaudioparameter
 
 # FileExplorer
 #PRODUCT_PACKAGES += \
