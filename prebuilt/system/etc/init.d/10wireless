@@ -12,10 +12,10 @@ if [ ! -f /data/misc/wifi/hostapd.conf ]; then
 fi
 
 # create ipconfig.txt if not exist - needed for WifiConfigStore
-#if [ ! -f /data/misc/wifi/ipconfig.txt ]; then
-#     touch /data/misc/wifi/ipconfig.txt
-#     chown system.wifi /data/misc/wifi/ipconfig.txt
-#fi
+if [ ! -f /data/misc/wifi/ipconfig.txt ]; then
+     touch /data/misc/wifi/ipconfig.txt
+     chown system.wifi /data/misc/wifi/ipconfig.txt
+fi
 
 # without proper permission wifi unable to store configured netwok settings
 if [ -f /data/misc/wifi/wpa_supplicant.conf ]; then
