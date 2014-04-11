@@ -88,6 +88,12 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/system/bin/cn_server:system/bin/cn_server
 
+# Filesystem management tools
+PRODUCT_PACKAGES += \
+    make_ext4fs \
+    setup_fs \
+    e2fsck
+
 # Hostapd
 PRODUCT_PACKAGES += \
    hostapd_cli \
