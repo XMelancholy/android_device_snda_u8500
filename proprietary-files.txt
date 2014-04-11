@@ -132,11 +132,6 @@ lib/libril.so
 lib/libshmnetlnk.so
 lib/libsms_server.so
 lib/libspeech_processing.so
-lib/libstagefrighthw.so
-lib/libstagefright_soft_ste_aacdec.so
-lib/libstagefright_soft_ste_mp3dec.so
-lib/libstagefright_ste_aacdec.so
-lib/libstagefright_ste_mp3decode.so
 lib/libste_adm.so
 lib/libste_aiq_tools.so
 lib/libste_ens_audio_common.so

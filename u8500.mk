@@ -132,6 +132,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    power.montblanc
 
+# libstagefrighthw
+PRODUCT_PACKAGES += \
+   libstagefrighthw
+
 # libblt_hw
 PRODUCT_PACKAGES += \
    libblt_hw

@@ -28,7 +28,7 @@ for FILE in `cat proprietary-files.txt | grep -v ^# | grep -v ^$`; do
         mkdir -p $BASE/$DIR
     fi
     #adb pull /system/$FILE $BASE/$FILE
-    unzip -p /home/xiangxin/snda/snda.zip system/$FILE > $BASE/$FILE
+    unzip -p /home/xinxin520/snda/snda.zip system/$FILE > $BASE/$FILE
 done
 
 ./setup-makefiles.sh
