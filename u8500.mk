@@ -63,26 +63,6 @@ PRODUCT_COPY_FILES += \
    $(LOCAL_PATH)/prebuilt/system/etc/wifi/hostapd.conf:system/etc/wifi/hostapd.conf \
    $(LOCAL_PATH)/prebuilt/system/etc/wifi/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf
 
-# ALSA Configs
-PRODUCT_COPY_FILES += \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/cards/aliases.conf:system/usr/share/alsa/cards/aliases.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/center_lfe.conf:system/usr/share/alsa/pcm/center_lfe.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/default.conf:system/usr/share/alsa/pcm/default.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/dmix.conf:system/usr/share/alsa/pcm/dmix.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/dpl.conf:system/usr/share/alsa/pcm/dpl.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/dsnoop.conf:system/usr/share/alsa/pcm/dsnoop.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/front.conf:system/usr/share/alsa/pcm/front.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/iec958.conf:system/usr/share/alsa/pcm/iec958.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/modem.conf:system/usr/share/alsa/pcm/modem.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/rear.conf:system/usr/share/alsa/pcm/rear.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/side.conf:system/usr/share/alsa/pcm/side.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/surround40.conf:system/usr/share/alsa/pcm/surround40.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/surround41.conf:system/usr/share/alsa/pcm/surround41.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/surround50.conf:system/usr/share/alsa/pcm/surround50.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/surround51.conf:system/usr/share/alsa/pcm/surround51.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/pcm/surround71.conf:system/usr/share/alsa/pcm/surround71.conf \
-   $(LOCAL_PATH)/hardware/libasound/src/conf/alsa.conf:system/usr/share/alsa/alsa.conf
-
 # New cn_binary needed for mobile network for cm11
 # cn_binary source build for kk ,jb cn_binary it's not work
 PRODUCT_COPY_FILES += \
