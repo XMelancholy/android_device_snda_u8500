@@ -46,6 +46,7 @@ on init
     # mount debugfs in order for Audio ADM component to retrieve debug information
     mkdir /debug
     mount debugfs none /debug
+
     # make files in /sys/ non-writable for OTHERS
     chmod 220 /sys/ab8500_chargalg/chargalg
     chown system system /sys/ab8500_chargalg/chargalg
@@ -192,10 +193,6 @@ on post-fs-data
     chmod 0755 /system/etc/init.d/01stesetup
     chmod 0755 /system/etc/init.d/10wireless
 
-    # Permissions for rfkill
-    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
-    chmod 664 /sys/class/rfkill/rfkill0/state
-
     # Permissions for bluetooth
     chown bluetooth bluetooth /dev/ttyAMA0
     chown bluetooth bluetooth /dev/ttyAMA1
@@ -205,8 +202,8 @@ on post-fs-data
     chmod 0660 /dev/ttyAMA2
 
     # Power up/down interface
-    chmod 0660 /sys/class/rfkill/rfkill0/state
-    chmod 0660 /sys/class/rfkill/rfkill0/type
+    chmod 0664 /sys/class/rfkill/rfkill0/state
+    chmod 0664 /sys/class/rfkill/rfkill0/type
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
 
@@ -545,20 +542,21 @@ service usbid_init /system/bin/usbid_init.sh
     class main
     oneshot
 
-service hciattach /system/bin/logwrapper /system/bin/hciattach -a 23 -n -s 115200 /dev/ttyAMA0 cg2900 115200 flow
-    class main
-    user root
-    group bluetooth net_bt_admin net_admin misc root
-    oneshot
+#service hciattach /system/bin/logwrapper /system/bin/hciattach -a 23 -n -s 115200 /dev/ttyAMA0 cg2900 115200 flow
+#    class main
+#    user root
+#    group bluetooth net_bt_admin net_admin misc root
+#    oneshot
 
-on propery:init.svc.hciattach=running
-    exec /system/bin/cg2900-channel_init.sh
+#on propery:init.svc.hciattach=running
+#    exec /system/bin/cg2900-channel_init.sh
 
 #on property:init.svc.bluetoothd=stopped
 #     write /sys/class/rfkill/rfkill1/state 0
 
 #on property:init.svc.bluetoothd=running
 #     write /sys/class/rfkill/rfkill1/state 1
+
 service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard0 /storage/sdcard0
     class late_start
     disabled
