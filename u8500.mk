@@ -109,8 +109,8 @@ PRODUCT_PACKAGES += \
    audio.usb.default
 
 # BT Vendor
-PRODUCT_PACKAGES += \
-   libbt-vendor
+#PRODUCT_PACKAGES += \
+#   libbt-vendor
 
 # Lights
 PRODUCT_PACKAGES += \
@@ -151,6 +151,10 @@ PRODUCT_PACKAGES += \
 # Libaudioparameter
 PRODUCT_PACKAGES += \
    libaudioparameter
+
+# Audio
+PRODUCT_PACKAGES += \
+   libaudiopreprocessing
 
 # FileExplorer
 #PRODUCT_PACKAGES += \

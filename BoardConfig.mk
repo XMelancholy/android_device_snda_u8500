@@ -47,7 +47,7 @@ COMMON_GLOBAL_CFLAGS += -DEGL_NEEDS_FNW -DBOARD_EGL_NEEDS_LEGACY_FB
 
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
-BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/snda/u8500/hardware/bluetooth
+#BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/snda/u8500/hardware/bluetooth
 #BOARD_BLUEDROID_VENDOR_CONF := device/snda/u8500/hardware/libbt-vendor/include/vnd_u8500.txt
 
 # Camera
