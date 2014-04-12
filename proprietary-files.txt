@@ -142,7 +142,6 @@ lib/libste_ext_ens_image_common.so
 lib/libste_isp8500_firmware_primary.so
 lib/libste_isp8500_firmware_secondary.so
 lib/libste_omxil-interface.so
-lib/libomxil-bellagio.so
 lib/libstecom.so
 lib/libstelpcutils.so
 lib/libsterc.so

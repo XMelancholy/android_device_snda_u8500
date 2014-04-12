@@ -116,6 +116,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    libblt_hw
 
+# libomxil-bellagio
+PRODUCT_PACKAGES += \
+   libomxil-bellagio
+
 # bcmdhd_net_iface
 PRODUCT_PACKAGES += \
    libnetcmdiface

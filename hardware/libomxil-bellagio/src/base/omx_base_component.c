@@ -28,8 +28,10 @@
 extern "C" {
 #endif
 
+#if 0
 #include <sys/syscall.h>
 #include <unistd.h>
+#endif
 
 #include <OMX_Core.h>
 #include <OMX_Component.h>
@@ -825,12 +827,14 @@ OMX_ERRORTYPE omx_base_component_GetComponentVersion(OMX_HANDLETYPE hComponent,
   /* Fill spec version (copy from component field) */
   memcpy(pSpecVersion, &omx_component->nVersion, sizeof(OMX_VERSIONTYPE));
 
+#if 0
   /* Fill UUID with handle address, PID and UID.
    * This should guarantee uiniqness */
   uuid[0] = (OMX_U32)omx_component;
   uuid[1] = getpid();
   uuid[2] = getuid();
   memcpy(*pComponentUUID, uuid, 3*sizeof(uuid));
+#endif
 
   DEBUG(DEB_LEV_FUNCTION_NAME, "Out of %s for component %x\n", __func__, (int)hComponent);
   return OMX_ErrorNone;
