@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+MULTIMEDIA_PATH := $(LOCAL_PATH)/../multimedia
 
 LOCAL_PATH := $(call my-dir)
 
@@ -25,7 +26,7 @@ LOCAL_SHARED_LIBRARIES := liblog libcutils libGLESv1_CM
 LOCAL_SRC_FILES := 	\
 	hwmem_gralloc.c hwmem_gralloc_pmem.c hwmem_gralloc_framebuffer.c
 
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/../b2r2lib/include
+LOCAL_C_INCLUDES += $(MULTIMEDIA_PATH)/linux/b2r2lib/include $(LOCAL_PATH)/../include
 LOCAL_MODULE := gralloc.$(TARGET_BOARD_PLATFORM)
 LOCAL_MODULE_TAGS := optional
 LOCAL_CFLAGS:= -DLOG_TAG=\"gralloc\"

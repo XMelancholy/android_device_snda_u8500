@@ -21,9 +21,9 @@
 #include <stdint.h>
 #include <errno.h>
 #include <unistd.h>
+#include <linux/compdev.h>
 #include <cutils/log.h>
 
-#include "../include/compdev.h"
 #include "vsync_monitor.h"
 
 /* Set this flag until the video mode support is integrated */

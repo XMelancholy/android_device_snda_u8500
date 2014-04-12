@@ -32,12 +32,19 @@ LOCAL_SHARED_LIBRARIES:= \
 	libdl \
 	liblog \
 	libstelpcutils
+MULTIMEDIA_PATH := $(LOCAL_PATH)/../multimedia
 
 LOCAL_C_INCLUDES += \
 	$(TOP)/frameworks/native/include/media/hardware \
-	$(TOP)/frameworks/native/include/media/openmax \
 	$(TOP)/frameworks/av/include/media/stagefright/foundation \
-	$(LOCAL_PATH)/include
+	$(MULTIMEDIA_PATH)/shared/mmhwbuffer_api/include \
+	$(MULTIMEDIA_PATH)/shared/mmhwbuffer_osi/include \
+	$(MULTIMEDIA_PATH)/shared/omxil \
+	$(MULTIMEDIA_PATH)/linux/bellagio_omxcore/omxcore_interface \
+	$(MULTIMEDIA_PATH)/shared/mmhwbuffer_osi
+
+LOCAL_C_INCLUDES += $(MULTIMEDIA_PATH)/shared/utils/include
+LOCAL_C_INCLUDES += $(MULTIMEDIA_PATH)/shared/host_trace
 
 LOCAL_MODULE:= libstagefrighthw
 LOCAL_MODULE_TAGS := optional

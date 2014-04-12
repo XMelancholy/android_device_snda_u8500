@@ -45,7 +45,7 @@
 #include <GLES/gl.h>
 
 #include "hwmem_gralloc.h"
-#include "../include/compdev.h"
+#include <linux/compdev.h>
 #define COMPDEV_PATH "/dev/comp0"
 
 enum {

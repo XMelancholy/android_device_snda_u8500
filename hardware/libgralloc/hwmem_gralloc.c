@@ -22,6 +22,7 @@
 #include <sys/mman.h>
 #include <errno.h>
 #include <limits.h>
+#include <linux/hwmem.h>
 #include <string.h>
 #include <stdarg.h>
 
@@ -35,7 +36,7 @@
 #include <hardware/gralloc.h>
 #include <system/graphics.h>
 #include "gralloc_stericsson_ext.h"
-#include "../include/hwmem.h"
+
 #include "hwmem_gralloc.h"
 #include "hwmem_gralloc_pmem.h"
 #include "hwmem_gralloc_framebuffer.h"

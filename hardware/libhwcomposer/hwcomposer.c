@@ -19,6 +19,9 @@
 #include <EGL/egl.h>
 #include <GLES/gl.h>
 #include <hardware/gralloc.h>
+#include <gralloc_stericsson_ext.h>
+#include <linux/hwmem.h>
+#include <linux/compdev.h>
 #include <limits.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -26,9 +29,6 @@
 #include <pwd.h>
 #include <grp.h>
 #include "vsync_monitor.h"
-#include "gralloc_stericsson_ext.h"
-#include "../include/hwmem.h"
-#include "../include/compdev.h"
 
 /* Use the STE version if available, otherwise fall back to
  * the corresponding vanilla version.
