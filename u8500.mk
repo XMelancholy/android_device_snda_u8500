@@ -108,10 +108,6 @@ PRODUCT_PACKAGES += \
    audio.a2dp.default \
    audio.usb.default
 
-# BT Vendor
-#PRODUCT_PACKAGES += \
-#   libbt-vendor
-
 # Lights
 PRODUCT_PACKAGES += \
    lights.montblanc
@@ -151,10 +147,6 @@ PRODUCT_PACKAGES += \
 # Libaudioparameter
 PRODUCT_PACKAGES += \
    libaudioparameter
-
-# Audio
-PRODUCT_PACKAGES += \
-   libaudiopreprocessing
 
 # FileExplorer
 #PRODUCT_PACKAGES += \
