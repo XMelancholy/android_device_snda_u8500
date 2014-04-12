@@ -122,7 +122,6 @@ lib/libmaluicc.so
 lib/libmalutil.so
 lib/libmpl.so
 lib/libmmprobe.so
-lib/libnl.so
 lib/libnmf.so
 lib/libnmfee.so
 lib/libnmftimer.so
