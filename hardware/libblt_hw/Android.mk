@@ -20,6 +20,7 @@ LOCAL_PRELINK_MODULE := false
 LOCAL_SRC_FILES := src/blt_b2r2.c
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/../include
 
 LOCAL_SHARED_LIBRARIES := liblog
 
