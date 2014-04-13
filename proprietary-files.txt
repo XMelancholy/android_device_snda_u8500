@@ -96,6 +96,7 @@ lib/libclientgps.so
 lib/libcn.so
 lib/libcops.so
 lib/libcspsa.so
+lib/libflash_current_calculation.so
 lib/libisimessage.so
 lib/liblbstestengine.so
 lib/liblos.so
