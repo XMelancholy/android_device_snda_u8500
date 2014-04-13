@@ -112,6 +112,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    power.montblanc
 
+# libsensors
+PRODUCT_PACKAGES += \
+   sensors.montblanc
+
 # libstagefrighthw
 PRODUCT_PACKAGES += \
    libstagefrighthw
