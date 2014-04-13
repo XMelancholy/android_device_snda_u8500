@@ -83,6 +83,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    libasound
 
+# libalsactrl
+PRODUCT_PACKAGES += \
+   libalsactrl
+
 # A2DP and USB
 PRODUCT_PACKAGES += \
    audio.a2dp.default \

@@ -90,7 +90,6 @@ lib/hw/audio_policy.montblanc.so
 lib/hw/camera.montblanc.so
 lib/hw/gps.montblanc.so
 lib/hw/sensors.montblanc.so
-lib/libalsactrl.so
 lib/libals.so
 lib/libarchive.so
 lib/libarchive_fe.so
