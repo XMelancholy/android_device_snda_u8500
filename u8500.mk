@@ -68,6 +68,13 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/system/bin/cn_server:system/bin/cn_server
 
+# Agps config
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/prebuilt/system/etc/LbsConfig.cfg:system/etc/LbsConfig.cfg \
+    $(LOCAL_PATH)/prebuilt/system/etc/LbsLogConfig.cfg:system/etc/LbsLogConfig.cfg \
+    $(LOCAL_PATH)/prebuilt/system/etc/LbsPgpsConfig.cfg:system/etc/LbsPgpsConfig.cfg \
+    $(LOCAL_PATH)/prebuilt/system/etc/LbsPltConfig.cfg:system/etc/LbsPltConfig.cfg
+
 # Filesystem management tools
 PRODUCT_PACKAGES += \
     make_ext4fs \

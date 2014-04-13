@@ -68,10 +68,6 @@ etc/firmware/wsm_10.bin
 etc/firmware/wsm_11.bin
 etc/firmware/wsm_20.bin
 etc/firmware/wsm_22.bin
-etc/LbsConfig.cfg
-etc/LbsLogConfig.cfg
-etc/LbsPgpsConfig.cfg
-etc/LbsPltConfig.cfg
 etc/plmn.latam.list
 etc/plmn.operator.list
 etc/psdata/stepscc_conf
