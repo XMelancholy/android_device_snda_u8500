@@ -49,7 +49,6 @@ LOCAL_SHARED_LIBRARIES := \
         libtinyalsa
 
 LOCAL_C_INCLUDES := \
-    $(LOCAL_PATH)/../include \
     $(LOCAL_PATH)/include \
     $(LOCAL_PATH)/ \
     $(TOP)/external/sqlite/dist/

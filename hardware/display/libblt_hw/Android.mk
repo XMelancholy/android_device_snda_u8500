@@ -11,18 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+MULTIMEDIA_PATH := $(LOCAL_PATH)/../../multimedia
 LOCAL_PATH:= $(call my-dir)
-# HAL module implemenation, not prelinked and stored in
-# hw/<COPYPIX_HARDWARE_MODULE_ID>.<ro.product.board>.so
-GRALLOC_PATH := $(LOCAL_PATH)/../libgralloc
-
 include $(CLEAR_VARS)
-LOCAL_C_INCLUDES := $(GRALLOC_PATH) $(LOCAL_PATH)/../include
+
 LOCAL_PRELINK_MODULE := false
-LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
-LOCAL_SHARED_LIBRARIES := liblog libcutils libEGL libGLESv1_CM libhardware
-LOCAL_SRC_FILES := hwcomposer.c vsync_monitor.c
-LOCAL_MODULE := hwcomposer.$(TARGET_BOARD_PLATFORM)
+LOCAL_SRC_FILES := src/blt_b2r2.c
+LOCAL_C_INCLUDES += $(MULTIMEDIA_PATH)/linux/b2r2lib/include
+LOCAL_SHARED_LIBRARIES := liblog
+LOCAL_MODULE := libblt_hw
 LOCAL_MODULE_TAGS := optional
+
 include $(BUILD_SHARED_LIBRARY)
