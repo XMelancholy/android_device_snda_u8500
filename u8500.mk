@@ -87,6 +87,11 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    libalsactrl
 
+# Audio HAL
+PRODUCT_PACKAGES += \
+   audio_policy.montblanc \
+   audio.primary.montblanc
+
 # A2DP and USB
 PRODUCT_PACKAGES += \
    audio.a2dp.default \

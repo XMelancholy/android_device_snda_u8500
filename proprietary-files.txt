@@ -85,8 +85,6 @@ etc/psdata/sterc_script_disconnect_dun
 lib/egl/libEGL_mali.so
 lib/egl/libGLESv1_CM_mali.so
 lib/egl/libGLESv2_mali.so
-lib/hw/audio.primary.montblanc.so
-lib/hw/audio_policy.montblanc.so
 lib/hw/camera.montblanc.so
 lib/hw/gps.montblanc.so
 lib/libals.so
