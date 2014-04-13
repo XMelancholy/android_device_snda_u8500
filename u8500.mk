@@ -79,13 +79,11 @@ PRODUCT_PACKAGES += \
    hostapd_cli \
    hostapd
 
-# Libasound
+# STE Audio
 PRODUCT_PACKAGES += \
-   libasound
-
-# libalsactrl
-PRODUCT_PACKAGES += \
-   libalsactrl
+   libasound \
+   libalsactrl \
+   libmmprobe
 
 # Audio HAL
 PRODUCT_PACKAGES += \
