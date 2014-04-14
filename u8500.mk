@@ -158,6 +158,11 @@ PRODUCT_PACKAGES += \
 #PRODUCT_PACKAGES += \
 #   FileExplorer
 
+# libdbus
+PRODUCT_PACKAGES += \
+   dbus-daemon \
+   libdbus
+
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \
    media.aac_51_output_enabled=1 \
