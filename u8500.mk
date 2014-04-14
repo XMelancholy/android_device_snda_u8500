@@ -154,11 +154,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    libaudioparameter
 
-# libdbus
-PRODUCT_PACKAGES += \
-   libdbus \
-   dbus-daemon
-
 # FileExplorer
 #PRODUCT_PACKAGES += \
 #   FileExplorer
