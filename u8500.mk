@@ -163,6 +163,10 @@ PRODUCT_PACKAGES += \
    dbus-daemon \
    libdbus
 
+# modem
+PRODUCT_PACKAGES += \
+   ste_mad
+
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \
    media.aac_51_output_enabled=1 \

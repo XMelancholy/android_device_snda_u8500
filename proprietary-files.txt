@@ -14,7 +14,6 @@ bin/psccd
 bin/simd
 bin/simpbd
 bin/sms_server
-bin/ste_mad
 bin/ste_omxil_test
 bin/ste-adm-test
 bin/stercd
