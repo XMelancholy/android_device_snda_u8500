@@ -512,12 +512,12 @@ service ril-daemon /system/bin/rild
     socket rild stream 660 root radio
     socket rild-debug stream 660 radio system
     user root
-    group radio cache inet misc audio sdcard_r sdcard_rw log dbus_access
+    group radio cache inet misc audio sdcard_rw log dbus_access
 
 service surfaceflinger /system/bin/surfaceflinger
     class main
     user system
-    group graphics drmrpc
+    group graphics
     onrestart restart zygote
 
 service zygote /system/bin/app_process -Xzygote /system/bin --zygote --start-system-server
@@ -531,12 +531,12 @@ service zygote /system/bin/app_process -Xzygote /system/bin --zygote --start-sys
 service drm /system/bin/drmserver
     class main
     user drm
-    group drm system inet drmrpc sdcard_r
+    group drm system inet drmrpc
 
 service media /system/bin/mediaserver
     class main
     user media
-    group system audio camera inet net_bt net_bt_admin net_bw_acct drmrpc input sdcard_rw shell
+    group system audio camera inet net_bt net_bt_admin net_bw_acct drmrpc input sdcard_rw shell mediadrm
     ioprio rt 4
 
 service bootanim /system/bin/bootanimation
@@ -546,12 +546,12 @@ service bootanim /system/bin/bootanimation
     disabled
     oneshot
 
-service dbus /system/bin/dbus-daemon --system --nofork
-    class main
-    socket dbus stream 660 bluetooth bluetooth
-    socket dbus_ste stream 666 bluetooth dbus_access
-    user bluetooth
-    group bluetooth net_bt_admin dbus_access
+#service dbus /system/bin/dbus-daemon --system --nofork
+#    class main
+#    socket dbus stream 660 bluetooth bluetooth
+#    socket dbus_ste stream 666 bluetooth dbus_access
+#    user bluetooth
+#    group bluetooth net_bt_admin dbus_access
 
 #service bluetoothd /system/bin/bluetoothd -n
 #    class main
