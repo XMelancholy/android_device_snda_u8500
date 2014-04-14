@@ -285,9 +285,11 @@ on boot
     chmod 0660 dev/cg2900_hci_raw
     chmod 0660 dev/cg2900_ste_tools
     chmod 0660 dev/cg2900_vs_audio
+
     # STE Permissions for Liblights.
     chown system system /sys/class/leds/lcd-backlight/brightness
     chown system system /sys/class/leds/button-backlight/brightness
+
     # Set timeout value for rmnet stats.
     write /sys/devices/virtual/net/rmnet0/timeout_suspend 5000000
 
@@ -551,11 +553,11 @@ service usbid_init /system/bin/usbid_init.sh
 #on propery:init.svc.hciattach=running
 #    exec /system/bin/cg2900-channel_init.sh
 
-#on property:init.svc.bluetoothd=stopped
-#     write /sys/class/rfkill/rfkill1/state 0
+on property:init.svc.bluetoothd=stopped
+     write /sys/class/rfkill/rfkill1/state 0
 
-#on property:init.svc.bluetoothd=running
-#     write /sys/class/rfkill/rfkill1/state 1
+on property:init.svc.bluetoothd=running
+     write /sys/class/rfkill/rfkill1/state 1
 
 service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard0 /storage/sdcard0
     class late_start
