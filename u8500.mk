@@ -167,6 +167,11 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    ste_mad
 
+# PACKAGES
+PRODUCT_PACKAGES += \
+   chargemode
+
+
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \
    media.aac_51_output_enabled=1 \
