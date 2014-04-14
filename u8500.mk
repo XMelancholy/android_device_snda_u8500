@@ -77,9 +77,9 @@ PRODUCT_COPY_FILES += \
 
 # Filesystem management tools
 PRODUCT_PACKAGES += \
-    make_ext4fs \
-    setup_fs \
-    e2fsck
+   make_ext4fs \
+   setup_fs \
+   e2fsck
 
 # Hostapd
 PRODUCT_PACKAGES += \
@@ -125,6 +125,10 @@ PRODUCT_PACKAGES += \
 # libsensors
 PRODUCT_PACKAGES += \
    sensors.montblanc
+
+# libmemtrack
+PRODUCT_PACKAGES += \
+   memtrack.montblanc
 
 # libstagefrighthw
 PRODUCT_PACKAGES += \
