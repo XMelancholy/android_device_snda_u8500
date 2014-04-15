@@ -75,6 +75,10 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/system/etc/LbsPgpsConfig.cfg:system/etc/LbsPgpsConfig.cfg \
     $(LOCAL_PATH)/prebuilt/system/etc/LbsPltConfig.cfg:system/etc/LbsPltConfig.cfg
 
+# APN
+PRODUCT_COPY_FILES += \
+   $(LOCAL_PATH)/prebuilt/system/etc/apns-conf.xml:system/etc/apns-conf.xml
+
 # Filesystem management tools
 PRODUCT_PACKAGES += \
    make_ext4fs \
@@ -155,8 +159,8 @@ PRODUCT_PACKAGES += \
    libaudioparameter
 
 # FileExplorer
-#PRODUCT_PACKAGES += \
-#   FileExplorer
+PRODUCT_PACKAGES += \
+   FileExplorer
 
 # libdbus
 PRODUCT_PACKAGES += \
