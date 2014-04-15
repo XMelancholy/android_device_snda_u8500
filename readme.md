@@ -17,6 +17,7 @@ Now connect your phone which have runing CM11 :
 		cd device/snda/u8500
 		./extract-files.sh
 
+		cd ../../..
 		mkdir -p kernel/snda
 		git clone https://github.com/XMelancholy/android_kernel_snda_u8500 kernel/snda/u8500
 
