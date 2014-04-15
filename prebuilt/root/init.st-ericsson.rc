@@ -541,4 +541,10 @@ service usbid_init /system/bin/usbid_init.sh
 service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard0 /storage/sdcard0
     class late_start
     disabled
-    
+
+service ste-cg29xx_ctrl /system/xbin/ste-cg29xx_ctrl -b 115200 -p 6 -l 23 -i /system/bin/cg2900-channel_init.sh /dev/ttyAMA0
+    class main
+    user root
+    group bluetooth net_bt_admin misc root system
+    oneshot
+

@@ -179,33 +179,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    chargemode
 
-# bluez 5.14
-PRODUCT_PACKAGES += \
-   bluetoothd \
-   bluetooth.default \
-   libbluetooth \
-   haltest \
-   btmon \
-   btproxy \
-   l2test \
-   bluetoothd-snoop \
-   hciattach \
-   hciconfig \
-   hcitool \
-   hcidump \
-   rfcomm \
-   rctest \
-   l2ping \
-   sdptool \
-   ciptool \
-   bccmd
-
-PRODUCT_PACKAGES += \
-   libglib \
-   libsbc
-
-# bluez 5.14 end
-
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \
    media.aac_51_output_enabled=1 \
