@@ -1,0 +1,13 @@
+diff --git a/external/bluetooth/bluedroid/Android.mk b/external/bluetooth/bluedroid/Android.mk
+index bfca5ae..0912d02 100644
+--- a/external/bluetooth/bluedroid/Android.mk
++++ b/external/bluetooth/bluedroid/Android.mk
+@@ -15,7 +15,7 @@ ifneq ($(call is-board-platform-in-list,msm8960 msm8930 apq8064),true)
+  endif
+ endif
+ 
+-include $(call all-subdir-makefiles)
++#include $(call all-subdir-makefiles)
+ 
+ # Cleanup our locals
+ bdroid_C_INCLUDES :=
