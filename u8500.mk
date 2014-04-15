@@ -171,6 +171,21 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    chargemode
 
+# bluez 5.14
+PRODUCT_PACKAGES += \
+   bluetoothd \
+   bluetooth.default \
+   haltest \
+   btmon \
+   btproxy \
+   l2test \
+   bluetoothd-snoop
+
+PRODUCT_PACKAGES += \
+   libglib \
+   libsbc
+
+# bluez 5.14 end
 
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \

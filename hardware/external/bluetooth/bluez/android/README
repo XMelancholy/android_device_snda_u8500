@@ -1,0 +1,145 @@
+BlueZ for Android
+*****************
+
+Since Android 4.2 there exists a well standardized HAL interface that the
+Bluetooth stack is expected to provide and which enables the easy replacement
+of the stack of choice on Android. Android BlueZ is intended as a drop-in
+replacement to Android provided Bluetooth stack.
+
+More details about BlueZ for Android architecture and components can be found
+in android/hal-apc-api.txt file.
+
+Supported Android version: 4.4
+
+===============================
+Building and running on Android
+===============================
+
+Steps needed to build and run Android Open Source Project 4.4.2 with
+integrated BlueZ.
+
+Build requirements
+==================
+
+- GLib - Android 4.2 or later don't provide GLib and one must provide it in
+'external/bluetooth/glib' folder of Android tree. Sample Android GLib port
+is available at https://code.google.com/p/aosp-bluez.glib/
+
+- Bionic support - Currently only 'master' branch available at
+https://android.googlesource.com/platform/bionic provides all required
+functionality and running BlueZ on release branch requires backporting missing
+features (currently only epoll_create1 call for Android 4.4.2). Sample
+Bionic for Android 4.4.2 with all required features backported is available at
+https://code.google.com/p/aosp-bluez.platform-bionic/
+
+Runtime requirements
+====================
+
+BlueZ HAL library requires 'bluetoothd' and 'bluetoothd-snoop' services to be
+available on Android system. Some permissions settings are also required.
+
+This can be done by importing init.bluetooth.rc file in init.rc file of targeted
+board:
+import init.bluetooth.rc
+
+For convenience examples are provided at:
+https://code.google.com/p/aosp-bluez.device-lge-mako/    (Nexus 4)
+https://code.google.com/p/aosp-bluez.device-asus-flo/    (Nexus 7 2013)
+
+Downloading and building
+========================
+
+Building for Android requires full Android AOSP source tree. Sample Android
+4.4.2 tree with all required components present is available at
+http://code.google.com/p/aosp-bluez/
+
+This tree provides support for Nexus4 (target aosp_mako-userdebug) and
+Nexus 7 2013 (target aosp_flo-userdebug). Tree does not provide binary blobs
+needed to run Android on supported devices. Those can be obtained from
+https://developers.google.com/android/nexus/drivers. Binary blobs needs to be
+unpacked (EULA acceptance required) into 'vendor' directory of Android tree.
+
+Downloading:
+repo init -u https://code.google.com/p/aosp-bluez.platform-manifest -b kitkat
+repo sync
+
+Building:
+source build/envsetup.sh
+lunch aosp_mako-userdebug    or    lunch aosp_flo-userdebug
+make -j8
+
+Flashing:
+adb reboot bootloader
+fastboot flashall -w
+
+After full build is done it is possible to rebuild only BlueZ:
+'cd external/bluetooth/bluez/android/'
+'mm' (or 'mm -B' to force rebuilding of all files)
+'adb sync' to update target device.
+
+Linux Kernel requirements
+=========================
+TODO add section about kernel requirements
+
+=============================
+Building and running on Linux
+=============================
+
+It is possible to build and test BlueZ for Android daemon on Linux (eg. PC).
+Simply follow instructions available at README file in BlueZ top directory.
+Android daemon binary is located at android/bluetoothd. See next section on
+how to test Android daemon on Linux.
+
+============
+Testing tool
+============
+
+BT HAL test tools located in android/haltest is provided for HAL level testing
+of both Android daemon and HAL library. Start it with '-n' parameter and type
+'bluetooth init' in prompt to initialize HAL library. Running without parameter
+will make haltest try to initialize all services after start. On Android
+required bluetoothd service will be started automatically. On Linux it is
+required to start android/bluetoothd manually before init command timeout or
+use provided android/system-emulator, which takes care of launching daemon
+automatically on HAL library initialization. To deinitialize HAL library and
+stop daemon type 'bluetooth cleanup'. Type 'help' for more information. Tab
+completion is also supported.
+
+===========================
+Implementation shortcomings
+===========================
+
+It is possible that some of HAL functionality is missing implementation due to
+reasons like feature feasibility or necessity for latest Android Framework.
+This sections provides list of such deficiencies. Note that HAL library is
+always expected to fully implement HAL API so missing implementation might
+happen only in daemon.
+
+HAL Bluetooth
+=============
+
+methods:
+dut_mode_send                      never called from Android Framework
+le_test_mode                       never called from Android Framework
+get_remote_service_record          never called from Android Framework
+
+callbacks:
+dut_mode_recv_cb
+le_test_mode_cb
+
+properties:
+BT_PROPERTY_SERVICE_RECORD         not supported for adapter and device, for
+                                   device this property is to be returned as
+                                   response to get_remote_service_record,
+                                   not sure what to return on get_property
+                                   calls (records of all services?)
+
+BT_PROPERTY_REMOTE_VERSION_INFO    information required by this property (LMP
+                                   information) are not accessible from mgmt
+                                   interface, also marking this property as
+                                   settable is probably a typo in HAL header
+
+Socket HAL
+==========
+
+Support only for BTSOCK_RFCOMM socket type.
