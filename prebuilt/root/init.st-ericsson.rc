@@ -397,12 +397,6 @@ service admsrv /system/bin/admsrv
     ioprio rt 4
     capability NET_ADMIN NET_RAW SYS_NICE
 
-service ste-cg29xx_ctrl /system/xbin/ste-cg29xx_ctrl -b 115200 -p 6 -l 23 -i /system/bin/cg2900-channel_init.sh /dev/ttyAMA0
-    class main
-    user root
-    group bluetooth net_bt_admin misc root system
-    oneshot
-
 service lbsd /system/bin/lbsd
     class main
     user root
@@ -543,21 +537,6 @@ service mad /system/bin/ste_mad
 service usbid_init /system/bin/usbid_init.sh
     class main
     oneshot
-
-#service hciattach /system/bin/logwrapper /system/bin/hciattach -a 23 -n -s 115200 /dev/ttyAMA0 cg2900 115200 flow
-#    class main
-#    user root
-#    group bluetooth net_bt_admin net_admin misc root
-#    oneshot
-
-#on propery:init.svc.hciattach=running
-#    exec /system/bin/cg2900-channel_init.sh
-
-on property:init.svc.bluetoothd=stopped
-     write /sys/class/rfkill/rfkill1/state 0
-
-on property:init.svc.bluetoothd=running
-     write /sys/class/rfkill/rfkill1/state 1
 
 service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard0 /storage/sdcard0
     class late_start

@@ -546,22 +546,6 @@ service bootanim /system/bin/bootanimation
     disabled
     oneshot
 
-#service dbus /system/bin/dbus-daemon --system --nofork
-#    class main
-#    socket dbus stream 660 bluetooth bluetooth
-#    socket dbus_ste stream 666 bluetooth dbus_access
-#    user bluetooth
-#    group bluetooth net_bt_admin dbus_access
-
-#service bluetoothd /system/bin/bluetoothd -n
-#    class main
-#    socket bluetooth stream 660 bluetooth bluetooth
-#    socket dbus_bluetooth stream 660 bluetooth bluetooth
-#    # init.rc does not yet support applying capabilities, so run as root and
-#    # let bluetoothd drop uid to bluetooth with the right linux capabilities
-#    group bluetooth net_bt_admin misc radio
-#    disabled
-
 service installd /system/bin/installd
     class main
     socket installd stream 600 system system

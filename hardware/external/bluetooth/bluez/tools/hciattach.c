@@ -47,6 +47,7 @@
 #include <bluetooth/hci_lib.h>
 
 #include "hciattach.h"
+#include "ppoll.h"
 
 struct uart_t {
 	char *type;

@@ -75,6 +75,14 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/system/etc/LbsPgpsConfig.cfg:system/etc/LbsPgpsConfig.cfg \
     $(LOCAL_PATH)/prebuilt/system/etc/LbsPltConfig.cfg:system/etc/LbsPltConfig.cfg
 
+# BT config
+PRODUCT_COPY_FILES += \
+   $(LOCAL_PATH)/prebuilt/system/etc/bluetooth/main.conf:system/etc/bluetooth/main.conf \
+   $(LOCAL_PATH)/prebuilt/system/etc/bluetooth/audio.conf:system/etc/bluetooth/audio.conf \
+   $(LOCAL_PATH)/prebuilt/system/etc/bluetooth/blacklist.conf:system/etc/bluetooth/blacklist.conf \
+   $(LOCAL_PATH)/prebuilt/system/etc/bluetooth/input.conf:system/etc/bluetooth/input.conf \
+   $(LOCAL_PATH)/prebuilt/system/etc/bluetooth/network.conf:system/etc/bluetooth/network.conf
+
 # Filesystem management tools
 PRODUCT_PACKAGES += \
    make_ext4fs \
@@ -175,11 +183,22 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    bluetoothd \
    bluetooth.default \
+   libbluetooth \
    haltest \
    btmon \
    btproxy \
    l2test \
-   bluetoothd-snoop
+   bluetoothd-snoop \
+   hciattach \
+   hciconfig \
+   hcitool \
+   hcidump \
+   rfcomm \
+   rctest \
+   l2ping \
+   sdptool \
+   ciptool \
+   bccmd
 
 PRODUCT_PACKAGES += \
    libglib \

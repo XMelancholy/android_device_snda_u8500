@@ -3,6 +3,9 @@ on boot
     chown bluetooth bluetooth /data/misc/bluetooth
     chown bluetooth bluetooth /dev/uhid
 
+    exec /system/bin/cg2900-channel_init.sh
+
+
 # services
 on property:bluetooth.start=daemon
     setprop bluetooth.start none
@@ -20,6 +23,34 @@ on property:bluetooth.stop=snoop
     setprop bluetooth.stop none
     stop bluetoothd-snoop
 
+service ste-cg29xx_ctrl /system/xbin/ste-cg29xx_ctrl -b 115200 -p 6 -l 23 -i /system/bin/cg2900-channel_init.sh /dev/ttyAMA0
+    class main
+    user root
+    group bluetooth net_bt_admin misc root system
+    oneshot
+
+#service hciattach /system/bin/logwrapper /system/bin/hciattach -a 23 -n -s 115200 /dev/ttyAMA0 cg2900 115200 flow
+#    class main
+#    user root
+#    group bluetooth net_bt_admin net_admin misc root
+#    oneshot
+
+service dbus /system/bin/dbus-daemon --system --nofork
+    class main
+    socket dbus stream 660 bluetooth bluetooth
+    socket dbus_ste stream 666 bluetooth dbus_access
+    user bluetooth
+    group bluetooth net_bt_admin dbus_access
+
+#service bluetoothd /system/bin/logwrapper /system/bin/bluetoothd
+#    class main
+#    socket bluetooth stream 660 bluetooth bluetooth
+#    socket dbus_bluetooth stream 660 bluetooth bluetooth
+#    # init.rc does not yet support applying capabilities, so run as root and
+#    # let bluetoothd drop uid to bluetooth with the right linux capabilities
+#    group bluetooth net_bt_admin misc radio
+#    disabled
+
 service bluetoothd /system/bin/logwrapper /system/bin/bluetoothd
     class main
     # init does not yet support setting capabilities so run as root,
@@ -35,3 +66,9 @@ service bluetoothd-snoop /system/bin/logwrapper /system/bin/bluetoothd-snoop
     group nobody
     disabled
     oneshot
+
+on property:init.svc.bluetoothd=stopped
+     write /sys/class/rfkill/rfkill1/state 0
+
+on property:init.svc.bluetoothd=running
+     write /sys/class/rfkill/rfkill1/state 1
