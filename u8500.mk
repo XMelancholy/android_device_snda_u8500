@@ -137,7 +137,9 @@ PRODUCT_PACKAGES += \
    watchdog-kicker
 
 PRODUCT_PACKAGES += \
-   libdbus
+   libdbus \
+   libarchive \
+   libarchive_fe 
 
 
 # FileExplorer
