@@ -84,6 +84,8 @@ on fs
     # the block device belonging to /data.
     start cspsa
 
+    # Launch core services in case charging mode is entered
+    start watchdog-kicker
 
 on post-fs
 
@@ -554,3 +556,7 @@ service dbus /system/bin/logwrapper /system/bin/dbus-daemon --system --nofork
     socket dbus_ste stream 660 bluetooth dbus_access
     user bluetooth
     group bluetooth net_bt_admin dbus_access
+
+service watchdog-kicker /system/xbin/watchdog-kicker -d /dev/watchdog -t 120
+    class main
+    oneshot
