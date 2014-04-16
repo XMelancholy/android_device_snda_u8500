@@ -126,23 +126,23 @@ PRODUCT_PACKAGES += \
    hostapd_cli \
    hostapd
 
-# FileExplorer
-#PRODUCT_PACKAGES += \
-#   FileExplorer
-
-# libdbus
-PRODUCT_PACKAGES += \
-   dbus-daemon \
-   libdbus
-
-# modem
+# Modem
 PRODUCT_PACKAGES += \
    ste_mad
 
 # PACKAGES
 PRODUCT_PACKAGES += \
    chargemode \
+   dbus-daemon \
    watchdog-kicker
+
+PRODUCT_PACKAGES += \
+   libdbus
+
+
+# FileExplorer
+#PRODUCT_PACKAGES += \
+#   FileExplorer
 
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \
