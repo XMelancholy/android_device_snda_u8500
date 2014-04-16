@@ -45,6 +45,8 @@ on init
     mkdir /mnt/fuse 0700 root system
     mount tmpfs tmpfs /mnt/fuse mode=0775,gid=1000
 
+    write /sys/class/leds/lcd-backlight/brightness 140
+
 on early-boot
 
     # USB initialization

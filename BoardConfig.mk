@@ -83,7 +83,6 @@ COMMON_GLOBAL_CFLAGS += -DUSES_TI_MAC80211
 BOARD_HAS_NO_SELECT_BUTTON := true
 BOARD_USES_MMCUTILS := true
 TARGET_RECOVERY_INITRC := device/snda/u8500/recovery/init.rc
-BOARD_CUSTOM_GRAPHICS := ../../../device/snda/u8500/recovery/graphics.c
 RECOVERY_FSTAB_VERSION := 2
 TARGET_RECOVERY_FSTAB = device/snda/u8500/prebuilt/root/fstab.st-ericsson
 
