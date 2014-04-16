@@ -106,7 +106,8 @@ PRODUCT_PACKAGES += \
    copybit.montblanc \
    power.montblanc \
    sensors.montblanc \
-   memtrack.montblanc
+   memtrack.montblanc \
+   libhealthd.montblanc
 
 PRODUCT_PACKAGES += \
    libblt_hw
