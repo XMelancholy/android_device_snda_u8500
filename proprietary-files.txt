@@ -518,5 +518,4 @@ usr/share/charge/res/pic_2.rle
 usr/share/charge/res/pic_3.rle
 usr/share/charge/res/pic_4.rle
 usr/share/charge/res/pic_5.rle
-usr/share/charge/res/snda.rle
 xbin/ste-cg29xx_ctrl
