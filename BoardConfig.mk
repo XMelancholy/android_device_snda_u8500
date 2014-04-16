@@ -97,5 +97,5 @@ TARGET_USE_CUSTOM_LUN_FILE_PATH := "/sys/devices/soc0/musb-ux500.0/musb-hdrc/gad
 # OTA
 TARGET_RELEASETOOL_OTA_FROM_TARGET_SCRIPT := device/snda/u8500/releasetools/snda_ota_from_target_files
 TARGET_OTA_ASSERT_DEVICE := u8500
-PRODUCT_BUILD_PROP_OVERRIDES += PRODUCT_NAME=s1w_u8500 BUILD_FINGERPRINT=Bambookphone/s1w_u8500/u8500:4.1.2/NS4.1/13436:user/release-keys PRIVATE_BUILD_DESC="s1w_u8500-user 4.1.2 NS4.1 13436 release-keys"
+PRODUCT_BUILD_PROP_OVERRIDES += PRODUCT_NAME=s1w_u8500 BUILD_FINGERPRINT=Bambookphone/s1w_u8500/u8500:4.4.2/NS4.1/13436:user/release-keys PRIVATE_BUILD_DESC="s1w_u8500-user 4.4.2 NS4.1 13436 release-keys"
 
