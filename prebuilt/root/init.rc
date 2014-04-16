@@ -517,7 +517,7 @@ service ril-daemon /system/bin/rild
 service surfaceflinger /system/bin/surfaceflinger
     class main
     user system
-    group graphics
+    group graphics drmrpc
     onrestart restart zygote
 
 service zygote /system/bin/app_process -Xzygote /system/bin --zygote --start-system-server
@@ -570,7 +570,6 @@ service keystore /system/bin/keystore /data/misc/keystore
     class main
     user keystore
     group keystore drmrpc system
-    socket keystore stream 666
 
 service dumpstate /system/bin/dumpstate -s
     class main
