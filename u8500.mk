@@ -141,7 +141,8 @@ PRODUCT_PACKAGES += \
 
 # PACKAGES
 PRODUCT_PACKAGES += \
-   chargemode
+   chargemode \
+   watchdog-kicker
 
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \
