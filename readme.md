@@ -29,7 +29,6 @@ Patch android source code :
 		patch -p1 < device/snda/u8500/patches/frameworks_base.patch
 		patch -p1 < device/snda/u8500/patches/frameworks_native.patch
 		patch -p1 < device/snda/u8500/patches/hardware_libhardware.patch
-		patch -p1 < device/snda/u8500/patches/hardware_libhardware_legacy.patch
 		patch -p1 < device/snda/u8500/patches/system_core.patch
 
 
@@ -41,7 +40,6 @@ Our step is optional!!! Use only if you going to sync CM 11 source code daily, t
 		patch -p1 -R < device/snda/u8500/patches/frameworks_base.patch
 		patch -p1 -R < device/snda/u8500/patches/frameworks_native.patch
 		patch -p1 -R < device/snda/u8500/patches/hardware_libhardware.patch
-		patch -p1 -R < device/snda/u8500/patches/hardware_libhardware_legacy.patch
 		patch -p1 -R < device/snda/u8500/patches/system_core.patch
 		repo forall -p -c 'git checkout -f'
 		repo sync
@@ -50,7 +48,6 @@ Our step is optional!!! Use only if you going to sync CM 11 source code daily, t
 		patch -p1 < device/snda/u8500/patches/frameworks_base.patch
 		patch -p1 < device/snda/u8500/patches/frameworks_native.patch
 		patch -p1 < device/snda/u8500/patches/hardware_libhardware.patch
-		patch -p1 < device/snda/u8500/patches/hardware_libhardware_legacy.patch
 		patch -p1 < device/snda/u8500/patches/system_core.patch
 
 
