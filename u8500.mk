@@ -85,78 +85,45 @@ PRODUCT_PACKAGES += \
    setup_fs \
    e2fsck
 
-# Hostapd
-PRODUCT_PACKAGES += \
-   hostapd_cli \
-   hostapd
-
 # STE Audio
 PRODUCT_PACKAGES += \
+   audio_policy.montblanc \
+   audio.primary.montblanc \
    libasound \
    libalsactrl \
    libmmprobe
 
-# Audio HAL
 PRODUCT_PACKAGES += \
-   audio_policy.montblanc \
-   audio.primary.montblanc
-
-# A2DP and USB
-PRODUCT_PACKAGES += \
+   libaudioparameter \
    audio.a2dp.default \
    audio.usb.default
 
-# Lights
+# STE Display 
 PRODUCT_PACKAGES += \
-   lights.montblanc
-   
-# libgralloc
-PRODUCT_PACKAGES += \
-   gralloc.montblanc
-
-# libhwcomposer
-PRODUCT_PACKAGES += \
-   hwcomposer.montblanc
-
-# libcopybit
-PRODUCT_PACKAGES += \
-   copybit.montblanc
-
-# libpower
-PRODUCT_PACKAGES += \
-   power.montblanc
-
-# libsensors
-PRODUCT_PACKAGES += \
-   sensors.montblanc
-
-# libmemtrack
-PRODUCT_PACKAGES += \
+   lights.montblanc \
+   gralloc.montblanc \
+   hwcomposer.montblanc \
+   copybit.montblanc \
+   power.montblanc \
+   sensors.montblanc \
    memtrack.montblanc
 
-# libstagefrighthw
-PRODUCT_PACKAGES += \
-   libstagefrighthw
-
-# libblt_hw
 PRODUCT_PACKAGES += \
    libblt_hw
 
-# libomxil-bellagio
+# STE Media
 PRODUCT_PACKAGES += \
+   libstagefrighthw \
    libomxil-bellagio
 
-# bcmdhd_net_iface
+# WLAN
 PRODUCT_PACKAGES += \
-   libnetcmdiface
+   libnetcmdiface \
+   libnl_2 \
 
-# Netlink
 PRODUCT_PACKAGES += \
-   libnl_2
-
-# Libaudioparameter
-PRODUCT_PACKAGES += \
-   libaudioparameter
+   hostapd_cli \
+   hostapd
 
 # FileExplorer
 #PRODUCT_PACKAGES += \
