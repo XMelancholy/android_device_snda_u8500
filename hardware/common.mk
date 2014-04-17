@@ -34,3 +34,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    ste-cg29xx_ctrl
 
+PRODUCT_PACKAGES += \
+   libstecom
+
