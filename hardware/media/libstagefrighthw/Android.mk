@@ -11,10 +11,6 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-$(shell mkdir -p $(TARGET_OUT_INTERMEDIATES)/SHARED_LIBRARIES/libstelpcutils_intermediates)
-
-$(shell touch $(TARGET_OUT_INTERMEDIATES)/SHARED_LIBRARIES/libstelpcutils_intermediates/export_includes)
-
 LOCAL_SRC_FILES = \
     STECodecsPlugin.cpp
 
