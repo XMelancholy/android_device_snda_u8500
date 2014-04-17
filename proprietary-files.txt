@@ -92,7 +92,6 @@ lib/libMali.so
 lib/libnmf.so
 lib/libnmfee.so
 lib/libnmftimer.so
-lib/libpscc.so
 lib/libril.so
 lib/libsms_server.so
 lib/libspeech_processing.so

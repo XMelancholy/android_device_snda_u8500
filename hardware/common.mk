@@ -36,5 +36,6 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_PACKAGES += \
    libstecom \
-   libmpl
+   libmpl \
+   libpscc
 
