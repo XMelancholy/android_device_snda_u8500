@@ -39,7 +39,8 @@ PRODUCT_PACKAGES += \
    libstecom \
    libmpl \
    libpscc \
-   libsterc
+   libsterc \
+   stercd
 
 PRODUCT_PACKAGES += \
    chargemode \

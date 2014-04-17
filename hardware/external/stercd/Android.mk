@@ -9,11 +9,11 @@ LOCAL_SHARED_LIBRARIES := libstecom libmpl libsterc liblog libpscc libutils
 LOCAL_STATIC_LIBRARIES := libaccsutil_security
 LOCAL_CFLAGS := -DSTERC_SW_VARIANT_ANDROID -DCFG_USE_ANDROID_LOG
 LOCAL_C_INCLUDES := \
-  $(LOCAL_PATH)/../../libstecom \
+  $(LOCAL_PATH)/../libstecom \
   $(LOCAL_PATH)/../libmpl \
   $(LOCAL_PATH)/../libnlcom \
   $(LOCAL_PATH)/../libpscc \
   $(LOCAL_PATH)/../libsterc \
-  $(LOCAL_PATH)/../../../modem/common/include
+  $(LOCAL_PATH)/../../modem/common/include
 
 include $(BUILD_EXECUTABLE)
