@@ -37,5 +37,15 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    libstecom \
    libmpl \
-   libpscc
+   libpscc \
+   libsterc
 
+PRODUCT_PACKAGES += \
+   chargemode \
+   dbus-daemon \
+   watchdog-kicker
+
+PRODUCT_PACKAGES += \
+   libdbus \
+   libarchive \
+   libarchive_fe

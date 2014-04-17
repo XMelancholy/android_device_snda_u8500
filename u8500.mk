@@ -131,18 +131,6 @@ PRODUCT_PACKAGES += \
    ste_mad \
    msa
 
-# PACKAGES
-PRODUCT_PACKAGES += \
-   chargemode \
-   dbus-daemon \
-   watchdog-kicker
-
-PRODUCT_PACKAGES += \
-   libdbus \
-   libarchive \
-   libarchive_fe 
-
-
 # FileExplorer
 #PRODUCT_PACKAGES += \
 #   FileExplorer
