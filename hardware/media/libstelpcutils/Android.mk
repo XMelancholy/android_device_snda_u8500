@@ -4,7 +4,7 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_SRC_FILES = \
+LOCAL_SRC_FILES := \
    stelp_log.c \
    stelp_fatal.c \
    stelp_time.c \
