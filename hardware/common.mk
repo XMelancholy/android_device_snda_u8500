@@ -34,6 +34,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    ste-cg29xx_ctrl
 
+# psdata
 PRODUCT_PACKAGES += \
    libstecom \
    libmpl \

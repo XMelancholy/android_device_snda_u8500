@@ -13,7 +13,6 @@ bin/simpbd
 bin/sms_server
 bin/ste_omxil_test
 bin/ste-adm-test
-bin/stercd
 bin/tuning_server
 etc/adm.sqlite-u8500_ab8500
 etc/adm.sqlite-u8520_ab8505_v1
