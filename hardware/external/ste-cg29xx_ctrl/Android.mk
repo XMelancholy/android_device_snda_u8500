@@ -1,0 +1,13 @@
+LOCAL_PATH:= $(call my-dir)
+
+include $(CLEAR_VARS)
+LOCAL_SRC_FILES := ste-cg29xx_ctrl.c
+LOCAL_CFLAGS:= -DANDROID
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../modem/cspsa
+LOCAL_SHARED_LIBRARIES := libcspsa
+LOCAL_MODULE := ste-cg29xx_ctrl
+LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+LOCAL_MODULE_TAGS := optional
+
+include $(BUILD_EXECUTABLE)
+
