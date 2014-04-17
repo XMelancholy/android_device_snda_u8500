@@ -35,5 +35,6 @@ PRODUCT_PACKAGES += \
    ste-cg29xx_ctrl
 
 PRODUCT_PACKAGES += \
-   libstecom
+   libstecom \
+   libmpl
 

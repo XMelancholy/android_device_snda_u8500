@@ -89,7 +89,6 @@ lib/libflash_current_calculation.so
 lib/liblbstestengine.so
 lib/liblos.so
 lib/libMali.so
-lib/libmpl.so
 lib/libnmf.so
 lib/libnmfee.so
 lib/libnmftimer.so
