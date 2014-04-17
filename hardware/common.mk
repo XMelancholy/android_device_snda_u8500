@@ -30,3 +30,7 @@ PRODUCT_PACKAGES += \
    libcspsa-core \
    libcspsa-ll-file
 
+# cg2900
+PRODUCT_PACKAGES += \
+   ste-cg29xx_ctrl
+
