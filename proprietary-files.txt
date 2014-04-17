@@ -112,7 +112,6 @@ lib/libste_omxil-interface.so
 lib/libstecom.so
 lib/libsterc.so
 lib/libtee.so
-lib/libtrace.so
 lib/libu300-ril.so
 lib/libu300-parser.so
 lib/libUMP.so
