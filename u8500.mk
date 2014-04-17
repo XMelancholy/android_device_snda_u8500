@@ -56,7 +56,6 @@ PRODUCT_COPY_FILES += \
    $(LOCAL_PATH)/prebuilt/system/etc/media_profiles.xml:system/etc/media_profiles.xml \
    $(LOCAL_PATH)/prebuilt/system/etc/asound.conf:system/etc/asound.conf \
    $(LOCAL_PATH)/prebuilt/system/etc/cacert.txt:system/etc/cacert.txt \
-   $(LOCAL_PATH)/prebuilt/system/etc/cspsa.conf:system/etc/cspsa.conf \
    $(LOCAL_PATH)/prebuilt/system/etc/dbus.conf:system/etc/dbus.conf \
    $(LOCAL_PATH)/prebuilt/system/etc/omxloaders:system/etc/omxloaders \
    $(LOCAL_PATH)/prebuilt/system/etc/ril_config:system/etc/ril_config \

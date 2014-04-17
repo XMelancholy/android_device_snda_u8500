@@ -4,7 +4,6 @@ bin/blue-up.sh
 bin/cg2900-channel_init.sh
 bin/cops_cmd
 bin/copsdaemon
-bin/cspsa-server
 bin/lbsd
 bin/lbsstelp
 bin/modem-supervisor
@@ -86,7 +85,6 @@ lib/libcamera_flash.so
 lib/libclientgps.so
 lib/libcn.so
 lib/libcops.so
-lib/libcspsa.so
 lib/libflash_current_calculation.so
 lib/liblbstestengine.so
 lib/liblos.so

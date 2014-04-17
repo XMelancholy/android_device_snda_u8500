@@ -21,6 +21,12 @@ PRODUCT_PACKAGES += \
    libshmnetlnk \
    libphonet
 
-
-
+# cspsa
+PRODUCT_PACKAGES += \
+   cspsa-server \
+   libcspsa \
+   cspsa.conf \
+   cspsa-cmd \
+   libcspsa-core \
+   libcspsa-ll-file
 
