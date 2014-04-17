@@ -110,7 +110,6 @@ lib/libste_isp8500_firmware_primary.so
 lib/libste_isp8500_firmware_secondary.so
 lib/libste_omxil-interface.so
 lib/libstecom.so
-lib/libstelpcutils.so
 lib/libsterc.so
 lib/libtee.so
 lib/libtrace.so

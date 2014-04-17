@@ -113,7 +113,8 @@ PRODUCT_PACKAGES += \
 # STE Media
 PRODUCT_PACKAGES += \
    libstagefrighthw \
-   libomxil-bellagio
+   libomxil-bellagio \
+   libstelpcutils
 
 # WLAN
 PRODUCT_PACKAGES += \

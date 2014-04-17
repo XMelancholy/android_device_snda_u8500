@@ -24,7 +24,6 @@ MAKEFILE=../../../$OUTDIR/$DEVICE-vendor-blobs.mk
 
 # Prebuilt libraries that are needed to build open-source libraries
 PRODUCT_COPY_FILES += \\
-    $OUTDIR/proprietary/lib/libstelpcutils.so:obj/lib/libstelpcutils.so \\
     $OUTDIR/proprietary/lib/libste_adm.so:obj/lib/libste_adm.so
 
 PRODUCT_COPY_FILES += \\
