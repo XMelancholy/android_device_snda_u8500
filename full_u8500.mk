@@ -9,6 +9,8 @@ $(call inherit-product, frameworks/native/build/phone-xhdpi-1024-dalvik-heap.mk)
 # Inherit from u8500 device
 $(call inherit-product, device/snda/u8500/u8500.mk)
 
+$(call inherit-product, device/snda/u8500/hardware/common.mk)
+
 PRODUCT_NAME := full_u8500
 PRODUCT_DEVICE := u8500
 PRODUCT_BRAND := Bambookphone

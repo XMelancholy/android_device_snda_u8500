@@ -106,8 +106,7 @@ PRODUCT_PACKAGES += \
    copybit.montblanc \
    power.montblanc \
    sensors.montblanc \
-   memtrack.montblanc \
-   libhealthd.montblanc
+   memtrack.montblanc
 
 PRODUCT_PACKAGES += \
    libblt_hw
@@ -128,7 +127,8 @@ PRODUCT_PACKAGES += \
 
 # Modem
 PRODUCT_PACKAGES += \
-   ste_mad
+   ste_mad \
+   msa
 
 # PACKAGES
 PRODUCT_PACKAGES += \
