@@ -3,7 +3,6 @@
 *.gcda
 *.gcno
 .config
-*.so
 *.a
 *.d
 coverage*
