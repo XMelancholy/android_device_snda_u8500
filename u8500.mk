@@ -79,8 +79,6 @@ PRODUCT_COPY_FILES += \
 
 # Filesystem management tools
 PRODUCT_PACKAGES += \
-   make_ext4fs \
-   setup_fs \
    e2fsck
 
 # STE Audio
@@ -116,11 +114,12 @@ PRODUCT_PACKAGES += \
    libstelpcutils \
    libtrace
 
-# WLAN
+# Network
 PRODUCT_PACKAGES += \
    libnetcmdiface \
    libnl_2 \
 
+# Hostapd
 PRODUCT_PACKAGES += \
    hostapd_cli \
    hostapd
@@ -149,7 +148,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # currently contain all of the bitmaps at xhdpi density so
 # we do this little trick to fall back to the hdpi version
 # if the xhdpi doesn't exist.
-PRODUCT_AAPT_CONFIG := normal mdpi hdpi
+PRODUCT_AAPT_CONFIG := normal hdpi
 PRODUCT_AAPT_PREF_CONFIG := hdpi
 
 # We have enough storage space to hold precise GC data
