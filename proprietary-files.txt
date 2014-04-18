@@ -13,6 +13,7 @@ bin/simpbd
 bin/sms_server
 bin/ste_omxil_test
 bin/ste-adm-test
+bin/stercd
 bin/tuning_server
 etc/adm.sqlite-u8500_ab8500
 etc/adm.sqlite-u8520_ab8505_v1
@@ -88,9 +89,11 @@ lib/libflash_current_calculation.so
 lib/liblbstestengine.so
 lib/liblos.so
 lib/libMali.so
+lib/libmpl.so
 lib/libnmf.so
 lib/libnmfee.so
 lib/libnmftimer.so
+lib/libpscc.so
 lib/libril.so
 lib/libsms_server.so
 lib/libspeech_processing.so
@@ -106,6 +109,8 @@ lib/libste_ext_ens_image_common.so
 lib/libste_isp8500_firmware_primary.so
 lib/libste_isp8500_firmware_secondary.so
 lib/libste_omxil-interface.so
+lib/libstecom.so
+lib/libsterc.so
 lib/libtee.so
 lib/libu300-ril.so
 lib/libu300-parser.so
