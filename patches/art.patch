@@ -1,0 +1,53 @@
+diff --git a/art/runtime/gc/heap.cc b/art/runtime/gc/heap.cc
+index 1b46257..e3611e2 100644
+--- a/art/runtime/gc/heap.cc
++++ b/art/runtime/gc/heap.cc
+@@ -940,6 +940,10 @@ void Heap::SetTargetHeapUtilization(float target) {
+   target_utilization_ = target;
+ }
+ 
++void Heap::SetTargetHeapMinFree(size_t size) {
++  min_free_ = size;
++}
++ 
+ size_t Heap::GetObjectsAllocated() const {
+   size_t total = 0;
+   typedef std::vector<space::ContinuousSpace*>::const_iterator It;
+diff --git a/art/runtime/gc/heap.h b/art/runtime/gc/heap.h
+index 0b64261..893f333 100644
+--- a/art/runtime/gc/heap.h
++++ b/art/runtime/gc/heap.h
+@@ -202,6 +202,10 @@ class Heap {
+   // Set target ideal heap utilization ratio, implements
+   // dalvik.system.VMRuntime.setTargetHeapUtilization.
+   void SetTargetHeapUtilization(float target);
++  
++  // Sets HEAP_MIN_FREE, implements
++  // dalvik.system.VMRuntime.SetTargetHeapMinFree.
++  void SetTargetHeapMinFree(size_t size);
+ 
+   // For the alloc space, sets the maximum number of bytes that the heap is allowed to allocate
+   // from the system. Doesn't allow the space to exceed its growth limit.
+diff --git a/art/runtime/native/dalvik_system_VMRuntime.cc b/art/runtime/native/dalvik_system_VMRuntime.cc
+index 5fc8bd5..058b3ae 100644
+--- a/art/runtime/native/dalvik_system_VMRuntime.cc
++++ b/art/runtime/native/dalvik_system_VMRuntime.cc
+@@ -43,6 +43,10 @@ static void VMRuntime_nativeSetTargetHeapUtilization(JNIEnv*, jobject, jfloat ta
+   Runtime::Current()->GetHeap()->SetTargetHeapUtilization(target);
+ }
+ 
++static void VMRuntime_nativeSetTargetHeapMinFree(JNIEnv*, jobject, jfloat target) {
++  Runtime::Current()->GetHeap()->SetTargetHeapMinFree(target);
++}
++
+ static void VMRuntime_startJitCompilation(JNIEnv*, jobject) {
+ }
+ 
+@@ -206,6 +210,7 @@ static JNINativeMethod gMethods[] = {
+   NATIVE_METHOD(VMRuntime, getTargetHeapUtilization, "()F"),
+   NATIVE_METHOD(VMRuntime, isDebuggerActive, "()Z"),
+   NATIVE_METHOD(VMRuntime, nativeSetTargetHeapUtilization, "(F)V"),
++  NATIVE_METHOD(VMRuntime, nativeSetTargetHeapMinFree, "(I)I"),
+   NATIVE_METHOD(VMRuntime, newNonMovableArray, "(Ljava/lang/Class;I)Ljava/lang/Object;"),
+   NATIVE_METHOD(VMRuntime, properties, "()[Ljava/lang/String;"),
+   NATIVE_METHOD(VMRuntime, setTargetSdkVersion, "(I)V"),
