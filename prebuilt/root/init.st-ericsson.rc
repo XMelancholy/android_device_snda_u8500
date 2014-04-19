@@ -129,6 +129,7 @@ on post-fs
     chmod 0660 /sys/power/state
     chmod 0660 /sys/power/wake_lock
     chmod 0660 /sys/power/wake_unlock
+
     # STE Camera permissions
     chown media  system   dev/mmio_camera
     chown media  system   dev/camera_flash
@@ -140,7 +141,6 @@ on post-fs-data
     # create basic filesystem structure
     mkdir /data/misc/hcid 0770 bluetooth bluetooth
     mkdir /data/misc/psdata
-
 
     mkdir /data/misc/telephony_log_levels
     chmod 0660 /data/misc/telephony_log_levels
@@ -172,7 +172,6 @@ on post-fs-data
     # Setup paths used for socket communication with the wpa supplicant.
     mkdir /data/system 0775 system system
     chown system system /data/system
-
 
     # Setup paths used for socket communication with the dhcp daemon(dhcpd)
     mkdir /data/misc/dhcp 0770 dhcp dhcp
@@ -347,7 +346,7 @@ on boot
     insmod /system/lib/modules/cw1200_core.ko
 
     # Install cw1200_wlan WLAN module
-    insmod /system/lib/modules/cw1200_wlan.ko
+    #insmod /system/lib/modules/cw1200_wlan.ko
 
     # Modem
     class_start modem
