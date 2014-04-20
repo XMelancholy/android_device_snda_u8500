@@ -54,8 +54,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    hciconfig \
    hciattach \
-   hcitool \
-
+   hcitool
 
 PRODUCT_PACKAGES += \
    chargemode \
