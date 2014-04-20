@@ -1,4 +1,3 @@
-#       modified:   core/jni/android_view_HardwareRenderer.cpp
 diff --git a/frameworks/base/core/jni/android_view_HardwareRenderer.cpp b/frameworks/base/core/jni/android_view_HardwareRenderer.cpp
 index 479fbe2..712e76b 100644
 --- a/frameworks/base/core/jni/android_view_HardwareRenderer.cpp
@@ -15,3 +14,25 @@ index 479fbe2..712e76b 100644
      return systemTime(SYSTEM_TIME_MONOTONIC);
  }
  
+diff --git a/frameworks/base/media/java/android/media/AudioService.java b/frameworks/base/media/java/android/media/AudioService.java
+index 6704eb5..8c33736 100644
+--- a/frameworks/base/media/java/android/media/AudioService.java
++++ b/frameworks/base/media/java/android/media/AudioService.java
+@@ -1071,8 +1071,6 @@ public class AudioService extends IAudioService.Stub {
+ 
+             oldIndex = streamState.getIndex(device);
+ 
+-            index = rescaleIndex(index * 10, streamType, streamTypeAlias);
+-
+             if (streamTypeAlias == AudioSystem.STREAM_MUSIC &&
+                 (device & AudioSystem.DEVICE_OUT_ALL_A2DP) != 0 &&
+                 (flags & AudioManager.FLAG_BLUETOOTH_ABS_VOLUME) == 0) {
+@@ -1083,6 +1081,8 @@ public class AudioService extends IAudioService.Stub {
+                 }
+             }
+ 
++            index = rescaleIndex(index * 10, streamType, streamTypeAlias);
++
+             flags &= ~AudioManager.FLAG_FIXED_VOLUME;
+             if ((streamTypeAlias == AudioSystem.STREAM_MUSIC) &&
+                     ((device & mFixedVolumeDevices) != 0)) {
