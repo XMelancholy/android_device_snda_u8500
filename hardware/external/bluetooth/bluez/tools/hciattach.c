@@ -42,9 +42,9 @@
 #include <sys/param.h>
 #include <sys/ioctl.h>
 
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/hci.h>
-#include <bluetooth/hci_lib.h>
+#include <bluetooth.h>
+#include <hci.h>
+#include <hci_lib.h>
 
 #include "hciattach.h"
 
@@ -326,12 +326,12 @@ static int intel(int fd, struct uart_t *u, struct termios *ti)
 {
 	return intel_init(fd, u->init_speed, &u->speed, ti);
 }
-
+#if 0
 static int bcm43xx(int fd, struct uart_t *u, struct termios *ti)
 {
 	return bcm43xx_init(fd, u->speed, ti, u->bdaddr);
 }
-
+#endif
 static int read_check(int fd, void *buf, int count)
 {
 	int res;
@@ -1139,11 +1139,11 @@ struct uart_t uart[] = {
 	/* Broadcom BCM2035 */
 	{ "bcm2035",    0x0A5C, 0x2035, HCI_UART_H4,   115200, 460800,
 				FLOW_CTL, DISABLE_PM, NULL, bcm2035  },
-
+#if 0
 	/* Broadcom BCM43XX */
 	{ "bcm43xx",    0x0000, 0x0000, HCI_UART_H4,   115200, 3000000,
 				FLOW_CTL, DISABLE_PM, NULL, bcm43xx, NULL  },
-
+#endif
 	{ "ath3k",    0x0000, 0x0000, HCI_UART_ATH3K, 115200, 115200,
 			FLOW_CTL, DISABLE_PM, NULL, ath3k_ps, ath3k_pm  },
 

@@ -111,8 +111,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    libstagefrighthw \
    libomxil-bellagio \
-   libstelpcutils \
-   libtrace
+   libstelpcutils
 
 # Network
 PRODUCT_PACKAGES += \

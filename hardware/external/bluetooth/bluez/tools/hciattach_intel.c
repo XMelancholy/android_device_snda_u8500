@@ -35,9 +35,9 @@
 #include <sys/ioctl.h>
 #include <time.h>
 
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/hci.h>
-#include <bluetooth/hci_lib.h>
+#include <bluetooth.h>
+#include <hci.h>
+#include <hci_lib.h>
 
 #include "hciattach.h"
 

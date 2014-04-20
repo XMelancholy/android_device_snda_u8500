@@ -523,3 +523,85 @@ $(foreach file,$(include_files),$(shell cp -u $(file) $(include_path)/bluetooth)
 LOCAL_EXPORT_C_INCLUDE_DIRS := $(include_path)
 
 include $(BUILD_STATIC_LIBRARY)
+
+#
+# hciattach
+#
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES:= \
+	bluez/tools/hciattach.c \
+	bluez/tools/hciattach_st.c \
+	bluez/tools/hciattach_ti.c \
+	bluez/tools/hciattach_tialt.c \
+	bluez/tools/hciattach_ath3k.c \
+	bluez/tools/hciattach_qualcomm.c \
+	bluez/tools/hciattach_intel.c
+
+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+
+LOCAL_C_INCLUDES:= \
+	$(LOCAL_PATH)/bluez/lib \
+	$(LOCAL_PATH)/bluez/android \
+	$(LOCAL_PATH)/bluez/tools
+
+LOCAL_SHARED_LIBRARIES := \
+	libbluetooth
+
+LOCAL_MODULE_PATH := $(TARGET_OUT_EXECUTABLES)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := hciattach
+
+include $(BUILD_EXECUTABLE)
+
+#
+# hciconfig
+#
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES:= \
+	bluez/tools/csr.c \
+	bluez/tools/csr_h4.c \
+	bluez/tools/hciconfig.c
+
+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+
+LOCAL_C_INCLUDES:=\
+	$(LOCAL_PATH)/bluez/lib \
+	$(LOCAL_PATH)/bluez/android \
+	$(LOCAL_PATH)/bluez/src \
+	$(LOCAL_PATH)/bluez/tools
+
+LOCAL_SHARED_LIBRARIES := \
+	libbluetooth
+
+LOCAL_MODULE_PATH := $(TARGET_OUT_EXECUTABLES)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE:=hciconfig
+
+include $(BUILD_EXECUTABLE)
+
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES:= \
+	bluez/lib/bluetooth.c \
+	bluez/lib/hci.c \
+	bluez/lib/sdp.c \
+	bluez/lib/uuid.c
+
+LOCAL_C_INCLUDES:= \
+	$(LOCAL_PATH)/bluez \
+	$(LOCAL_PATH)/bluez/lib \
+
+LOCAL_SHARED_LIBRARIES := \
+	libcutils \
+	liblog \
+
+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+
+LOCAL_MODULE:=libbluetooth
+
+include $(BUILD_SHARED_LIBRARY)

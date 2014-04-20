@@ -39,13 +39,13 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/hci.h>
-#include <bluetooth/hci_lib.h>
+#include <bluetooth.h>
+#include <hci.h>
+#include <hci_lib.h>
 
-#include "src/textfile.h"
-#include "src/shared/util.h"
-#include "tools/csr.h"
+#include "textfile.h"
+#include "shared/util.h"
+#include "csr.h"
 
 static struct hci_dev_info di;
 static int all;

@@ -47,7 +47,15 @@ PRODUCT_PACKAGES += \
 
 # Bluez tools
 PRODUCT_PACKAGES += \
-   libsbc
+   libsbc \
+   libbluetooth
+
+# Bluez debug tools
+PRODUCT_PACKAGES += \
+   hciconfig \
+   hciattach \
+   hcitool \
+
 
 PRODUCT_PACKAGES += \
    chargemode \
@@ -56,4 +64,12 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    libarchive \
    libarchive_fe
+
+# bluez Configs
+PRODUCT_COPY_FILES += \
+   $(LOCAL_PATH)/external/bluetooth/data/audio.conf:system/etc/bluetooth/audio.conf \
+   $(LOCAL_PATH)/external/bluetooth/data/blacklist.conf:system/etc/bluetooth/blacklist.conf \
+   $(LOCAL_PATH)/external/bluetooth/data/input.conf:system/etc/bluetooth/input.conf \
+   $(LOCAL_PATH)/external/bluetooth/data/main.conf:system/etc/bluetooth/main.conf \
+   $(LOCAL_PATH)/external/bluetooth/data/network.conf:system/etc/bluetooth/network.conf
 
