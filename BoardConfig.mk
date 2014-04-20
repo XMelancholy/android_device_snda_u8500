@@ -37,7 +37,6 @@ BOARD_HAVE_PRE_KITKAT_AUDIO_BLOB := true
 
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
-BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/snda/u8500/bluetooth
 
 # Camera
 USE_CAMERA_STUB := true
