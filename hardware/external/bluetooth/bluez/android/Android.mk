@@ -1,11 +1,11 @@
-LOCAL_PATH := external/bluetooth
+LOCAL_PATH := device/snda/u8500/hardware/external/bluetooth
 
 # Retrieve BlueZ version from configure.ac file
 BLUEZ_VERSION := `grep "^AC_INIT" $(LOCAL_PATH)/bluez/configure.ac | sed -e "s/.*,.\(.*\))/\1/"`
 
 # Specify pathmap for glib and sbc
-pathmap_INCL += glib:external/bluetooth/glib \
-		sbc:external/bluetooth/sbc \
+pathmap_INCL += glib:device/snda/u8500/hardware/external/bluetooth/glib \
+		sbc:device/snda/u8500/hardware/external/bluetooth/sbc \
 
 # Specify common compiler flags
 BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\" \

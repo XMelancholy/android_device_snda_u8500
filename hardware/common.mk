@@ -34,12 +34,26 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    ste-cg29xx_ctrl
 
+# Dbus
+PRODUCT_PACKAGES += \
+   dbus-daemon \
+   libdbus
+
+# Bluez 5
+PRODUCT_PACKAGES += \
+   bluetoothd \
+   bluetoothd-snoop \
+   bluetooth.default
+
+# Bluez tools
+PRODUCT_PACKAGES += \
+   libsbc
+
 PRODUCT_PACKAGES += \
    chargemode \
-   dbus-daemon \
    watchdog-kicker
 
 PRODUCT_PACKAGES += \
-   libdbus \
    libarchive \
    libarchive_fe
+
