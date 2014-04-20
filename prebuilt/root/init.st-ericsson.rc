@@ -559,3 +559,12 @@ service dbus /system/bin/logwrapper /system/bin/dbus-daemon --system --nofork
 service watchdog-kicker /system/xbin/watchdog-kicker -d /dev/watchdog -t 120
     class main
     oneshot
+
+service hciattach /system/bin/logwrapper /system/bin/hciattach -t 23 -n -s 115200 /dev/ttyAMA0 cg2900 115200 flow
+    class main
+    user root
+    group bluetooth net_bt_admin net_admin misc root
+    oneshot
+
+on propery:init.svc.hciattach=running
+    exec /system/bin/cg2900-channel_init.sh
