@@ -233,7 +233,7 @@ static void handle_pin_request(void *buf, uint16_t len)
 	DBG("");
 
 	if (bt_hal_cbacks->pin_request_cb)
-		bt_hal_cbacks->pin_request_cb(addr, name, ev->class_of_dev);
+		bt_hal_cbacks->pin_request_cb(addr, name, ev->class_of_dev, 0);
 }
 
 static void handle_ssp_request(void *buf, uint16_t len)
