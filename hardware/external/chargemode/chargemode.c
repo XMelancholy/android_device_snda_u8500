@@ -946,9 +946,7 @@ int main(int argc,char **argv)
 			DEBUG("Argument to app. Do not end\n");
 		} else {
 			DEBUG("No argument. Bye.");
-#ifdef LOGO
 		    goto boot_logo;
-#endif
 		}
 	}
 

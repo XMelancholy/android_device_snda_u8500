@@ -1,8 +1,6 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-#LOCAL_CFLAGS+= -DLOGO
-
 LOCAL_SRC_FILES:= \
 	chargemode.c
 
