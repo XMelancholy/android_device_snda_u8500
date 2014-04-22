@@ -58,11 +58,7 @@ FILE *logFP = NULL;
 #define DISP_POWER_MODE_PATH "/sys/devices/mcde_disp_sharp_lq043t1.0/power_mode"
 #define DEV_PATH_TO_INPUT "/dev/input"
 #define PIC_FILE_PATH "/system/usr/share/charge/res/"
-
-#ifdef LOGO
 #define BOOT_LOGO_PATH "/system/usr/share/charge/res/snda.rle"
-#endif
-
 #define BATTERY_CAP_PATH "/sys/class/power_supply/ab8500_fg/capacity"
 #define INPUT_NUMERIC_ID (sizeof("input") - 1)
 #define TURN_ON_STATUS_MAIN_CH_DET 0x10
@@ -838,7 +834,6 @@ display_error_exit:
 	return 0;
 }
 
-#ifdef LOGO
 static void display_picture(const char *pic_path)
 {
     PicDescribtion pd;
@@ -904,7 +899,6 @@ display_error_exit:
     }
 	return;
 }
-#endif
 
 int main(int argc,char **argv)
 {
@@ -1193,10 +1187,8 @@ close_usb:
         pthread_join(display_thread, NULL);
     }
 
-#ifdef LOGO
 boot_logo:    
 	display_picture(BOOT_LOGO_PATH);
-#endif  
 exit:
 
 
