@@ -1060,6 +1060,9 @@ struct uart_t uart[] = {
 	/* Xircom PCMCIA cards: Credit Card Adapter and Real Port Adapter */
 	{ "xircom",     0x0105, 0x080a, HCI_UART_H4,   115200, 115200,
 				FLOW_CTL, DISABLE_PM,  NULL, NULL     },
+	/* ST-Ericsson CG2900 UART */
+	{ "cg2900",     0x0000, 0x0000, HCI_UART_STE,   115200,  115200,
+				FLOW_CTL, DISABLE_PM, NULL, NULL },
 
 	/* CSR Casira serial adapter or BrainBoxes serial dongle (BL642) */
 	{ "csr",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200,

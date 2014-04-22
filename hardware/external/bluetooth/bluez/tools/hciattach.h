@@ -40,6 +40,8 @@
 #define HCI_UART_LL	4
 #define HCI_UART_ATH3K  5
 
+#define HCI_UART_STE	6
+
 #define HCI_UART_RAW_DEVICE	0
 #define HCI_UART_RESET_ON_INIT	1
 #define HCI_UART_CREATE_AMP	2

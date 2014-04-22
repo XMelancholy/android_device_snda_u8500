@@ -31,8 +31,8 @@ PRODUCT_PACKAGES += \
    libcspsa-ll-file
 
 # cg2900
-#PRODUCT_PACKAGES += \
-#   ste-cg29xx_ctrl
+PRODUCT_PACKAGES += \
+   ste-cg29xx_ctrl
 
 # Dbus
 PRODUCT_PACKAGES += \
