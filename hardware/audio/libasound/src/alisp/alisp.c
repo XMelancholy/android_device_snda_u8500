@@ -233,6 +233,9 @@ static struct alisp_object * incref_tree(struct alisp_instance *instance, struct
 	return incref_object(instance, p);
 }
 
+/* Function not used yet. Leave it commented out until we actually use it to
+ * avoid compiler complaints */
+#if 0
 static struct alisp_object * incref_tree_explicit(struct alisp_instance *instance, struct alisp_object * p, struct alisp_object * e)
 {
 	if (p == NULL)
@@ -250,6 +253,7 @@ static struct alisp_object * incref_tree_explicit(struct alisp_instance *instanc
 		return incref_object(instance, p);
 	return p;
 }
+#endif
 
 static void free_objects(struct alisp_instance *instance)
 {
@@ -1021,7 +1025,7 @@ static const char *obj_type_str(struct alisp_object * p)
 	case ALISP_OBJ_CONS: return "cons";
 	default: assert(0);
 	}
-        return NULL;
+	return 0; /* make compiler happy */
 }
 
 static void print_obj_lists(struct alisp_instance *instance, snd_output_t *out)
@@ -1709,7 +1713,7 @@ static struct alisp_object * F_princ(struct alisp_instance *instance, struct ali
 			delete_tree(instance, p1);
 		p1 = eval(instance, car(p));
 		if (alisp_compare_type(p1, ALISP_OBJ_STRING))
-			snd_output_printf("%s%s", instance->out, p1->value.s);
+			snd_output_printf(instance->out, "%s", p1->value.s);
 		else
 			princ_object(instance->out, p1);
 		n = cdr(p);
