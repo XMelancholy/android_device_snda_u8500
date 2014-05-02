@@ -36,7 +36,7 @@ Patch android source code :
 
 
 
-Our step is optional!!! Use only if you going to sync CM 11 source code daily, than simple revert each patch before you sync CM 10 source code :
+Our step is optional!!! Use only if you going to sync CM 11 source code daily, than simple revert each patch before you sync CM 11 source code :
 
 		patch -p1 -R < device/snda/u8500/patches/art.patch
 		patch -p1 -R < device/snda/u8500/patches/bionic.patch
