@@ -48,7 +48,8 @@ PRODUCT_PACKAGES += \
 # Bluez tools
 PRODUCT_PACKAGES += \
    libsbc \
-   libbluetooth
+   libbluetooth \
+   libglib
 
 # Bluez debug tools
 PRODUCT_PACKAGES += \
