@@ -12,4 +12,4 @@
 /dev/block/mmcblk0p10                      /recovery     emmc      defaults                                                                                 defaults
 
 # Internal SD Card
-/devices/sdi4/mmc_host/mmc1/mmc1            auto         vfat      nosuid,nodev                                                                             wait,voldmanaged=sdcard0:7,nonremovable
+/devices/sdi4/mmc_host/mmc1/mmc1            auto         vfat      defaults       voldmanaged=sdcard0:7

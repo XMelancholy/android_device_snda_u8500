@@ -26,11 +26,12 @@ LOCAL_SRC_FILES :=  \
         alsactrl_hwh_u8500_dev.c \
         alsactrl_hwh_u8500_d2d.c \
         alsactrl_hwh_u8500_vc.c \
-        alsactrl_hwh_u8540.c \
-        alsactrl_hwh_u8540_dev.c \
-        alsactrl_hwh_u8540_d2d.c \
-        alsactrl_hwh_u8540_vc.c \
         alsactrl_cscall.c
+
+#        alsactrl_hwh_u8540.c \
+#        alsactrl_hwh_u8540_dev.c \
+#        alsactrl_hwh_u8540_d2d.c \
+#        alsactrl_hwh_u8540_vc.c \
 
 LOCAL_CFLAGS += -D_POSIX_C_SOURCE
 LOCAL_CFLAGS += -O3 -Wall -funwind-tables
