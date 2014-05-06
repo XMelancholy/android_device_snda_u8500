@@ -1,2 +1,0 @@
-add_lunch_combo aosp_u8500-userdebug
-add_lunch_combo aosp_u8500-user
