@@ -61,10 +61,6 @@ PRODUCT_PACKAGES += \
    chargemode \
    watchdog-kicker
 
-PRODUCT_PACKAGES += \
-   libarchive \
-   libarchive_fe
-
 # bluez Configs
 PRODUCT_COPY_FILES += \
    $(LOCAL_PATH)/external/bluetooth/data/audio.conf:system/etc/bluetooth/audio.conf \
