@@ -116,7 +116,14 @@ PRODUCT_PACKAGES += \
 # Network
 PRODUCT_PACKAGES += \
    libnetcmdiface \
-   libnl_2 \
+   libnl_2
+
+# WIFi
+PRODUCT_PACKAGES += \
+   crda \
+   regdbdump \
+   regulatory.bin \
+   linville.key.pub.pem
 
 # Hostapd
 PRODUCT_PACKAGES += \
