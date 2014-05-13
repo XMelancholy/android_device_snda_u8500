@@ -79,6 +79,8 @@ lib/egl/libGLESv1_CM_mali.so
 lib/egl/libGLESv2_mali.so
 lib/hw/camera.montblanc.so
 lib/hw/gps.montblanc.so
+lib/libarchive.so
+lib/libarchive_fe.so
 lib/libals.so
 lib/libbassapp.so
 lib/libcamera_flash.so
