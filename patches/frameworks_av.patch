@@ -18,7 +18,7 @@
 #	修改：      frameworks/av/services/camera/libcameraservice/device1/CameraHardwareInterface.h
 #
 diff --git a/frameworks/av/camera/CameraParameters.cpp b/frameworks/av/camera/CameraParameters.cpp
-index 7fa3d06..7117578 100644
+index 4935c74..ef25645 100644
 --- a/frameworks/av/camera/CameraParameters.cpp
 +++ b/frameworks/av/camera/CameraParameters.cpp
 @@ -518,6 +518,34 @@ void CameraParameters::setOrientation(int orientation)
@@ -69,10 +69,10 @@ index 7fa3d06..7117578 100644
  void CameraParameters::set(const char *key, const char *value)
  {
 diff --git a/frameworks/av/include/camera/CameraParameters.h b/frameworks/av/include/camera/CameraParameters.h
-index fa3b9aa..265d65a 100644
+index 4a5ec8f..6220a0d 100644
 --- a/frameworks/av/include/camera/CameraParameters.h
 +++ b/frameworks/av/include/camera/CameraParameters.h
-@@ -1064,6 +1064,39 @@ public:
+@@ -1069,6 +1069,39 @@ public:
      void getSupportedHfrSizes(Vector<Size> &sizes) const;
  #endif
  
@@ -129,7 +129,7 @@ index 85ba920..014fc7a 100644
              const BitmapParams &src, const BitmapParams &dst);
  
 diff --git a/frameworks/av/include/media/stagefright/MediaDefs.h b/frameworks/av/include/media/stagefright/MediaDefs.h
-index 170e587..169dec6 100644
+index 79efd74..57ce2cf 100644
 --- a/frameworks/av/include/media/stagefright/MediaDefs.h
 +++ b/frameworks/av/include/media/stagefright/MediaDefs.h
 @@ -27,8 +27,14 @@ extern const char *MEDIA_MIMETYPE_VIDEO_VP9;
@@ -148,7 +148,7 @@ index 170e587..169dec6 100644
  extern const char *MEDIA_MIMETYPE_AUDIO_AMR_NB;
  extern const char *MEDIA_MIMETYPE_AUDIO_AMR_WB;
 diff --git a/frameworks/av/include/media/stagefright/OMXCodec.h b/frameworks/av/include/media/stagefright/OMXCodec.h
-index 8ad8e8c..6707b9c 100644
+index 5df0874..3391e0e 100644
 --- a/frameworks/av/include/media/stagefright/OMXCodec.h
 +++ b/frameworks/av/include/media/stagefright/OMXCodec.h
 @@ -86,6 +86,10 @@ struct OMXCodec : public MediaSource,
@@ -172,7 +172,7 @@ index 8ad8e8c..6707b9c 100644
      };
  
      struct CodecNameAndQuirks {
-@@ -374,6 +381,11 @@ private:
+@@ -390,6 +397,11 @@ private:
              const void *data, size_t size,
              unsigned *profile, unsigned *level);
  
@@ -315,7 +315,7 @@ index 295c0f5..b4feece 100644
  
  #ifdef QCOM_HARDWARE
 diff --git a/frameworks/av/media/libstagefright/MediaDefs.cpp b/frameworks/av/media/libstagefright/MediaDefs.cpp
-index b5d4e44..2eb5c9e 100644
+index 4913c1e..b466ed2 100644
 --- a/frameworks/av/media/libstagefright/MediaDefs.cpp
 +++ b/frameworks/av/media/libstagefright/MediaDefs.cpp
 @@ -25,8 +25,14 @@ const char *MEDIA_MIMETYPE_VIDEO_VP9 = "video/x-vnd.on2.vp9";
@@ -334,10 +334,10 @@ index b5d4e44..2eb5c9e 100644
  const char *MEDIA_MIMETYPE_AUDIO_AMR_NB = "audio/3gpp";
  const char *MEDIA_MIMETYPE_AUDIO_AMR_WB = "audio/amr-wb";
 diff --git a/frameworks/av/media/libstagefright/OMXCodec.cpp b/frameworks/av/media/libstagefright/OMXCodec.cpp
-index 2cea323..e719cdd 100644
+index 9cdf90a..05f63e6 100644
 --- a/frameworks/av/media/libstagefright/OMXCodec.cpp
 +++ b/frameworks/av/media/libstagefright/OMXCodec.cpp
-@@ -322,6 +322,24 @@ void OMXCodec::findMatchingCodecs(
+@@ -339,6 +339,24 @@ void OMXCodec::findMatchingCodecs(
      }
  }
  
@@ -362,7 +362,7 @@ index 2cea323..e719cdd 100644
  // static
  uint32_t OMXCodec::getComponentQuirks(
          const MediaCodecList *list, size_t index) {
-@@ -387,6 +405,12 @@ uint32_t OMXCodec::getComponentQuirks(
+@@ -404,6 +422,12 @@ uint32_t OMXCodec::getComponentQuirks(
        quirks |= kInputBufferSizesAreBogus;
      }
  #endif
@@ -375,7 +375,7 @@ index 2cea323..e719cdd 100644
  
  #ifdef QCOM_HARDWARE
      quirks |= ExtendedCodec::getComponentQuirks(list,index);
-@@ -613,7 +637,57 @@ status_t OMXCodec::parseAVCCodecSpecificData(
+@@ -630,7 +654,57 @@ status_t OMXCodec::parseAVCCodecSpecificData(
  
      return OK;
  }
@@ -433,7 +433,7 @@ index 2cea323..e719cdd 100644
  status_t OMXCodec::configureCodec(const sp<MetaData> &meta) {
      ALOGV("configureCodec protected=%d",
           (mFlags & kEnableGrallocUsageProtected) ? 1 : 0);
-@@ -972,6 +1046,9 @@ static size_t getFrameSize(
+@@ -1039,6 +1113,9 @@ static size_t getFrameSize(
          case OMX_COLOR_FormatYUV420Planar:
          case OMX_COLOR_FormatYUV420SemiPlanar:
          case OMX_TI_COLOR_FormatYUV420PackedSemiPlanar:
@@ -443,7 +443,7 @@ index 2cea323..e719cdd 100644
          /*
          * FIXME: For the Opaque color format, the frame size does not
          * need to be (w*h*3)/2. It just needs to
-@@ -1764,6 +1841,10 @@ void OMXCodec::setComponentRole(
+@@ -1862,6 +1939,10 @@ void OMXCodec::setComponentRole(
              "video_decoder.mpeg4", "video_encoder.mpeg4" },
          { MEDIA_MIMETYPE_VIDEO_H263,
              "video_decoder.h263", "video_encoder.h263" },
@@ -454,7 +454,7 @@ index 2cea323..e719cdd 100644
          { MEDIA_MIMETYPE_VIDEO_VP8,
              "video_decoder.vp8", "video_encoder.vp8" },
          { MEDIA_MIMETYPE_VIDEO_VP9,
-@@ -1856,6 +1937,16 @@ status_t OMXCodec::init() {
+@@ -1954,6 +2035,16 @@ status_t OMXCodec::init() {
      CHECK_EQ((int)mState, (int)LOADED);
  
      status_t err;
@@ -471,7 +471,7 @@ index 2cea323..e719cdd 100644
      if (!(mQuirks & kRequiresLoadedToIdleAfterAllocation)) {
          err = mOMX->sendCommand(mNode, OMX_CommandStateSet, OMX_StateIdle);
          CHECK_EQ(err, (status_t)OK);
-@@ -1915,7 +2006,12 @@ status_t OMXCodec::allocateBuffersOnPort(OMX_U32 portIndex) {
+@@ -2013,7 +2104,12 @@ status_t OMXCodec::allocateBuffersOnPort(OMX_U32 portIndex) {
      }
  
      status_t err = OK;
@@ -484,7 +484,7 @@ index 2cea323..e719cdd 100644
              && portIndex == kPortIndexInput) {
          err = mOMX->storeMetaDataInBuffers(mNode, kPortIndexInput, OMX_TRUE);
          if (err != OK) {
-@@ -2116,7 +2212,11 @@ status_t OMXCodec::allocateOutputBuffersFromNativeWindow() {
+@@ -2214,7 +2310,11 @@ status_t OMXCodec::allocateOutputBuffersFromNativeWindow() {
              mNativeWindow.get(),
              def.format.video.nFrameWidth,
              def.format.video.nFrameHeight,
@@ -496,16 +496,16 @@ index 2cea323..e719cdd 100644
  #else
      OMX_COLOR_FORMATTYPE eColorFormat;
  
-@@ -4720,6 +4820,9 @@ static const char *videoCompressionFormatString(OMX_VIDEO_CODINGTYPE type) {
+@@ -5364,6 +5464,9 @@ static const char *videoCompressionFormatString(OMX_VIDEO_CODINGTYPE type) {
          "OMX_VIDEO_CodingRV",
          "OMX_VIDEO_CodingAVC",
          "OMX_VIDEO_CodingMJPEG",
 +#ifdef STE_HARDWARE
 +        "OMX_VIDEO_CodingVC1",
 +#endif
+         "OMX_VIDEO_CodingVPX",
      };
  
-     size_t numNames = sizeof(kNames) / sizeof(kNames[0]);
 diff --git a/frameworks/av/media/libstagefright/SurfaceMediaSource.cpp b/frameworks/av/media/libstagefright/SurfaceMediaSource.cpp
 index e8402ad..ec16791 100644
 --- a/frameworks/av/media/libstagefright/SurfaceMediaSource.cpp
@@ -696,25 +696,16 @@ index 597167f..1c8e789 100644
      static const signed kClipMin = -278;
      static const signed kClipMax = 535;
 diff --git a/frameworks/av/media/libstagefright/omx/SoftOMXPlugin.cpp b/frameworks/av/media/libstagefright/omx/SoftOMXPlugin.cpp
-index d6cde73..0780ad2 100644
+index 934fccc..9835c06 100644
 --- a/frameworks/av/media/libstagefright/omx/SoftOMXPlugin.cpp
 +++ b/frameworks/av/media/libstagefright/omx/SoftOMXPlugin.cpp
-@@ -34,6 +34,9 @@ static const struct {
-     const char *mRole;
- 
- } kComponents[] = {
-+#ifdef STE_HARDWARE
-+    { "OMX.ST.aac.decoder", "ste_aacdec", "audio_decoder.aac" },
-+#endif
-     { "OMX.google.aac.decoder", "aacdec", "audio_decoder.aac" },
-     { "OMX.google.aac.encoder", "aacenc", "audio_encoder.aac" },
-     { "OMX.google.amrnb.decoder", "amrdec", "audio_decoder.amrnb" },
-@@ -48,6 +51,9 @@ static const struct {
+@@ -71,6 +71,10 @@ static const struct {
      { "OMX.google.h263.encoder", "mpeg4enc", "video_encoder.h263" },
      { "OMX.google.mpeg4.decoder", "mpeg4dec", "video_decoder.mpeg4" },
      { "OMX.google.mpeg4.encoder", "mpeg4enc", "video_encoder.mpeg4" },
 +#ifdef STE_HARDWARE
 +    { "OMX.ST.mp3.decoder", "ste_mp3dec", "audio_decoder.mp3" },
++    { "OMX.ST.aac.decoder", "ste_aacdec", "audio_decoder.aac" },
 +#endif
      { "OMX.google.mp3.decoder", "mp3dec", "audio_decoder.mp3" },
      { "OMX.google.vorbis.decoder", "vorbisdec", "audio_decoder.vorbis" },
@@ -746,7 +737,7 @@ index 94f4ab7..fb6a7e4 100644
  // ----------------------------------------------------------------------------
  // Audio pre-processing configuration
 diff --git a/frameworks/av/services/audioflinger/PlaybackTracks.h b/frameworks/av/services/audioflinger/PlaybackTracks.h
-index d3ae9a1..284fe1f 100644
+index c26067a..3edb397 100644
 --- a/frameworks/av/services/audioflinger/PlaybackTracks.h
 +++ b/frameworks/av/services/audioflinger/PlaybackTracks.h
 @@ -52,7 +52,11 @@ public:
