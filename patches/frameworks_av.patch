@@ -328,7 +328,7 @@ index 4913c1e..b466ed2 100644
  const char *MEDIA_MIMETYPE_VIDEO_MPEG2 = "video/mpeg2";
  const char *MEDIA_MIMETYPE_VIDEO_RAW = "video/raw";
 +#ifdef STE_HARDWARE
-+const char *MEDIA_MIMETYPE_VIDEO_VC1 = "video/vc1";
++//const char *MEDIA_MIMETYPE_VIDEO_VC1 = "video/vc1";
 +#endif
  
  const char *MEDIA_MIMETYPE_AUDIO_AMR_NB = "audio/3gpp";
