@@ -1,0 +1,188 @@
+diff --git a/system/netd/CommandListener.cpp b/system/netd/CommandListener.cpp
+index 3b8d30e..f8b3b5c 100644
+--- a/system/netd/CommandListener.cpp
++++ b/system/netd/CommandListener.cpp
+@@ -205,8 +205,9 @@ CommandListener::CommandListener(UidMarkMap *map) :
+     registerCmd(new ResolverCmd());
+     registerCmd(new FirewallCmd());
+     registerCmd(new ClatdCmd());
++#if 0
+     registerCmd(new RouteCmd());
+-
++#endif
+     if (!sSecondaryTableCtrl)
+         sSecondaryTableCtrl = new SecondaryTableController(map);
+     if (!sTetherCtrl)
+@@ -842,6 +843,7 @@ int CommandListener::TetherCmd::runCommand(SocketClient *cli,
+                 rc = sTetherCtrl->tetherInterface(argv[3]);
+             } else if (!strcmp(argv[2], "remove")) {
+                 rc = sTetherCtrl->untetherInterface(argv[3]);
++#if 0
+             } else if (!strcmp(argv[2], "list")) {
+                 InterfaceCollection *ilist = sTetherCtrl->getTetheredInterfaceList();
+                 InterfaceCollection::iterator it;
+@@ -854,6 +856,7 @@ int CommandListener::TetherCmd::runCommand(SocketClient *cli,
+                 rc = sTetherCtrl->addUpstreamInterface(argv[3]);
+             } else if (!strcmp(argv[2], "remove_upstream")) {
+                 rc = sTetherCtrl->removeUpstreamInterface(argv[3]);
++#endif
+             } else {
+                 cli->sendMsg(ResponseCode::CommandParameterError,
+                              "Unknown tether interface operation", false);
+@@ -884,7 +887,7 @@ int CommandListener::TetherCmd::runCommand(SocketClient *cli,
+ }
+ 
+ 
+-
++#if 0
+ CommandListener::V6RtrAdvCmd::V6RtrAdvCmd() :
+                  NetdCommand("v6rtradv") {
+ }
+@@ -953,7 +956,7 @@ int CommandListener::V6RtrAdvCmd::runCommand(SocketClient *cli,
+ 
+     return 0;
+ }
+-
++#endif
+ 
+ CommandListener::NatCmd::NatCmd() :
+                  NetdCommand("nat") {
+@@ -1735,7 +1738,7 @@ int CommandListener::ClatdCmd::runCommand(SocketClient *cli, int argc,
+ 
+     return 0;
+ }
+-
++#if 0
+ CommandListener::RouteCmd::RouteCmd() :
+                  NetdCommand("route") {
+ }
+@@ -2043,3 +2046,4 @@ int CommandListener::RouteCmd::runCommand(SocketClient *cli, int argc, char **ar
+     }
+     return 0;
+ }
++#endif
+\ No newline at end of file
+diff --git a/system/netd/TetherController.cpp b/system/netd/TetherController.cpp
+index 1ade2ca..c7b820e 100644
+--- a/system/netd/TetherController.cpp
++++ b/system/netd/TetherController.cpp
+@@ -36,7 +36,7 @@
+ #include <cutils/properties.h>
+ 
+ #include "TetherController.h"
+-
++#if 0
+ #include <private/android_filesystem_config.h>
+ #include <unistd.h>
+ 
+@@ -46,10 +46,13 @@
+ #define IP6_CFG_ALL_FORWARDING      "/proc/sys/net/ipv6/conf/all/forwarding"
+ #define IP6_IFACE_CFG_ACCEPT_RA     "/proc/sys/net/ipv6/conf/%s/accept_ra"
+ #define PROC_PATH_SIZE              255
++#endif
+ 
+ TetherController::TetherController() {
+     mInterfaces = new InterfaceCollection();
++#if 0
+     mUpstreamInterfaces = new InterfaceCollection();
++#endif
+     mDnsForwarders = new NetAddressCollection();
+     mDaemonFd = -1;
+     mDaemonPid = 0;
+@@ -63,14 +66,17 @@ TetherController::~TetherController() {
+     }
+     mInterfaces->clear();
+ 
++#if 0
+     for (it = mUpstreamInterfaces->begin(); it != mUpstreamInterfaces->end(); ++it) {
+         free(*it);
+     }
+     mUpstreamInterfaces->clear();
++#endif
+ 
+     mDnsForwarders->clear();
+ }
+ 
++#if 0
+ static int config_write_setting(const char *path, const char *value)
+ {
+     int fd = open(path, O_WRONLY);
+@@ -88,6 +94,7 @@ static int config_write_setting(const char *path, const char *value)
+     close(fd);
+     return 0;
+ }
++#endif
+ 
+ int TetherController::setIpFwdEnabled(bool enable) {
+ 
+@@ -112,6 +119,7 @@ int TetherController::setIpFwdEnabled(bool enable) {
+         return -1;
+     }
+     close(fd);
++#if 0
+     if (config_write_setting(
+             IP6_CFG_ALL_PROXY_NDP, enable ? "2" : "0")) {
+         ALOGE("Failed to write proxy_ndp (%s)", strerror(errno));
+@@ -122,7 +130,7 @@ int TetherController::setIpFwdEnabled(bool enable) {
+         ALOGE("Failed to write ip6 forwarding (%s)", strerror(errno));
+         return -1;
+     }
+-
++#endif
+     return 0;
+ }
+ 
+@@ -247,7 +255,7 @@ bool TetherController::isTetheringStarted() {
+     return (mDaemonPid == 0 ? false : true);
+ }
+ 
+-
++#if 0
+ int TetherController::startV6RtrAdv(int num_ifaces, char **ifaces) {
+     int pid;
+     int num_processed_args = 1;
+@@ -343,7 +351,7 @@ int TetherController::removeV6RtrAdvIface(const char *iface) {
+ bool TetherController::isV6RtrAdvStarted() {
+     return (mRtrAdvPid == 0 ? false : true);
+ }
+-
++#endif
+ #define MAX_CMD_SIZE 1024
+ 
+ int TetherController::setDnsForwarders(char **servers, int numServers) {
+@@ -421,7 +429,7 @@ int TetherController::applyDnsInterfaces() {
+     }
+     return 0;
+ }
+-
++#if 0
+ int TetherController::addUpstreamInterface(char *iface)
+ {
+     InterfaceCollection::iterator it;
+@@ -464,13 +472,13 @@ int TetherController::removeUpstreamInterface(char *iface)
+     ALOGW("Couldn't find interface %s to remove", iface);
+     return 0;
+ }
+-
++#endif
+ int TetherController::tetherInterface(const char *interface) {
+     ALOGD("tetherInterface(%s)", interface);
+     mInterfaces->push_back(strdup(interface));
+-
++#if 0
+     addV6RtrAdvIface(interface);
+-
++#endif
+     if (applyDnsInterfaces()) {
+         InterfaceCollection::iterator it;
+         for (it = mInterfaces->begin(); it != mInterfaces->end(); ++it) {
+@@ -495,7 +503,9 @@ int TetherController::untetherInterface(const char *interface) {
+         if (!strcmp(interface, *it)) {
+             free(*it);
+             mInterfaces->erase(it);
++#if 0
+             removeV6RtrAdvIface(NULL);
++#endif
+             return applyDnsInterfaces();
+         }
+     }
