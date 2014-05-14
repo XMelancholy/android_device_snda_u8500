@@ -55,7 +55,14 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    hciconfig \
    hciattach \
-   hcitool
+   hcitool \
+   avtest \
+   l2ping \
+   btmgmt \
+   l2test \
+   btproxy \
+   btmon \
+   haltest
 
 PRODUCT_PACKAGES += \
    chargemode \
