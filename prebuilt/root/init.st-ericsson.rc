@@ -567,28 +567,28 @@ service watchdog-kicker /system/xbin/watchdog-kicker -d /dev/watchdog -t 120
     class main
     oneshot
 
-service hciattach /system/bin/logwrapper /system/bin/hciattach -n -s 115200 /dev/ttyAMA0 cg2900 115200 flow
-    class main
-    user root
-    group bluetooth net_bt_admin net_admin misc root
-    oneshot
+#service hciattach /system/bin/logwrapper /system/bin/hciattach -n -s 115200 /dev/ttyAMA0 cg2900 115200 flow
+#    class main
+#    user root
+#    group bluetooth net_bt_admin net_admin misc root
+#    oneshot
 
-on property:init.svc.bluetoothd=running
-    start hciattach
+#on property:init.svc.bluetoothd=running
+#    start hciattach
 
-on property:init.svc.hciattach=running
-    exec /system/bin/cg2900-channel_init.sh
+#on property:init.svc.hciattach=running
+#    exec /system/bin/cg2900-channel_init.sh
 
-on property:bluetooth.status=on
-    write /sys/class/rfkill/rfkill0/state 1
+#on property:bluetooth.status=on
+#    write /sys/class/rfkill/rfkill0/state 1
 
-on property:init.svc.bluetoothd=stopped
-    setprop bluetooth.status off
-    write /sys/class/rfkill/rfkill0/state 0
+#on property:init.svc.bluetoothd=stopped
+#    setprop bluetooth.status off
+#    write /sys/class/rfkill/rfkill0/state 0
 
-on property:wlan.driver.status=ok
-    write /sys/class/rfkill/rfkill0/state 1
+#on property:wlan.driver.status=ok
+#    write /sys/class/rfkill/rfkill0/state 1
 
-on property:wlan.driver.status=unloaded
-    write /sys/class/rfkill/rfkill0/state 0
+#on property:wlan.driver.status=unloaded
+#    write /sys/class/rfkill/rfkill0/state 0
 
