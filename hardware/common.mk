@@ -31,38 +31,49 @@ PRODUCT_PACKAGES += \
    libcspsa-ll-file
 
 # cg2900
-PRODUCT_PACKAGES += \
-   ste-cg29xx_ctrl
+#PRODUCT_PACKAGES += \
+#   ste-cg29xx_ctrl
 
 # Dbus
 PRODUCT_PACKAGES += \
    dbus-daemon \
    libdbus
 
-# Bluez 5
+# Bluez 5.11 libs
 PRODUCT_PACKAGES += \
-   bluetoothd \
-   bluetoothd-snoop \
-   bluetooth.default
+    libbtio \
+    libbluetooth
+
+# setup functions to initialize the encoder and decoder for A2DP streams
+PRODUCT_PACKAGES += \
+    libsbc
+
+# Bluez daemon, android hal and haltest
+PRODUCT_PACKAGES += \
+    bluetoothd \
+    bluetoothd-snoop \
+    bluetooth.default \
+    audio.a2dp.default \
+    haltest
+
+# Bluez btmon
+PRODUCT_PACKAGES += \
+    btmon
 
 # Bluez tools
 PRODUCT_PACKAGES += \
-   libsbc \
-   libbluetooth \
-   libglib
-
-# Bluez debug tools
-PRODUCT_PACKAGES += \
-   hciconfig \
-   hciattach \
-   hcitool \
-   avtest \
-   l2ping \
-   btmgmt \
-   l2test \
-   btproxy \
-   btmon \
-   haltest
+    hciattach \
+    hciconfig \
+    hcitool \
+    hcidump \
+    rfcomm \
+    rctest \
+    l2test \
+    l2ping \
+    sdptool \
+    ciptool \
+    bccmd \
+    btproxy
 
 PRODUCT_PACKAGES += \
    chargemode \
