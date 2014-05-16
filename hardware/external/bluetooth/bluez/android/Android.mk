@@ -4,7 +4,7 @@ LOCAL_PATH := $(call my-dir)
 BLUEZ_VERSION := $(shell grep ^AC_INIT $(LOCAL_PATH)/../configure.ac | cpp -P -D'AC_INIT(_,v)=v')
 
 # Specify pathmap for glib
-pathmap_INCL += glib:external/bluetooth/glib
+pathmap_INCL += glib:device/snda/u8500/hardware/external/bluetooth/glib
 
 # Specify common compiler flags
 BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\" \
