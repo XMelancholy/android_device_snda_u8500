@@ -23,11 +23,9 @@ on property:bluetooth.stop=snoop
 
 service bluetoothd /system/bin/logwrapper /system/bin/bluetoothd
     class main
-    #socket bluetooth stream 660 bluetooth bluetooth
-    #socket dbus_bluetooth stream 660 bluetooth bluetooth
     # init does not yet support setting capabilities so run as root,
     # bluetoothd drop uid to bluetooth with the right linux capabilities
-    group bluetooth net_bt_admin misc radio
+    group bluetooth
     disabled
     oneshot
 
