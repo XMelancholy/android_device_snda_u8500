@@ -45,6 +45,8 @@
 #include <bluetooth/hci_lib.h>
 #include <bluetooth/rfcomm.h>
 
+#include "ppoll.h"
+
 static int rfcomm_raw_tty = 0;
 static int auth = 0;
 static int encryption = 0;

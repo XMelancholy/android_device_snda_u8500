@@ -76,7 +76,7 @@ void mainloop_init(void)
 {
 	unsigned int i;
 
-	epoll_fd = epoll_create1(EPOLL_CLOEXEC);
+	epoll_fd = epoll_create(MAX_MAINLOOP_ENTRIES);
 
 	for (i = 0; i < MAX_MAINLOOP_ENTRIES; i++)
 		mainloop_list[i] = NULL;

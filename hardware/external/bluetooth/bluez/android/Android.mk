@@ -4,11 +4,14 @@ LOCAL_PATH := $(call my-dir)
 BLUEZ_VERSION := $(shell grep ^AC_INIT $(LOCAL_PATH)/../configure.ac | cpp -P -D'AC_INIT(_,v)=v')
 
 # Specify pathmap for glib
-pathmap_INCL += glib:device/snda/u8500/hardware/external/bluetooth/glib
+pathmap_INCL += $(LOCAL_PATH)/../../glib/include
 
 # Specify common compiler flags
 BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\" \
+	-DPLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION) \
 	-DANDROID_STORAGEDIR=\"/data/misc/bluetooth\" \
+	-DHAVE_CONFIG_H \
+	-DANDROID \
 
 # Disable warnings enabled by Android but not enabled in autotools build
 BLUEZ_COMMON_CFLAGS += -Wno-pointer-arith -Wno-missing-field-initializers
@@ -48,8 +51,7 @@ LOCAL_SRC_FILES := \
 	../profiles/network/bnep.c \
 
 LOCAL_C_INCLUDES := \
-	$(call include-path-for, glib) \
-	$(call include-path-for, glib)/glib \
+	$(LOCAL_PATH)/../../glib/include \
 
 LOCAL_C_INCLUDES += \
 	$(LOCAL_PATH)/../ \
@@ -143,8 +145,8 @@ LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
 
 LOCAL_SHARED_LIBRARIES := libhardware
 
-LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-LOCAL_MODULE_TAGS := debug
+LOCAL_MODULE_PATH := $(TARGET_OUT_EXECUTABLES)
+LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := haltest
 
 include $(BUILD_EXECUTABLE)
@@ -182,11 +184,12 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/.. \
 	$(LOCAL_PATH)/../lib \
 	$(LOCAL_PATH)/../src/shared \
+	$(LOCAL_PATH)/../../glib/include \
 
 LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
 
-LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-LOCAL_MODULE_TAGS := debug
+LOCAL_MODULE_PATH := $(TARGET_OUT_EXECUTABLES)
+LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := btmon
 
 include $(BUILD_EXECUTABLE)
@@ -208,8 +211,8 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
 
-LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-LOCAL_MODULE_TAGS := debug
+LOCAL_MODULE_PATH := $(TARGET_OUT_EXECUTABLES)
+LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := btproxy
 
 include $(BUILD_EXECUTABLE)
@@ -255,8 +258,8 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
 
-LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-LOCAL_MODULE_TAGS := debug
+LOCAL_MODULE_PATH := $(TARGET_OUT_EXECUTABLES)
+LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := l2test
 
 include $(BUILD_EXECUTABLE)

@@ -1,0 +1,11 @@
+#ifndef SOCK_CLOEXEC
+#define SOCK_CLOEXEC	02000000
+#endif
+
+#ifndef SOCK_NONBLOCK
+#define SOCK_NONBLOCK	04000
+#endif
+
+#ifndef EPOLL_CLOEXEC
+#define EPOLL_CLOEXEC	02000000
+#endif
