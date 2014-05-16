@@ -1,36 +1,22 @@
+#
 #	修改：      bionic/libc/Android.mk
 #	修改：      bionic/libc/SYSCALLS.TXT
 #	修改：      bionic/libc/arch-arm/syscalls.mk
-#	重命名：    bionic/libc/arch-arm/syscalls/select.S -> bionic/libc/arch-arm/syscalls/__ppoll.S
-#	新文件：    bionic/libc/arch-arm/syscalls/__pselect6.S
 #	重命名：    bionic/libc/arch-arm/syscalls/epoll_create.S -> bionic/libc/arch-arm/syscalls/epoll_create1.S
-#	删除：      bionic/libc/arch-arm/syscalls/poll.S
-#	重命名：    bionic/libc/bionic/pselect.c -> bionic/libc/bionic/bionic_time_conversions.cpp
+#	修改：      bionic/libc/arch-mips/syscalls.mk
+#	重命名：    bionic/libc/arch-mips/syscalls/epoll_create.S -> bionic/libc/arch-mips/syscalls/epoll_create1.S
+#	修改：      bionic/libc/arch-x86/syscalls.mk
+#	重命名：    bionic/libc/arch-x86/syscalls/epoll_create.S -> bionic/libc/arch-x86/syscalls/epoll_create1.S
 #	新文件：    bionic/libc/bionic/epoll_create.cpp
-#	新文件：    bionic/libc/bionic/poll.cpp
-#	修改：      bionic/libc/include/poll.h
 #	修改：      bionic/libc/include/sys/epoll.h
 #	修改：      bionic/libc/include/sys/socket.h
-#	新文件：    bionic/libc/private/bionic_time_conversions.h
 #	修改：      bionic/linker/linker.cpp
 #
 diff --git a/bionic/libc/Android.mk b/bionic/libc/Android.mk
-index 1b02b78..c4bdd5e 100644
+index 1b02b78..0901464 100644
 --- a/bionic/libc/Android.mk
 +++ b/bionic/libc/Android.mk
-@@ -109,7 +109,6 @@ libc_common_src_files := \
- 	bionic/pathconf.c \
- 	bionic/perror.c \
- 	bionic/pread.c \
--	bionic/pselect.c \
- 	bionic/ptsname.c \
- 	bionic/ptsname_r.c \
- 	bionic/pututline.c \
-@@ -202,9 +201,11 @@ libc_common_src_files += \
- libc_bionic_src_files := \
-     bionic/abort.cpp \
-     bionic/assert.cpp \
-+    bionic/bionic_time_conversions.cpp \
+@@ -205,6 +205,7 @@ libc_bionic_src_files := \
      bionic/brk.cpp \
      bionic/dirent.cpp \
      bionic/__errno.c \
@@ -38,16 +24,8 @@ index 1b02b78..c4bdd5e 100644
      bionic/eventfd_read.cpp \
      bionic/eventfd_write.cpp \
      bionic/futimens.cpp \
-@@ -214,6 +215,7 @@ libc_bionic_src_files := \
-     bionic/libc_logging.cpp \
-     bionic/libgen.cpp \
-     bionic/mmap.cpp \
-+    bionic/poll.cpp \
-     bionic/pthread_attr.cpp \
-     bionic/pthread_detach.cpp \
-     bionic/pthread_equal.cpp \
 diff --git a/bionic/libc/SYSCALLS.TXT b/bionic/libc/SYSCALLS.TXT
-index 88c980f..12a1b5c 100644
+index 88c980f..ce6cb8a 100644
 --- a/bionic/libc/SYSCALLS.TXT
 +++ b/bionic/libc/SYSCALLS.TXT
 @@ -305,7 +305,7 @@ long    perf_event_open(struct perf_event_attr *attr_uptr, pid_t pid, int cpu, i
@@ -59,38 +37,11 @@ index 88c980f..12a1b5c 100644
  int     epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)    1
  int     epoll_wait(int epfd, struct epoll_event *events, int max, int timeout)   1
  
-@@ -313,7 +313,8 @@ int     inotify_init(void)      1
- int     inotify_add_watch(int, const char *, unsigned int)  1
- int     inotify_rm_watch(int, unsigned int)  1
- 
--int     poll(struct pollfd *, unsigned int, long)  1
-+int     __pselect6:pselect6(int, fd_set*, fd_set*, fd_set*, timespec*, void*)  1
-+int     __ppoll:ppoll(pollfd*, unsigned int, timespec*, const sigset_t*, size_t)  1
- 
- int     eventfd:eventfd2(unsigned int, int)  1
- 
 diff --git a/bionic/libc/arch-arm/syscalls.mk b/bionic/libc/arch-arm/syscalls.mk
-index 252a428..05c0f61 100644
+index 252a428..e17705b 100644
 --- a/bionic/libc/arch-arm/syscalls.mk
 +++ b/bionic/libc/arch-arm/syscalls.mk
-@@ -48,6 +48,8 @@ syscall_src += arch-arm/syscalls/pread64.S
- syscall_src += arch-arm/syscalls/pwrite64.S
- syscall_src += arch-arm/syscalls/__open.S
- syscall_src += arch-arm/syscalls/__openat.S
-+syscall_src += arch-arm/syscalls/__ppoll.S
-+syscall_src += arch-arm/syscalls/__pselect6.S
- syscall_src += arch-arm/syscalls/close.S
- syscall_src += arch-arm/syscalls/lseek.S
- syscall_src += arch-arm/syscalls/__llseek.S
-@@ -73,7 +75,6 @@ syscall_src += arch-arm/syscalls/dup.S
- syscall_src += arch-arm/syscalls/pipe.S
- syscall_src += arch-arm/syscalls/pipe2.S
- syscall_src += arch-arm/syscalls/dup2.S
--syscall_src += arch-arm/syscalls/select.S
- syscall_src += arch-arm/syscalls/ftruncate.S
- syscall_src += arch-arm/syscalls/ftruncate64.S
- syscall_src += arch-arm/syscalls/getdents.S
-@@ -196,13 +197,12 @@ syscall_src += arch-arm/syscalls/sysinfo.S
+@@ -196,7 +196,7 @@ syscall_src += arch-arm/syscalls/sysinfo.S
  syscall_src += arch-arm/syscalls/personality.S
  syscall_src += arch-arm/syscalls/perf_event_open.S
  syscall_src += arch-arm/syscalls/futex.S
@@ -99,62 +50,6 @@ index 252a428..05c0f61 100644
  syscall_src += arch-arm/syscalls/epoll_ctl.S
  syscall_src += arch-arm/syscalls/epoll_wait.S
  syscall_src += arch-arm/syscalls/inotify_init.S
- syscall_src += arch-arm/syscalls/inotify_add_watch.S
- syscall_src += arch-arm/syscalls/inotify_rm_watch.S
--syscall_src += arch-arm/syscalls/poll.S
- syscall_src += arch-arm/syscalls/eventfd.S
- syscall_src += arch-arm/syscalls/__set_tls.S
- syscall_src += arch-arm/syscalls/cacheflush.S
-diff --git a/bionic/libc/arch-arm/syscalls/__ppoll.S b/bionic/libc/arch-arm/syscalls/__ppoll.S
-new file mode 100644
-index 0000000..7b833ac
---- /dev/null
-+++ b/bionic/libc/arch-arm/syscalls/__ppoll.S
-@@ -0,0 +1,19 @@
-+/* Generated by gensyscalls.py. Do not edit. */
-+
-+#include <asm/unistd.h>
-+#include <linux/err.h>
-+#include <machine/asm.h>
-+
-+ENTRY(__ppoll)
-+    mov     ip, sp
-+    .save   {r4, r5, r6, r7}
-+    stmfd   sp!, {r4, r5, r6, r7}
-+    ldmfd   ip, {r4, r5, r6}
-+    ldr     r7, =__NR_ppoll
-+    swi     #0
-+    ldmfd   sp!, {r4, r5, r6, r7}
-+    cmn     r0, #(MAX_ERRNO + 1)
-+    bxls    lr
-+    neg     r0, r0
-+    b       __set_errno
-+END(__ppoll)
-diff --git a/bionic/libc/arch-arm/syscalls/__pselect6.S b/bionic/libc/arch-arm/syscalls/__pselect6.S
-new file mode 100644
-index 0000000..44e22ee
---- /dev/null
-+++ b/bionic/libc/arch-arm/syscalls/__pselect6.S
-@@ -0,0 +1,19 @@
-+/* Generated by gensyscalls.py. Do not edit. */
-+
-+#include <asm/unistd.h>
-+#include <linux/err.h>
-+#include <machine/asm.h>
-+
-+ENTRY(__pselect6)
-+    mov     ip, sp
-+    .save   {r4, r5, r6, r7}
-+    stmfd   sp!, {r4, r5, r6, r7}
-+    ldmfd   ip, {r4, r5, r6}
-+    ldr     r7, =__NR_pselect6
-+    swi     #0
-+    ldmfd   sp!, {r4, r5, r6, r7}
-+    cmn     r0, #(MAX_ERRNO + 1)
-+    bxls    lr
-+    neg     r0, r0
-+    b       __set_errno
-+END(__pselect6)
 diff --git a/bionic/libc/arch-arm/syscalls/epoll_create.S b/bionic/libc/arch-arm/syscalls/epoll_create.S
 deleted file mode 100644
 index b2894e6..0000000
@@ -197,108 +92,142 @@ index 0000000..d05451d
 +    neg     r0, r0
 +    b       __set_errno
 +END(epoll_create1)
-diff --git a/bionic/libc/arch-arm/syscalls/poll.S b/bionic/libc/arch-arm/syscalls/poll.S
+diff --git a/bionic/libc/arch-mips/syscalls.mk b/bionic/libc/arch-mips/syscalls.mk
+index 23393a2..994f114 100644
+--- a/bionic/libc/arch-mips/syscalls.mk
++++ b/bionic/libc/arch-mips/syscalls.mk
+@@ -199,7 +199,7 @@ syscall_src += arch-mips/syscalls/sysinfo.S
+ syscall_src += arch-mips/syscalls/personality.S
+ syscall_src += arch-mips/syscalls/perf_event_open.S
+ syscall_src += arch-mips/syscalls/futex.S
+-syscall_src += arch-mips/syscalls/epoll_create.S
++syscall_src += arch-mips/syscalls/epoll_create1.S
+ syscall_src += arch-mips/syscalls/epoll_ctl.S
+ syscall_src += arch-mips/syscalls/epoll_wait.S
+ syscall_src += arch-mips/syscalls/inotify_init.S
+diff --git a/bionic/libc/arch-mips/syscalls/epoll_create.S b/bionic/libc/arch-mips/syscalls/epoll_create.S
 deleted file mode 100644
-index 71d4c81..0000000
---- a/bionic/libc/arch-arm/syscalls/poll.S
+index 2f4ac7f..0000000
+--- a/bionic/libc/arch-mips/syscalls/epoll_create.S
 +++ /dev/null
-@@ -1,15 +0,0 @@
+@@ -1,22 +0,0 @@
 -/* autogenerated by gensyscalls.py */
 -#include <asm/unistd.h>
--#include <linux/err.h>
--#include <machine/asm.h>
+-    .text
+-    .globl epoll_create
+-    .align 4
+-    .ent epoll_create
 -
--ENTRY(poll)
--    mov     ip, r7
--    ldr     r7, =__NR_poll
--    swi     #0
--    mov     r7, ip
--    cmn     r0, #(MAX_ERRNO + 1)
--    bxls    lr
--    neg     r0, r0
--    b       __set_errno
--END(poll)
-diff --git a/bionic/libc/arch-arm/syscalls/select.S b/bionic/libc/arch-arm/syscalls/select.S
-deleted file mode 100644
-index 09fb52b..0000000
---- a/bionic/libc/arch-arm/syscalls/select.S
-+++ /dev/null
-@@ -1,18 +0,0 @@
--/* autogenerated by gensyscalls.py */
--#include <asm/unistd.h>
--#include <linux/err.h>
--#include <machine/asm.h>
--
--ENTRY(select)
--    mov     ip, sp
--    .save   {r4, r5, r6, r7}
--    stmfd   sp!, {r4, r5, r6, r7}
--    ldmfd   ip, {r4, r5, r6}
--    ldr     r7, =__NR__newselect
--    swi     #0
--    ldmfd   sp!, {r4, r5, r6, r7}
--    cmn     r0, #(MAX_ERRNO + 1)
--    bxls    lr
--    neg     r0, r0
--    b       __set_errno
--END(select)
-diff --git a/bionic/libc/bionic/bionic_time_conversions.cpp b/bionic/libc/bionic/bionic_time_conversions.cpp
+-epoll_create:
+-    .set noreorder
+-    .cpload $t9
+-    li $v0, __NR_epoll_create
+-    syscall
+-    bnez $a3, 1f
+-    move $a0, $v0
+-    j $ra
+-    nop
+-1:
+-    la $t9,__set_errno
+-    j $t9
+-    nop
+-    .set reorder
+-    .end epoll_create
+diff --git a/bionic/libc/arch-mips/syscalls/epoll_create1.S b/bionic/libc/arch-mips/syscalls/epoll_create1.S
 new file mode 100644
-index 0000000..7f3c026
+index 0000000..a13b495
 --- /dev/null
-+++ b/bionic/libc/bionic/bionic_time_conversions.cpp
-@@ -0,0 +1,51 @@
-+/*
-+ * Copyright (C) 2013 The Android Open Source Project
-+ * All rights reserved.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *  * Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions and the following disclaimer.
-+ *  * Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in
-+ *    the documentation and/or other materials provided with the
-+ *    distribution.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
-+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-+ * SUCH DAMAGE.
-+ */
++++ b/bionic/libc/arch-mips/syscalls/epoll_create1.S
+@@ -0,0 +1,22 @@
++/* autogenerated by gensyscalls.py */
++#include <asm/unistd.h>
++    .text
++    .globl epoll_create1
++    .align 4
++    .ent epoll_create1
 +
-+#include "private/bionic_time_conversions.h"
++epoll_create1:
++    .set noreorder
++    .cpload $t9
++    li $v0, __NR_epoll_create1
++    syscall
++    bnez $a3, 1f
++    move $a0, $v0
++    j $ra
++    nop
++1:
++    la $t9,__set_errno
++    j $t9
++    nop
++    .set reorder
++    .end epoll_create1
+diff --git a/bionic/libc/arch-x86/syscalls.mk b/bionic/libc/arch-x86/syscalls.mk
+index 11573de..beb58bc 100644
+--- a/bionic/libc/arch-x86/syscalls.mk
++++ b/bionic/libc/arch-x86/syscalls.mk
+@@ -200,7 +200,7 @@ syscall_src += arch-x86/syscalls/sysinfo.S
+ syscall_src += arch-x86/syscalls/personality.S
+ syscall_src += arch-x86/syscalls/perf_event_open.S
+ syscall_src += arch-x86/syscalls/futex.S
+-syscall_src += arch-x86/syscalls/epoll_create.S
++syscall_src += arch-x86/syscalls/epoll_create1.S
+ syscall_src += arch-x86/syscalls/epoll_ctl.S
+ syscall_src += arch-x86/syscalls/epoll_wait.S
+ syscall_src += arch-x86/syscalls/inotify_init.S
+diff --git a/bionic/libc/arch-x86/syscalls/epoll_create.S b/bionic/libc/arch-x86/syscalls/epoll_create.S
+deleted file mode 100644
+index 061f173..0000000
+--- a/bionic/libc/arch-x86/syscalls/epoll_create.S
++++ /dev/null
+@@ -1,21 +0,0 @@
+-/* autogenerated by gensyscalls.py */
+-#include <linux/err.h>
+-#include <machine/asm.h>
+-#include <asm/unistd.h>
+-
+-ENTRY(epoll_create)
+-    pushl   %ebx
+-    mov     8(%esp), %ebx
+-    movl    $__NR_epoll_create, %eax
+-    int     $0x80
+-    cmpl    $-MAX_ERRNO, %eax
+-    jb      1f
+-    negl    %eax
+-    pushl   %eax
+-    call    __set_errno
+-    addl    $4, %esp
+-    orl     $-1, %eax
+-1:
+-    popl    %ebx
+-    ret
+-END(epoll_create)
+diff --git a/bionic/libc/arch-x86/syscalls/epoll_create1.S b/bionic/libc/arch-x86/syscalls/epoll_create1.S
+new file mode 100644
+index 0000000..5972d49
+--- /dev/null
++++ b/bionic/libc/arch-x86/syscalls/epoll_create1.S
+@@ -0,0 +1,21 @@
++/* autogenerated by gensyscalls.py */
++#include <linux/err.h>
++#include <machine/asm.h>
++#include <asm/unistd.h>
 +
-+bool timespec_from_timeval(timespec& ts, const timeval& tv) {
-+  // Whole seconds can just be copied.
-+  ts.tv_sec = tv.tv_sec;
-+
-+  // But we might overflow when converting microseconds to nanoseconds.
-+  if (tv.tv_usec >= 1000000 || tv.tv_usec < 0) {
-+    return false;
-+  }
-+  ts.tv_nsec = tv.tv_usec * 1000;
-+  return true;
-+}
-+
-+void timespec_from_ms(timespec& ts, const int ms) {
-+  ts.tv_sec = ms / 1000;
-+  ts.tv_nsec = (ms % 1000) * 1000000;
-+}
-+
-+void timeval_from_timespec(timeval& tv, const timespec& ts) {
-+  tv.tv_sec = ts.tv_sec;
-+  tv.tv_usec = ts.tv_nsec / 1000;
-+}
++ENTRY(epoll_create1)
++    pushl   %ebx
++    mov     8(%esp), %ebx
++    movl    $__NR_epoll_create1, %eax
++    int     $0x80
++    cmpl    $-MAX_ERRNO, %eax
++    jb      1f
++    negl    %eax
++    pushl   %eax
++    call    __set_errno
++    addl    $4, %esp
++    orl     $-1, %eax
++1:
++    popl    %ebx
++    ret
++END(epoll_create1)
 diff --git a/bionic/libc/bionic/epoll_create.cpp b/bionic/libc/bionic/epoll_create.cpp
 new file mode 100644
 index 0000000..1dfafa8
@@ -338,212 +267,8 @@ index 0000000..1dfafa8
 +int epoll_create(int /*obsolete_size*/) {
 +  return epoll_create1(0);
 +}
-diff --git a/bionic/libc/bionic/poll.cpp b/bionic/libc/bionic/poll.cpp
-new file mode 100644
-index 0000000..ebb318d
---- /dev/null
-+++ b/bionic/libc/bionic/poll.cpp
-@@ -0,0 +1,110 @@
-+/*
-+ * Copyright (C) 2013 The Android Open Source Project
-+ * All rights reserved.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *  * Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions and the following disclaimer.
-+ *  * Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in
-+ *    the documentation and/or other materials provided with the
-+ *    distribution.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
-+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-+ * SUCH DAMAGE.
-+ */
-+
-+#include <sys/poll.h>
-+#include <sys/select.h>
-+
-+#include "private/bionic_time_conversions.h"
-+#include "private/kernel_sigset_t.h"
-+
-+extern "C" int __ppoll(pollfd*, unsigned int, timespec*, const kernel_sigset_t*, size_t);
-+extern "C" int __pselect6(int, fd_set*, fd_set*, fd_set*, timespec*, void*);
-+
-+int poll(pollfd* fds, nfds_t fd_count, int ms) {
-+  timespec ts;
-+  timespec* ts_ptr = NULL;
-+  if (ms >= 0) {
-+    timespec_from_ms(ts, ms);
-+    ts_ptr = &ts;
-+  }
-+  return __ppoll(fds, fd_count, ts_ptr, NULL, 0);
-+}
-+
-+int ppoll(pollfd* fds, nfds_t fd_count, const timespec* ts, const sigset_t* ss) {
-+  timespec mutable_ts;
-+  timespec* mutable_ts_ptr = NULL;
-+  if (ts != NULL) {
-+    mutable_ts = *ts;
-+    mutable_ts_ptr = &mutable_ts;
-+  }
-+
-+  kernel_sigset_t kernel_ss;
-+  kernel_sigset_t* kernel_ss_ptr = NULL;
-+  if (ss != NULL) {
-+    kernel_ss.set(ss);
-+    kernel_ss_ptr = &kernel_ss;
-+  }
-+
-+  return __ppoll(fds, fd_count, mutable_ts_ptr, kernel_ss_ptr, sizeof(kernel_ss));
-+}
-+
-+int select(int fd_count, fd_set* read_fds, fd_set* write_fds, fd_set* error_fds, timeval* tv) {
-+  timespec ts;
-+  timespec* ts_ptr = NULL;
-+  if (tv != NULL) {
-+    if (!timespec_from_timeval(ts, *tv)) {
-+      errno = EINVAL;
-+      return -1;
-+    }
-+    ts_ptr = &ts;
-+  }
-+  int result = __pselect6(fd_count, read_fds, write_fds, error_fds, ts_ptr, NULL);
-+  if (tv != NULL) {
-+    timeval_from_timespec(*tv, ts);
-+  }
-+  return result;
-+}
-+
-+int pselect(int fd_count, fd_set* read_fds, fd_set* write_fds, fd_set* error_fds,
-+            const timespec* ts, const sigset_t* ss) {
-+  timespec mutable_ts;
-+  timespec* mutable_ts_ptr = NULL;
-+  if (ts != NULL) {
-+    mutable_ts = *ts;
-+    mutable_ts_ptr = &mutable_ts;
-+  }
-+
-+  kernel_sigset_t kernel_ss;
-+  kernel_sigset_t* kernel_ss_ptr = NULL;
-+  if (ss != NULL) {
-+    kernel_ss.set(ss);
-+    kernel_ss_ptr = &kernel_ss;
-+  }
-+
-+  // The Linux kernel only handles 6 arguments and this system call really needs 7,
-+  // so the last argument is a void* pointing to:
-+  struct pselect6_extra_data_t {
-+    uintptr_t ss_addr;
-+    size_t ss_len;
-+  };
-+  pselect6_extra_data_t extra_data;
-+  extra_data.ss_addr = reinterpret_cast<uintptr_t>(kernel_ss_ptr);
-+  extra_data.ss_len = sizeof(kernel_ss);
-+
-+  return __pselect6(fd_count, read_fds, write_fds, error_fds, mutable_ts_ptr, &extra_data);
-+}
-diff --git a/bionic/libc/bionic/pselect.c b/bionic/libc/bionic/pselect.c
-deleted file mode 100644
-index 76ce2c0..0000000
---- a/bionic/libc/bionic/pselect.c
-+++ /dev/null
-@@ -1,59 +0,0 @@
--/*
-- * Copyright (C) 2008 The Android Open Source Project
-- * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions
-- * are met:
-- *  * Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- *  * Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in
-- *    the documentation and/or other materials provided with the
-- *    distribution.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
-- * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-- * SUCH DAMAGE.
-- */
--#include <sys/select.h>
--#include <signal.h>
--#include <pthread.h>
--
--int
--pselect(int  n, fd_set*  readfds, fd_set*  writefds, fd_set*  errfds,
--        const struct timespec*  timeout, const sigset_t*  sigmask)
--{
--    sigset_t        oldmask;
--    int             result;
--    struct timeval  tv, *tv_timeout = NULL;
--
--    if (sigmask != NULL)
--        pthread_sigmask( SIG_SETMASK, sigmask, &oldmask );
--
--    if (timeout != NULL) {
--        tv_timeout = &tv;
--        tv.tv_sec  = timeout->tv_sec;
--        tv.tv_usec = (timeout->tv_nsec + 999)/1000;  // round up
--        if (tv.tv_usec >= 1000000) {
--            tv.tv_sec  += 1;
--            tv.tv_usec -= 1000000;
--        }
--    }
--
--    result = select( n, readfds, writefds, errfds, tv_timeout );
--
--    if (sigmask != NULL)
--        pthread_sigmask( SIG_SETMASK, &oldmask, NULL );
--
--    return result;
--}
-diff --git a/bionic/libc/include/poll.h b/bionic/libc/include/poll.h
-index 560be89..3f586b2 100644
---- a/bionic/libc/include/poll.h
-+++ b/bionic/libc/include/poll.h
-@@ -30,13 +30,15 @@
- 
- #include <sys/cdefs.h>
- #include <linux/poll.h>
-+#include <signal.h> /* For sigset_t. */
-+#include <time.h> /* For timespec. */
- 
- __BEGIN_DECLS
- 
--typedef unsigned int  nfds_t;
-+typedef unsigned int nfds_t;
- 
--/* POSIX specifies "int" for the timeout, Linux seems to use long... */
--extern int poll(struct pollfd *, nfds_t, long);
-+extern int poll(struct pollfd*, nfds_t, int);
-+extern int ppoll(struct pollfd*, nfds_t, const struct timespec*, const sigset_t*);
- 
- __END_DECLS
- 
 diff --git a/bionic/libc/include/sys/epoll.h b/bionic/libc/include/sys/epoll.h
-index 38739aa..c45d2b2 100644
+index 38739aa..4e2b787 100644
 --- a/bionic/libc/include/sys/epoll.h
 +++ b/bionic/libc/include/sys/epoll.h
 @@ -29,6 +29,7 @@
@@ -554,15 +279,16 @@ index 38739aa..c45d2b2 100644
  
  __BEGIN_DECLS
  
-@@ -51,6 +52,7 @@ __BEGIN_DECLS
+@@ -51,6 +52,8 @@ __BEGIN_DECLS
  #define EPOLL_CTL_DEL    2
  #define EPOLL_CTL_MOD    3
  
 +#define EPOLL_CLOEXEC O_CLOEXEC
++
  typedef union epoll_data 
  {
      void *ptr;
-@@ -66,6 +68,7 @@ struct epoll_event
+@@ -66,6 +69,7 @@ struct epoll_event
  };
  
  int epoll_create(int size);
@@ -571,7 +297,7 @@ index 38739aa..c45d2b2 100644
  int epoll_wait(int epfd, struct epoll_event *events, int max, int timeout);
  
 diff --git a/bionic/libc/include/sys/socket.h b/bionic/libc/include/sys/socket.h
-index 17ba0a1..d570ce0 100644
+index 17ba0a1..21be130 100644
 --- a/bionic/libc/include/sys/socket.h
 +++ b/bionic/libc/include/sys/socket.h
 @@ -32,6 +32,7 @@
@@ -582,67 +308,28 @@ index 17ba0a1..d570ce0 100644
  #include <asm/socket.h>
  #include <linux/sockios.h>
  #include <linux/uio.h>
-@@ -60,6 +61,8 @@ typedef int socklen_t;
- #define SOCK_SEQPACKET   5
+@@ -61,13 +62,15 @@ typedef int socklen_t;
  #define SOCK_PACKET      10
  #endif
+ 
+-/* BIONIC: second argument to shutdown() */
 +#define SOCK_CLOEXEC O_CLOEXEC
 +#define SOCK_NONBLOCK O_NONBLOCK
- 
- /* BIONIC: second argument to shutdown() */
++
  enum {
-diff --git a/bionic/libc/private/bionic_time_conversions.h b/bionic/libc/private/bionic_time_conversions.h
-new file mode 100644
-index 0000000..51f543f
---- /dev/null
-+++ b/bionic/libc/private/bionic_time_conversions.h
-@@ -0,0 +1,44 @@
-+/*
-+ * Copyright (C) 2013 The Android Open Source Project
-+ * All rights reserved.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *  * Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions and the following disclaimer.
-+ *  * Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in
-+ *    the documentation and/or other materials provided with the
-+ *    distribution.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
-+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-+ * SUCH DAMAGE.
-+ */
-+
-+#ifndef _BIONIC_TIME_CONVERSIONS_H
-+#define _BIONIC_TIME_CONVERSIONS_H
-+
-+#include <time.h>
-+#include <sys/cdefs.h>
-+
-+__BEGIN_DECLS
-+
-+__LIBC_HIDDEN__ bool timespec_from_timeval(timespec& ts, const timeval& tv);
-+__LIBC_HIDDEN__ void timespec_from_ms(timespec& ts, const int ms);
-+
-+__LIBC_HIDDEN__ void timeval_from_timespec(timeval& tv, const timespec& ts);
-+
-+__END_DECLS
-+
-+#endif
+-    SHUT_RD = 0,        /* no more receptions */
++  SHUT_RD = 0,
+ #define SHUT_RD         SHUT_RD
+-    SHUT_WR,            /* no more transmissions */
++  SHUT_WR,
+ #define SHUT_WR         SHUT_WR
+-    SHUT_RDWR           /* no more receptions or transmissions */
++  SHUT_RDWR
+ #define SHUT_RDWR       SHUT_RDWR
+ };
+ 
 diff --git a/bionic/linker/linker.cpp b/bionic/linker/linker.cpp
-index d776bdf..9ace88e 100644
+index d776bdf..dc282f1 100644
 --- a/bionic/linker/linker.cpp
 +++ b/bionic/linker/linker.cpp
 @@ -1531,8 +1531,8 @@ static bool soinfo_link_image(soinfo* si) {
@@ -652,7 +339,7 @@ index d776bdf..9ace88e 100644
 -        DEBUG("%s has text relocations. This is wasting memory and is "
 -                "a security risk. Please fix.", si->name);
 +        //DEBUG("%s has text relocations. This is wasting memory and is "
-+        //        "a security risk. Please fix.", si->name);
++         //       "a security risk. Please fix.", si->name);
          if (phdr_table_unprotect_segments(si->phdr, si->phnum, si->load_bias) < 0) {
              DL_ERR("can't unprotect loadable segments for \"%s\": %s",
                     si->name, strerror(errno));
