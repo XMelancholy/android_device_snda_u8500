@@ -16,7 +16,7 @@ LOCAL_C_INCLUDES:= \
 	$(LOCAL_PATH)/../lib \
 	$(LOCAL_PATH)/../gdbus \
 	$(call include-path-for, glib) \
-	$(LOCAL_PATH)/../../glib/include \
+	$(call include-path-for, glib)/glib
 
 LOCAL_SHARED_LIBRARIES := \
 	libcutils \

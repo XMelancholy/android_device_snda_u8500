@@ -27,9 +27,8 @@ LOCAL_C_INCLUDES:= \
 	$(LOCAL_PATH)/../ \
 	$(LOCAL_PATH)/../src \
 	$(call include-path-for, glib) \
-	$(call include-path-for, dbus) \
-	$(LOCAL_PATH)/../../glib/include \
-	$(LOCAL_PATH)/../../../../../device/sony/$(TARGET_DEVICE)/hardware \
+	$(call include-path-for, glib)/glib \
+	$(LOCAL_PATH)/../../../dbus/dbus
 
 LOCAL_SHARED_LIBRARIES := \
 	libbluetooth \

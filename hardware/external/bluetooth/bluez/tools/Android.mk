@@ -82,8 +82,8 @@ LOCAL_C_INCLUDES:= \
 	$(LOCAL_PATH)/../lib \
 	$(LOCAL_PATH)/../tools \
 	$(LOCAL_PATH)/../src \
-	$(LOCAL_PATH)/../../glib/glib \
-	$(LOCAL_PATH)/../../glib
+	$(call include-path-for, glib) \
+	$(call include-path-for, glib)/glib
 
 LOCAL_SHARED_LIBRARIES := \
 	libbluetooth libglib
@@ -250,7 +250,8 @@ LOCAL_C_INCLUDES:= \
 	$(LOCAL_PATH)/../src \
 	$(LOCAL_PATH)/../lib \
 	$(LOCAL_PATH)/../tools \
-	$(LOCAL_PATH)/../../glib/include
+	$(call include-path-for, glib) \
+	$(call include-path-for, glib)/glib
 
 LOCAL_SHARED_LIBRARIES := \
 	libbluetooth
