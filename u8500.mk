@@ -83,37 +83,9 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
    e2fsck
 
-# STE Audio
+# USB
 PRODUCT_PACKAGES += \
-   audio_policy.montblanc \
-   audio.primary.montblanc \
-   libasound \
-   libalsactrl \
-   libmmprobe
-
-PRODUCT_PACKAGES += \
-   libaudioparameter \
-   audio.a2dp.default \
-   audio.usb.default
-
-# STE Display 
-PRODUCT_PACKAGES += \
-   lights.montblanc \
-   gralloc.montblanc \
-   hwcomposer.montblanc \
-   copybit.montblanc \
-   power.montblanc \
-   sensors.montblanc \
-   memtrack.montblanc
-
-PRODUCT_PACKAGES += \
-   libblt_hw
-
-# STE Media
-PRODUCT_PACKAGES += \
-   libstagefrighthw \
-   libomxil-bellagio \
-   libstelpcutils
+   com.android.future.usb.accessory
 
 # Network
 PRODUCT_PACKAGES += \
@@ -131,15 +103,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
    hostapd_cli \
    hostapd
-
-# Modem
-PRODUCT_PACKAGES += \
-   ste_mad \
-   msa
-
-# FileExplorer
-#PRODUCT_PACKAGES += \
-#   FileExplorer
 
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \

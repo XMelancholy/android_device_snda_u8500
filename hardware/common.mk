@@ -47,6 +47,47 @@ PRODUCT_COPY_FILES += \
    $(LOCAL_PATH)/FM/config/com.stericsson.hardware.fm.receiver.xml:system/etc/permissions/com.stericsson.hardware.fm.receiver.xml \
    $(LOCAL_PATH)/FM/config/com.stericsson.hardware.fm.transmitter.xml:system/etc/permissions/com.stericsson.hardware.fm.transmitter.xml
 
+# FileExplorer
+#PRODUCT_PACKAGES += \
+#   FileExplorer
+
+# Modem
+PRODUCT_PACKAGES += \
+   ste_mad \
+   msa
+
+# STE Audio
+PRODUCT_PACKAGES += \
+   audio_policy.montblanc \
+   audio.primary.montblanc \
+   libasound \
+   libalsactrl \
+   libmmprobe
+
+PRODUCT_PACKAGES += \
+   libaudioparameter \
+   audio.a2dp.default \
+   audio.usb.default
+
+# STE Display
+PRODUCT_PACKAGES += \
+   lights.montblanc \
+   gralloc.montblanc \
+   hwcomposer.montblanc \
+   copybit.montblanc \
+   power.montblanc \
+   sensors.montblanc \
+   memtrack.montblanc
+
+PRODUCT_PACKAGES += \
+   libblt_hw
+
+# STE Media
+PRODUCT_PACKAGES += \
+   libstagefrighthw \
+   libomxil-bellagio \
+   libstelpcutils
+
 # Dbus
 PRODUCT_PACKAGES += \
    dbus-daemon \
