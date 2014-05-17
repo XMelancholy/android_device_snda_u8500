@@ -34,12 +34,25 @@ PRODUCT_PACKAGES += \
 #PRODUCT_PACKAGES += \
 #   ste-cg29xx_ctrl
 
+FMRADIO_CG2900_SET_TX_ONLY := false
+FMRADIO_CG2900_SET_RX_ONLY := false
+
+# fm_cg2900
+PRODUCT_PACKAGES += \
+   libfmradio.cg2900 \
+   libfmradio.cg2900_tx \
+   libfmradio.cg2900_rx \
+
+PRODUCT_COPY_FILES += \
+   $(LOCAL_PATH)/FM/config/com.stericsson.hardware.fm.receiver.xml:system/etc/permissions/com.stericsson.hardware.fm.receiver.xml \
+   $(LOCAL_PATH)/FM/config/com.stericsson.hardware.fm.transmitter.xml:system/etc/permissions/com.stericsson.hardware.fm.transmitter.xml
+
 # Dbus
 PRODUCT_PACKAGES += \
    dbus-daemon \
    libdbus
 
-# Bluez 5.11 libs
+# Bluez 5 libs
 PRODUCT_PACKAGES += \
     libbtio \
     libbluetooth
