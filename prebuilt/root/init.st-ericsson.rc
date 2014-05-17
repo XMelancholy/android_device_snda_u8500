@@ -47,32 +47,6 @@ on init
     mkdir /debug
     mount debugfs none /debug
 
-    # make files in /sys/ non-writable for OTHERS
-    chmod 220 /sys/ab8500_chargalg/chargalg
-    chown system system /sys/ab8500_chargalg/chargalg
-    chmod 664 /sys/devices/sensor00/fn54/fifoindex
-    chmod 664 /sys/devices/sensor00/fn54/get_report
-    chmod 664 /sys/devices/sensor00/fn54/no_auto_cal
-    chmod 664 /sys/devices/sensor00/fn54/status
-    chmod 664 /sys/devices/sensor00/fn54/reporttype
-    chmod 220 /sys/devices/sensor00/fn34/rescanPDT
-    chmod 664 /sys/devices/sensor00/fn34/blocknum
-    chmod 664 /sys/devices/sensor00/fn34/cmd
-    chmod 664 /sys/devices/sensor00/fn34/bootloaderid
-    chmod 664 /sys/devices/sensor00/fn34/data
-    chmod 664 /sys/devices/sensor00/fn11/relreport
-    chmod 664 /sys/devices/sensor00/fn11/swap
-    chmod 664 /sys/devices/sensor00/fn11/offset
-    chmod 664 /sys/devices/sensor00/fn11/clip
-    chmod 664 /sys/devices/sensor00/fn11/flip
-    chmod 220 /sys/devices/sensor00/fn01/reset
-    chmod 664 /sys/devices/sensor00/fn01/reportrate
-    chmod 664 /sys/devices/sensor00/fn01/nosleep
-    chmod 664 /sys/devices/sensor00/fn01/chargerinput
-    chmod 664 /sys/devices/sensor00/fn01/sleepmode
-    chmod 664 /sys/devices/sensor00/enabled
-    chmod 664 /sys/devices/sensor00/hasbsr
-
 on fs
 
     # mount mtd partitions
@@ -137,12 +111,6 @@ on post-fs
     chmod 0660 /sys/power/wake_lock
     chmod 0660 /sys/power/wake_unlock
 
-    # STE Camera permissions
-    chown media  system   dev/mmio_camera
-    chown media  system   dev/camera_flash
-    chmod 0660 dev/camera_flash
-    chmod 0660 dev/mmio_camera
-
 on post-fs-data
 
     # create basic filesystem structure
@@ -197,10 +165,6 @@ on post-fs-data
     # Create Directory for Caching files for camera
     mkdir /data/tuning 0700 media camera
 
-    # Permissions for init.d script
-    chmod 0755 /system/etc/init.d/01stesetup
-    chmod 0755 /system/etc/init.d/10wireless
-
     # Permissions for bluetooth
     chown bluetooth bluetooth /dev/ttyAMA0
     chown bluetooth bluetooth /dev/ttyAMA1
@@ -232,77 +196,6 @@ on boot
     # STE cg2900 init
     exec cg2900-channel_init.sh
     start init_ste-cg2900
-
-
-    # STE permissions 
-    chown system graphics dev/ape_opp
-    chown system graphics dev/b2r2_blt
-    chown media  system   dev/cm_channel
-    chown media  system   dev/cm_control
-    chown media  system   dev/cm_sia_trace
-    chown media  system   dev/cm_sva_trace
-    chown system graphics dev/comp0
-    chown system graphics dev/ddr_opp
-    chown media  system   dev/hwmem
-    chown media  system   dev/i2c-2
-    chown system graphics dev/mali
-    chown audio  audio    dev/modemaudio
-    chown root   wifi     dev/rfkill
-    chown media  system   dev/stm
-    chown root   system   dev/tee
-    chown system system   dev/tsl27713
-
-    chmod 0666 dev/ape_opp
-    chmod 0666 dev/b2r2_blt
-    chmod 0660 dev/cm_channel
-    chmod 0660 dev/cm_control
-    chmod 0444 dev/cm_sia_trace
-    chmod 0444 dev/cm_sva_trace
-    chmod 0666 dev/comp0
-    chmod 0660 dev/ddr_opp
-    chmod 0666 dev/hwmem
-    chmod 0660 dev/i2c-2
-    chmod 0666 dev/mali
-    chmod 0660 dev/modemaudio
-    chmod 0660 dev/rfkill
-    chmod 0660 dev/stm
-    chmod 0666 dev/tee
-    chmod 0666 dev/tsl27713
-
-# ST-Ericsson Connectivity Controller interfaces
-    chown system system   dev/cg2900_audio
-    chown system system   dev/cg2900_bt_acl
-    chown system system   dev/cg2900_bt_cmd
-    chown system system   dev/cg2900_bt_evt
-    chown system system   dev/cg2900_core
-    chown system system   dev/cg2900_core_test
-    chown system system   dev/cg2900_debug
-    chown system system   dev/cg2900_fm_audio
-    chown system system   dev/cg2900_fm_radio
-    chown gps    gps      dev/cg2900_gnss
-    chown system system   dev/cg2900_hci_logger
-    chown system system   dev/cg2900_hci_raw
-    chown system system   dev/cg2900_ste_tools
-    chown system system   dev/cg2900_vs_audio
-
-    chmod 0660 dev/cg2900_audio
-    chmod 0660 dev/cg2900_bt_acl
-    chmod 0660 dev/cg2900_bt_cmd
-    chmod 0660 dev/cg2900_bt_evt
-    chmod 0660 dev/cg2900_core
-    chmod 0660 dev/cg2900_core_test
-    chmod 0660 dev/cg2900_debug
-    chmod 0660 dev/cg2900_fm_audio
-    chmod 0660 dev/cg2900_fm_radio
-    chmod 0660 dev/cg2900_gnss
-    chmod 0660 dev/cg2900_hci_logger
-    chmod 0660 dev/cg2900_hci_raw
-    chmod 0660 dev/cg2900_ste_tools
-    chmod 0660 dev/cg2900_vs_audio
-
-    # STE Permissions for Liblights.
-    chown system system /sys/class/leds/lcd-backlight/brightness
-    chown system system /sys/class/leds/button-backlight/brightness
 
     # Set timeout value for rmnet stats.
     write /sys/devices/virtual/net/rmnet0/timeout_suspend 5000000
@@ -359,7 +252,7 @@ on boot
     insmod /system/lib/modules/cw1200_core.ko
 
     # Install cw1200_wlan WLAN module
-    #insmod /system/lib/modules/cw1200_wlan.ko
+    insmod /system/lib/modules/cw1200_wlan.ko
 
     # Modem
     class_start modem
@@ -390,8 +283,9 @@ service phonet-netdev /system/bin/ifconfig upnlink0 up
 service modem /system/bin/sh /system/etc/ste_modem.sh
     class modem-u8500
     user radio
-    group radio system
-    capability NET_ADMIN
+    group radio
+#    group radio system
+#    capability NET_ADMIN
 
 # STE: Modem-supervisor
 service modem-supervisor /system/bin/modem-supervisor -r -f /dev/dbx500_mloader_fw -i /sys/devices/platform/ab8500-i2c.0/chip_id -c monitor
