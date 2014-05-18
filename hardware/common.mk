@@ -95,6 +95,7 @@ PRODUCT_PACKAGES += \
 
 # Bluez 5 libs
 PRODUCT_PACKAGES += \
+    libbtio \
     libbluetooth
 
 # setup functions to initialize the encoder and decoder for A2DP streams
