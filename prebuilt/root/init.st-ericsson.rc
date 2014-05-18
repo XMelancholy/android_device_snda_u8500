@@ -61,13 +61,6 @@ on fs
     # Launch core services in case charging mode is entered
     start watchdog-kicker
 
-    # STE: init cg2900
-    #start init_cg2900
-
-    # Bluez start init
-    #start hciattach
-    start dbus
-
 on post-fs
 
     chown radio radio /modemfs
@@ -283,9 +276,8 @@ service phonet-netdev /system/bin/ifconfig upnlink0 up
 service modem /system/bin/sh /system/etc/ste_modem.sh
     class modem-u8500
     user radio
-    group radio
-#    group radio system
-#    capability NET_ADMIN
+    group radio system
+    capability NET_ADMIN
 
 # STE: Modem-supervisor
 service modem-supervisor /system/bin/modem-supervisor -r -f /dev/dbx500_mloader_fw -i /sys/devices/platform/ab8500-i2c.0/chip_id -c monitor
