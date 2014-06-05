@@ -110,7 +110,7 @@ PRODUCT_PACKAGES += \
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \
    media.aac_51_output_enabled=1 \
-   persist.sys.usb.config=mtp,adb \
+   persist.sys.usb.config=mass_storage,adb \
    ro.sf.lcd_density=240 \
    wifi.interface=wlan0
 
