@@ -10,16 +10,16 @@ Getting Started :
 		repo sync
 
 		mkdir -p device/snda/u8500
-		git clone https://github.com/XMelancholy/android_device_snda_u8500.git -b mk_mkt device/snda/u8500
+		git clone https://github.com/XMelancholy/android_device_snda_u8500.git -b cm11.0 device/snda/u8500
 
-Now connect your phone which have runing mk kk :
+Now connect your phone which have runing CM11 :
 
 		cd device/snda/u8500
 		./extract-files.sh
 
 		cd ../../..
 		mkdir -p kernel/snda
-		git clone https://github.com/XMelancholy/android_kernel_snda_u8500 -b cm-11.0 kernel/snda/u8500
+		git clone https://github.com/XMelancholy/android_kernel_snda_u8500 kernel/snda/u8500
 
 
 Patch android source code :
@@ -36,7 +36,7 @@ Patch android source code :
 
 
 
-Our step is optional!!! Use only if you going to sync mk kitkat source code daily, than simple revert each patch before you sync mk kikat source code :
+Our step is optional!!! Use only if you going to sync CM 11 source code daily, than simple revert each patch before you sync CM 11 source code :
 
 		patch -p1 -R < device/snda/u8500/patches/bionic.patch
 		patch -p1 -R < device/snda/u8500/patches/external_bluetooth_bluedroid.patch
@@ -60,14 +60,14 @@ Our step is optional!!! Use only if you going to sync mk kitkat source code dail
 		patch -p1 < device/snda/u8500/patches/system_vold.patch
 
 
-Download mk prebuilts : 
+Download CM prebuilts : 
 
-		./vendor/mk/get-prebuilts
+		./vendor/cm/get-prebuilts
 
 You are ready to build :
 
 		source build/envsetup.sh
-		lunch mk_u8500-userdebug
+		lunch cm_u8500-userdebug
 		make otapackage
 
 ENJOY!
