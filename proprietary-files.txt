@@ -77,7 +77,6 @@ etc/psdata/sterc_script_disconnect_dun
 lib/egl/libEGL_mali.so
 lib/egl/libGLESv1_CM_mali.so
 lib/egl/libGLESv2_mali.so
-lib/hw/camera.montblanc.so
 lib/hw/gps.montblanc.so
 lib/libarchive.so
 lib/libarchive_fe.so
@@ -118,7 +117,6 @@ lib/libtrace.so
 lib/libu300-ril.so
 lib/libu300-parser.so
 lib/libUMP.so
-lib/libZXImg.so
 lib/ste_omxcomponents/libst_omxarmivproc.so
 lib/ste_omxcomponents/libst_omxface_detector.so
 lib/ste_omxcomponents/libst_omxnorcos.so
