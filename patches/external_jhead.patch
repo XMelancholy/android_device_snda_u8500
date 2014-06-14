@@ -1,0 +1,13 @@
+diff --git a/external/jhead.h b/external/jhead.h
+index a3825e8..4248e8c 100644
+--- a/jhead.h
++++ b/jhead.h
+@@ -114,6 +114,8 @@ typedef struct {
+     char  ThumbnailAtEnd;              // Exif header ends with the thumbnail
+                                        // (we can only modify the thumbnail if 
+     int   ThumbnailSizeOffset;
++       //修复编译相机驱动错误
++    int   ThumbnailHeight, ThumbnailWidth;
+ 
+     int  DateTimeOffsets[MAX_DATE_COPIES];
+     int  numDateTimeTags;
