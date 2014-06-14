@@ -288,7 +288,7 @@ service modem-supervisor /system/bin/modem-supervisor -r -f /dev/dbx500_mloader_
 service copsd /system/bin/copsdaemon
     class modem-core
     user root
-    group system
+#    group system
 
 service admsrv /system/bin/admsrv
     class main
