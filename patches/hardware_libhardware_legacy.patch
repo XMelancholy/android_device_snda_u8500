@@ -8,7 +8,7 @@ index c7bdc59..53b9e44 100644
  endif
 +ifeq ($(WIFI_MAC_ADDR_CSPSA),true)
 +LOCAL_CFLAGS += -DCSPSA
-+LOCAL_C_INCLUDES += device/snda/u8500/hardware/modem/cspsa
++LOCAL_C_INCLUDES += hardware/snda/modem/cspsa
 +LOCAL_SHARED_LIBRARIES += libcspsa
 +endif
  

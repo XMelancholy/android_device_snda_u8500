@@ -24,40 +24,18 @@ Now connect your phone which have runing CM11 :
 
 Patch android source code :
 
-		patch -p1 < device/snda/u8500/patches/bionic.patch
-		patch -p1 < device/snda/u8500/patches/external_bluetooth_bluedroid.patch
-		patch -p1 < device/snda/u8500/patches/frameworks_av.patch
-		patch -p1 < device/snda/u8500/patches/frameworks_base.patch
-		patch -p1 < device/snda/u8500/patches/frameworks_native.patch
-		patch -p1 < device/snda/u8500/patches/hardware_libhardware.patch
-		patch -p1 < device/snda/u8500/patches/hardware_libhardware_legacy.patch
-		patch -p1 < device/snda/u8500/patches/system_core.patch
-		patch -p1 < device/snda/u8500/patches/system_vold.patch
-
+		cd device/snda/u8500/patches
+		./applypatch.sh
 
 
 Our step is optional!!! Use only if you going to sync CM 11 source code daily, than simple revert each patch before you sync CM 11 source code :
 
-		patch -p1 -R < device/snda/u8500/patches/bionic.patch
-		patch -p1 -R < device/snda/u8500/patches/external_bluetooth_bluedroid.patch
-		patch -p1 -R < device/snda/u8500/patches/frameworks_av.patch
-		patch -p1 -R < device/snda/u8500/patches/frameworks_base.patch
-		patch -p1 -R < device/snda/u8500/patches/frameworks_native.patch
-		patch -p1 -R < device/snda/u8500/patches/hardware_libhardware.patch
-		patch -p1 -R < device/snda/u8500/patches/hardware_libhardware_legacy.patch
-		patch -p1 -R < device/snda/u8500/patches/system_core.patch
-		patch -p1 -R < device/snda/u8500/patches/system_vold.patch
+		cd device/snda/u8500/patches
+		./un-patch.sh
 		repo forall -p -c 'git checkout -f'
 		repo sync
-		patch -p1 < device/snda/u8500/patches/bionic.patch
-		patch -p1 < device/snda/u8500/patches/external_bluetooth_bluedroid.patch
-		patch -p1 < device/snda/u8500/patches/frameworks_av.patch
-		patch -p1 < device/snda/u8500/patches/frameworks_base.patch
-		patch -p1 < device/snda/u8500/patches/frameworks_native.patch
-		patch -p1 < device/snda/u8500/patches/hardware_libhardware.patch
-		patch -p1 < device/snda/u8500/patches/hardware_libhardware_legacy.patch
-		patch -p1 < device/snda/u8500/patches/system_core.patch
-		patch -p1 < device/snda/u8500/patches/system_vold.patch
+		./applypatch.sh
+		cd ../../../..
 
 
 Download CM prebuilts : 
