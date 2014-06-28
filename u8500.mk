@@ -22,9 +22,9 @@ PRODUCT_COPY_FILES += \
    frameworks/native/data/etc/android.hardware.telephony.gsm.xml:system/etc/permissions/android.hardware.telephony.gsm.xml
 
 # BT HARDWARE ,Not need!
-#PRODUCT_COPY_FILES += \
-#   frameworks/native/data/etc/android.hardware.bluetooth.xml:system/etc/permissions/android.hardware.bluetooth.xml \
-#   frameworks/native/data/etc/android.hardware.bluetooth_le.xml:system/etc/permissions/android.hardware.bluetooth_le.xml
+PRODUCT_COPY_FILES += \
+   frameworks/native/data/etc/android.hardware.bluetooth.xml:system/etc/permissions/android.hardware.bluetooth.xml \
+   frameworks/native/data/etc/android.hardware.bluetooth_le.xml:system/etc/permissions/android.hardware.bluetooth_le.xml
 
 # Key layouts and touchscreen
 PRODUCT_COPY_FILES += \
@@ -62,22 +62,23 @@ PRODUCT_COPY_FILES += \
    $(LOCAL_PATH)/prebuilt/system/etc/ril_config:system/etc/ril_config \
    $(LOCAL_PATH)/prebuilt/system/etc/ste_modem.sh:system/etc/ste_modem.sh \
    $(LOCAL_PATH)/prebuilt/system/etc/init.d/01stesetup:system/etc/init.d/01stesetup \
+   $(LOCAL_PATH)/prebuilt/system/etc/init.d/02selinux:system/etc/init.d/02selinux \
    $(LOCAL_PATH)/prebuilt/system/etc/init.d/10wireless:system/etc/init.d/10wireless \
    $(LOCAL_PATH)/prebuilt/system/etc/wifi/p2p_supplicant.conf:system/etc/wifi/p2p_supplicant.conf \
    $(LOCAL_PATH)/prebuilt/system/etc/wifi/hostapd.conf:system/etc/wifi/hostapd.conf \
    $(LOCAL_PATH)/prebuilt/system/etc/wifi/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf
 
-# New cn_binary needed for mobile network for cm11
-# cn_binary source build for kk ,jb cn_binary it's not work
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/prebuilt/system/bin/cn_server:system/bin/cn_server
-
-# Agps config
+# AGPS Config
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/system/etc/LbsConfig.cfg:system/etc/LbsConfig.cfg \
     $(LOCAL_PATH)/prebuilt/system/etc/LbsLogConfig.cfg:system/etc/LbsLogConfig.cfg \
     $(LOCAL_PATH)/prebuilt/system/etc/LbsPgpsConfig.cfg:system/etc/LbsPgpsConfig.cfg \
     $(LOCAL_PATH)/prebuilt/system/etc/LbsPltConfig.cfg:system/etc/LbsPltConfig.cfg
+
+# New cn_binary needed for mobile network for cm11
+# cn_binary source build for kk ,jb cn_binary it's not work
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/prebuilt/system/bin/cn_server:system/bin/cn_server
 
 # Filesystem management tools
 PRODUCT_PACKAGES += \
@@ -110,7 +111,7 @@ PRODUCT_PACKAGES += \
 # for build.prop
 PRODUCT_PROPERTY_OVERRIDES += \
    media.aac_51_output_enabled=1 \
-   persist.sys.usb.config=mass_storage,adb \
+   persist.sys.usb.config=mass_storage,acm,adb \
    ro.sf.lcd_density=240 \
    wifi.interface=wlan0
 

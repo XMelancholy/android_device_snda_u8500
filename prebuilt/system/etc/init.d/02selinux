@@ -1,0 +1,8 @@
+#!/system/bin/sh
+
+cp -f /system/etc/security/mac_permissions.xml /data/security/mac_permissions.xml
+chmod 0660 /data/security/mac_permissions.xml
+chown root:root /data/security/mac_permissions.xml
+
+chmod 0660 /data/system/packages.list
+chown system:system /data/system/packages.list

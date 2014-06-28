@@ -56,3 +56,6 @@ ste.webkit.accelerated_canvas=false
 
 # Nutshell: Disable on-screen navigation bar
 qemu.hw.mainkeys=1
+
+# Bluetooth
+persist.sys.bluetooth.handsfree=hfp_wbs

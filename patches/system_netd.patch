@@ -1,0 +1,1765 @@
+#	修改：      Android.mk
+#	修改：      CommandListener.cpp
+#	修改：      CommandListener.h
+#	修改：      NatController.cpp
+#	修改：      NetdConstants.cpp
+#	修改：      NetdConstants.h
+#	删除：      QsoftapCmd.cpp
+#	修改：      ResponseCode.h
+#	删除：      RouteController.cpp
+#	删除：      RouteController.h
+#	修改：      SecondaryTableController.cpp
+#	修改：      SecondaryTableController.h
+#	修改：      TetherController.cpp
+#	修改：      TetherController.h
+#
+diff --git a/system/netd/Android.mk b/system/netd/Android.mk
+index 0eff886..8195d2d 100644
+--- a/system/netd/Android.mk
++++ b/system/netd/Android.mk
+@@ -23,7 +23,7 @@ LOCAL_SRC_FILES:=                                      \
+                   oem_iptables_hook.cpp                \
+                   UidMarkMap.cpp                       \
+                   main.cpp                             \
+-                  RouteController.cpp
++
+ 
+ LOCAL_MODULE:= netd
+ 
+@@ -54,13 +54,6 @@ ifneq ($(BOARD_HOSTAPD_DRIVER),)
+   endif
+ endif
+ 
+-ifeq ($(BOARD_HAS_QCOM_WLAN_SDK), true)
+-  LOCAL_SRC_FILES += QsoftapCmd.cpp
+-  LOCAL_CFLAGS += -DQSAP_WLAN
+-  LOCAL_SHARED_LIBRARIES += libqsap_sdk
+-  LOCAL_C_INCLUDES += $(LOCAL_PATH)/../qcom/softap/sdk/
+-endif
+-
+ include $(BUILD_EXECUTABLE)
+ 
+ include $(CLEAR_VARS)
+diff --git a/system/netd/CommandListener.cpp b/system/netd/CommandListener.cpp
+index 52024de..d6a284f 100644
+--- a/system/netd/CommandListener.cpp
++++ b/system/netd/CommandListener.cpp
+@@ -1,9 +1,5 @@
+ /*
+  * Copyright (C) 2008 The Android Open Source Project
+- * Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+- *
+- * Not a Contribution. Apache license notifications and license are
+- * retained for attribution purposes only.
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+@@ -28,7 +24,6 @@
+ #include <dirent.h>
+ #include <errno.h>
+ #include <string.h>
+-#include <ctype.h>
+ #include <linux/if.h>
+ 
+ #define LOG_TAG "CommandListener"
+@@ -46,14 +41,6 @@
+ #include "NetdConstants.h"
+ #include "FirewallController.h"
+ 
+-#ifndef INET_ADDRSTRLEN
+-#define INET_ADDRSTRLEN 16
+-#endif
+-
+-#ifdef QSAP_WLAN
+-#include "qsap_api.h"
+-#endif
+-
+ TetherController *CommandListener::sTetherCtrl = NULL;
+ NatController *CommandListener::sNatCtrl = NULL;
+ PppController *CommandListener::sPppCtrl = NULL;
+@@ -65,7 +52,6 @@ ResolverController *CommandListener::sResolverCtrl = NULL;
+ SecondaryTableController *CommandListener::sSecondaryTableCtrl = NULL;
+ FirewallController *CommandListener::sFirewallCtrl = NULL;
+ ClatdController *CommandListener::sClatdCtrl = NULL;
+-RouteController *CommandListener::sRouteCtrl = NULL;
+ 
+ /**
+  * List of module chains to be created, along with explicit ordering. ORDERING
+@@ -143,48 +129,6 @@ static void createChildChains(IptablesTarget target, const char* table, const ch
+     } while (*(++childChain) != NULL);
+ }
+ 
+-/**
+- * Check if string is a valid interface name.
+- * Utilize if_nametoindex, on success it returns ifindex, and on error 0.
+- */
+-static bool isValidIface(const char* iface) {
+-    return (0 != if_nametoindex(iface));
+-}
+-
+-/**
+- * Check if string is a valid IPv4 or IPv6 address
+- * Utilize inet_pton, on success it returns 1, and on error it returns 0 or -1.
+- * Error -1 means af is not a valid address family, but since v4/v6 is used, this is not applicable.
+- * Error 0 means string is not a valid address, and only this is applicable.
+- */
+-static bool isValidIp(const char* str, const char* af) {
+-    int ret;
+-    unsigned char c;
+-    if (!strcmp(af, "v4")) {
+-        struct in_addr addr;
+-        ret = inet_pton(AF_INET, str, &addr);
+-    }
+-    else if (!strcmp(af, "v6")) {
+-        struct in6_addr addr6;
+-        ret = inet_pton(AF_INET6, str, &addr6);
+-    }
+-    if ( ret == 1 )
+-    {
+-        /* There is limitation on inet_pton which on success case it allows trailing
+-           character of '\0' or space. The '\0' is ensured not to be accepted by the caller,
+-           but the spacing should be caught here.
+-         */
+-         c = *str;
+-         while (c)
+-         {
+-             if ( isspace(c) ) return false;
+-             c = *++str;
+-         }
+-         return true;
+-    }
+-    return false;
+-}
+-
+ CommandListener::CommandListener(UidMarkMap *map) :
+                  FrameworkListener("netd", true) {
+     registerCmd(new InterfaceCmd());
+@@ -193,17 +137,12 @@ CommandListener::CommandListener(UidMarkMap *map) :
+     registerCmd(new NatCmd());
+     registerCmd(new ListTtysCmd());
+     registerCmd(new PppdCmd());
+-#ifdef QSAP_WLAN
+-    registerCmd(new QsoftapCmd());
+-#else /* QSAP_WLAN */
+     registerCmd(new SoftapCmd());
+-#endif /* QSAP_WLAN */
+     registerCmd(new BandwidthControlCmd());
+     registerCmd(new IdletimerControlCmd());
+     registerCmd(new ResolverCmd());
+     registerCmd(new FirewallCmd());
+     registerCmd(new ClatdCmd());
+-    registerCmd(new RouteCmd());
+ 
+     if (!sSecondaryTableCtrl)
+         sSecondaryTableCtrl = new SecondaryTableController(map);
+@@ -227,8 +166,6 @@ CommandListener::CommandListener(UidMarkMap *map) :
+         sInterfaceCtrl = new InterfaceController();
+     if (!sClatdCtrl)
+         sClatdCtrl = new ClatdController();
+-    if (!sRouteCtrl)
+-        sRouteCtrl = new RouteController();
+ 
+     /*
+      * This is the only time we touch top-level chains in iptables; controllers
+@@ -767,8 +704,6 @@ int CommandListener::TetherCmd::runCommand(SocketClient *cli,
+                                                       int argc, char **argv) {
+     int rc = 0;
+ 
+-    ALOGD("TetherCmd::runCommand. argc: %d. argv[0]: %s", argc, argv[0]);
+-
+     if (argc < 2) {
+         cli->sendMsg(ResponseCode::CommandSyntaxError, "Missing argument", false);
+         return 0;
+@@ -809,14 +744,9 @@ int CommandListener::TetherCmd::runCommand(SocketClient *cli,
+         }
+ 
+         if (!strcmp(argv[1], "start")) {
+-            int lease_time = 0;
+             if (argc % 2 == 1) {
+-                if (!(lease_time = atoi(argv[argc-1]))) {
+-                    cli->sendMsg(ResponseCode::CommandParameterError, "Invalid lease time",
+-                        false);
+-                    return 0;
+-                }
+-                argc--;
++                cli->sendMsg(ResponseCode::CommandSyntaxError, "Bad number of arguments", false);
++                return 0;
+             }
+ 
+             int num_addrs = argc - 2;
+@@ -830,28 +760,14 @@ int CommandListener::TetherCmd::runCommand(SocketClient *cli,
+                     return 0;
+                 }
+             }
+-            if (lease_time)
+-                rc = sTetherCtrl->startTethering(num_addrs, addrs, lease_time);
+-            else
+-                rc = sTetherCtrl->startTethering(num_addrs, addrs);
++            rc = sTetherCtrl->startTethering(num_addrs, addrs);
+             free(addrs);
+         } else if (!strcmp(argv[1], "interface")) {
+             if (!strcmp(argv[2], "add")) {
+                 rc = sTetherCtrl->tetherInterface(argv[3]);
+             } else if (!strcmp(argv[2], "remove")) {
+                 rc = sTetherCtrl->untetherInterface(argv[3]);
+-            } else if (!strcmp(argv[2], "list")) {
+-                InterfaceCollection *ilist = sTetherCtrl->getTetheredInterfaceList();
+-                InterfaceCollection::iterator it;
+-
+-                for (it = ilist->begin(); it != ilist->end(); ++it) {
+-                    cli->sendMsg(ResponseCode::TetherInterfaceListResult, *it, false);
+-                }
+-            } else if (!strcmp(argv[2], "add_upstream")) {
+-                ALOGD("command %s %s %s %s", argv[0], argv[1], argv[2], argv[3]);
+-                rc = sTetherCtrl->addUpstreamInterface(argv[3]);
+-            } else if (!strcmp(argv[2], "remove_upstream")) {
+-                rc = sTetherCtrl->removeUpstreamInterface(argv[3]);
++            /* else if (!strcmp(argv[2], "list")) handled above */
+             } else {
+                 cli->sendMsg(ResponseCode::CommandParameterError,
+                              "Unknown tether interface operation", false);
+@@ -881,78 +797,6 @@ int CommandListener::TetherCmd::runCommand(SocketClient *cli,
+     return 0;
+ }
+ 
+-
+-
+-CommandListener::V6RtrAdvCmd::V6RtrAdvCmd() :
+-                 NetdCommand("v6rtradv") {
+-}
+-
+-int CommandListener::V6RtrAdvCmd::runCommand(SocketClient *cli,
+-                                                      int argc, char **argv) {
+-    int rc = 0;
+-
+-    if (argc < 2) {
+-        cli->sendMsg(ResponseCode::CommandSyntaxError, "Missing argument", false);
+-        return 0;
+-    }
+-
+-    if (!strcmp(argv[1], "stop")) {
+-        rc = sTetherCtrl->stopV6RtrAdv();
+-    } else if (!strcmp(argv[1], "status")) {
+-        char *tmp = NULL;
+-
+-        asprintf(&tmp, "IPv6 Router Advertisement service %s",
+-                 (sTetherCtrl->isV6RtrAdvStarted() ? "started" : "stopped"));
+-        cli->sendMsg(ResponseCode::V6RtrAdvResult, tmp, false);
+-        free(tmp);
+-        return 0;
+-    } else {
+-        /*
+-         * These commands take a minimum of 4 arguments
+-         */
+-        if (argc < 4) {
+-            cli->sendMsg(ResponseCode::CommandSyntaxError, "Missing argument", false);
+-            return 0;
+-        }
+-
+-        if (!strcmp(argv[1], "start")) {
+-
+-            int num_ifaces = argc - 2;
+-            int arg_index = 2;
+-            rc = sTetherCtrl->startV6RtrAdv(num_ifaces, &argv[arg_index]);
+-        } else if (!strcmp(argv[1], "interface")) {
+-            if (!strcmp(argv[2], "add")) {
+-                rc = sTetherCtrl->tetherInterface(argv[3]);
+-            } else if (!strcmp(argv[2], "remove")) {
+-                rc = sTetherCtrl->untetherInterface(argv[3]);
+-            } else if (!strcmp(argv[2], "list")) {
+-                InterfaceCollection *ilist = sTetherCtrl->getTetheredInterfaceList();
+-                InterfaceCollection::iterator it;
+-
+-                for (it = ilist->begin(); it != ilist->end(); ++it) {
+-                    cli->sendMsg(ResponseCode::TetherInterfaceListResult, *it, false);
+-                }
+-            } else {
+-                cli->sendMsg(ResponseCode::CommandParameterError,
+-                             "Unknown tether interface operation", false);
+-                return 0;
+-            }
+-        } else {
+-            cli->sendMsg(ResponseCode::CommandSyntaxError, "Unknown v6rtradv cmd", false);
+-            return 0;
+-        }
+-    }
+-
+-    if (!rc) {
+-        cli->sendMsg(ResponseCode::CommandOkay, "V6RtrAdv operation succeeded", false);
+-    } else {
+-        cli->sendMsg(ResponseCode::OperationFailed, "V6RtrAdv operation failed", true);
+-    }
+-
+-    return 0;
+-}
+-
+-
+ CommandListener::NatCmd::NatCmd() :
+                  NetdCommand("nat") {
+ }
+@@ -1735,311 +1579,3 @@ int CommandListener::ClatdCmd::runCommand(SocketClient *cli, int argc,
+ 
+     return 0;
+ }
+-
+-CommandListener::RouteCmd::RouteCmd() :
+-                 NetdCommand("route") {
+-}
+-
+-int CommandListener::RouteCmd::runCommand(SocketClient *cli, int argc, char **argv) {
+-    if (argc < 5) {
+-        cli->sendMsg(ResponseCode::CommandSyntaxError,
+-                    "Missing argument", false);
+-        return 0;
+-    }
+-
+-    const char *ipVer = NULL;
+-    int domain;
+-
+-    if (!strcmp(argv[3], "v4")) {
+-        ipVer = "-4";
+-        domain = AF_INET;
+-    } else if (!strcmp(argv[3], "v6")) {
+-        ipVer = "-6";
+-        domain = AF_INET6;
+-    } else {
+-        cli->sendMsg(ResponseCode::CommandSyntaxError,
+-                     "Supported family v4|v6",false);
+-        return 0;
+-    }
+-
+-    if (!strcmp(argv[2], "src")) {
+-        /* source based routing */
+-        if (!strcmp(argv[1], "replace")) {
+-            if (argc != 7 && argc != 8) {
+-                cli->sendMsg(ResponseCode::CommandSyntaxError,
+-                   "Usage: route replace src inet_family <interface>"
+-                   " <ipaddr> <routeId> [<gateway>]", false);
+-                return 0;
+-            }
+-
+-            char* end;
+-            long int rid =  strtol(argv[6], &end, 10);
+-            if (*end != '\0')
+-            {
+-                cli->sendMsg(ResponseCode::CommandParameterError,
+-                                "RouteID: invalid numerical value", false);
+-                return 0;
+-            }
+-            if ((rid < 1) || (rid > 252)) {
+-                cli->sendMsg(ResponseCode::CommandParameterError,
+-                                "0 < RouteID < 253", false);
+-                return 0;
+-            }
+-
+-            struct in_addr addr;
+-            int prefix_length;
+-            unsigned flags = 0;
+-
+-            ifc_init();
+-            ifc_get_info(argv[4], &addr.s_addr, &prefix_length, &flags);
+-            ifc_close();
+-
+-            char *iface = argv[4],
+-                 *srcPrefix = argv[5],
+-                 *routeId = argv[6],
+-                 *network = NULL,
+-                 *gateway = NULL;
+-
+-            if (false == isValidIface(iface)) {
+-                cli->sendMsg(ResponseCode::CommandParameterError,
+-                                "invalid interface", false);
+-                return 0;
+-            }
+-
+-            if (false == isValidIp(srcPrefix, argv[3]) ) {
+-                cli->sendMsg(ResponseCode::CommandParameterError,
+-                                "invalid IP address", false);
+-                return 0;
+-            }
+-
+-            if (argc > 7) {
+-                gateway = argv[7];
+-                if (false == isValidIp(gateway, argv[3]) ) {
+-                    cli->sendMsg(ResponseCode::CommandParameterError,
+-                            "invalid gateway", false);
+-                    return 0;
+-                }
+-            }
+-
+-            // compute the network block in CIDR notation (for IPv4 only)
+-            if (domain == AF_INET) {
+-                struct in_addr net;
+-                in_addr_t mask = prefixLengthToIpv4Netmask(prefix_length);
+-                net.s_addr = (addr.s_addr & mask);
+-
+-
+-                char net_s[INET_ADDRSTRLEN];
+-                inet_ntop(AF_INET, &(net.s_addr), net_s, INET_ADDRSTRLEN);
+-                asprintf(&network, "%s/%d", net_s, prefix_length);
+-            }
+-
+-            std::string res = sRouteCtrl->repSrcRoute( iface,
+-                                                       srcPrefix,
+-                                                       gateway,
+-                                                       routeId,
+-                                                       ipVer);
+-            if (!res.empty()) {
+-                cli->sendMsg(ResponseCode::OperationFailed, res.c_str(), false);
+-            } else {
+-                if (network != NULL) {
+-                     //gateway is null for link local route, metric is 0
+-                    res = sRouteCtrl->addDstRoute(iface,
+-                                network, NULL, 0, routeId);
+-                    if (res.empty()) {
+-                        res = "source route replace & local subnet "
+-                              "route add succeeded for rid: ";
+-                        res += routeId;
+-                    }
+-                    cli->sendMsg(ResponseCode::CommandOkay, res.c_str(), false);
+-                } else {
+-                    res = "source route replace succeeded for rid:";
+-                    res += routeId;
+-                    cli->sendMsg(ResponseCode::CommandOkay, res.c_str(), false);
+-                }
+-            }
+-            free(network);
+-        } else if (!strcmp(argv[1], "del")) {
+-            if (argc != 5) {
+-                cli->sendMsg(ResponseCode::CommandSyntaxError,
+-                            "Usage: route del src v[4|6] <routeId>", false);
+-                return 0;
+-            }
+-
+-            char* end;
+-            long int rid =  strtol(argv[4], &end, 10);
+-            if (*end != '\0')
+-            {
+-                cli->sendMsg(ResponseCode::CommandParameterError,
+-                        "RouteID: invalid numerical value", false);
+-                return 0;
+-            }
+-            if ((rid < 1) || (rid > 252)) {
+-                cli->sendMsg(ResponseCode::CommandParameterError,
+-                            "RouteID: between 0 and 253", false);
+-                return 0;
+-            }
+-
+-            std::string res = sRouteCtrl->delSrcRoute(argv[4], ipVer);
+-            if (!res.empty()) {
+-                cli->sendMsg(ResponseCode::OperationFailed, res.c_str(), false);
+-            } else {
+-                res = "source route delete succeeded for rid:";
+-                res += argv[4];
+-                cli->sendMsg(ResponseCode::CommandOkay, res.c_str(), false);
+-            }
+-        } else {
+-            cli->sendMsg(ResponseCode::CommandSyntaxError,
+-                        "permitted operation for src routes: <replace|del>",
+-                        false);
+-        }
+-    } else if (!strcmp(argv[2], "def")) {
+-        /* default route configuration */
+-        if (!strcmp(argv[1], "replace")) {
+-            if ((argc != 5) && (argc != 6)) {
+-                cli->sendMsg(ResponseCode::CommandSyntaxError,
+-                        "Usage: route replace def v[4|6]"
+-                        " <interface> [<gateway>]", false);
+-                return 0;
+-            }
+-
+-            char *iface = argv[4],
+-                 *gateway = NULL;
+-
+-            if (false == isValidIface(iface)) {
+-                cli->sendMsg(ResponseCode::CommandParameterError,
+-                                "invalid interface", false);
+-                return 0;
+-            }
+-
+-            if (argc > 5) {
+-                gateway = argv[5];
+-                if (false == isValidIp(gateway, argv[3]) ) {
+-                    cli->sendMsg(ResponseCode::CommandParameterError,
+-                            "invalid gateway", false);
+-                    return 0;
+-                }
+-            }
+-
+-            std::string res =
+-                sRouteCtrl->replaceDefRoute(iface, gateway, ipVer);
+-            if (!res.empty()) {
+-                cli->sendMsg(ResponseCode::OperationFailed, res.c_str(), false);
+-            } else {
+-                cli->sendMsg(ResponseCode::CommandOkay,
+-                            "default route replace succeeded", false);
+-            }
+-        } else if (!strcmp(argv[1], "add")) {
+-            if ((argc !=6) && (argc != 7)) {
+-                cli->sendMsg(ResponseCode::CommandSyntaxError,
+-                        "Usage: route add def v[4|6]"
+-                        " <interface> <metric> [<gateway>]", false);
+-                return 0;
+-            }
+-
+-            char *iface = argv[4],
+-                 *gateway = NULL;
+-            int metric = atoi(argv[5]);
+-
+-            if (false == isValidIface(iface)) {
+-                cli->sendMsg(ResponseCode::CommandParameterError,
+-                                "invalid interface", false);
+-                return 0;
+-            }
+-
+-            if (argc > 6) {
+-                gateway = argv[6];
+-                if (false == isValidIp(gateway, argv[3]) ) {
+-                    cli->sendMsg(ResponseCode::CommandParameterError,
+-                            "invalid gateway", false);
+-                    return 0;
+-                }
+-            }
+-
+-            std::string res =
+-                sRouteCtrl->addDefRoute(iface, gateway, ipVer, metric);
+-            if (!res.empty()) {
+-                cli->sendMsg(ResponseCode::OperationFailed, res.c_str(), false);
+-            } else {
+-                cli->sendMsg(ResponseCode::CommandOkay,
+-                            "default route add with metric succeeded", false);
+-            }
+-        } else {
+-            cli->sendMsg(ResponseCode::CommandSyntaxError,
+-                         "Permitted action for def routes <replace|add>",
+-                         false);
+-        }
+-    } else if (!strcmp(argv[2], "dst")) {
+-        /* destination based route configuration */
+-        if (!strcmp(argv[1], "add")) {
+-            if (argc != 7 && argc != 8) {
+-                cli->sendMsg(ResponseCode::CommandSyntaxError,
+-                   "Usage: route add dst v[4|6]"
+-                   " <interface> <metric> <dstIpAddr> [<gateway>]", false);
+-                return 0;
+-            }
+-
+-            char *iface = argv[4],
+-                 *dstPrefix = argv[6],
+-                 *gateway = NULL;
+-            int metric = atoi(argv[5]);
+-
+-            if (false == isValidIface(iface)) {
+-                cli->sendMsg(ResponseCode::CommandParameterError,
+-                                "invalid interface", false);
+-                return 0;
+-            }
+-
+-            if (false == isValidIp(dstPrefix, argv[3]) ) {
+-                cli->sendMsg(ResponseCode::CommandParameterError,
+-                                "invalid IP address", false);
+-                return 0;
+-            }
+-
+-            if (argc > 7) {
+-                gateway = argv[7];
+-                if (false == isValidIp(gateway, argv[3]) ) {
+-                    cli->sendMsg(ResponseCode::CommandParameterError,
+-                            "invalid gateway", false);
+-                    return 0;
+-                }
+-            }
+-
+-            std::string res =
+-                sRouteCtrl->addDstRoute(iface, dstPrefix, gateway, metric);
+-            if (!res.empty()) {
+-                cli->sendMsg(ResponseCode::OperationFailed, res.c_str(), false);
+-            } else {
+-                cli->sendMsg(ResponseCode::CommandOkay,
+-                            "destination route add succeeded", false);
+-            }
+-        } else if (!strcmp(argv[1], "del")) {
+-            if (argc != 5) {
+-                cli->sendMsg(ResponseCode::CommandSyntaxError,
+-                             "Usage: route del dst v[4|6] <ipaddr>", false);
+-                return 0;
+-            }
+-
+-            if (false == isValidIp(argv[4], argv[3]) ) {
+-                cli->sendMsg(ResponseCode::CommandParameterError,
+-                                "invalid IP address", false);
+-                return 0;
+-            }
+-
+-            std::string res = sRouteCtrl->delDstRoute(argv[4]);
+-            if (!res.empty()){
+-                cli->sendMsg(ResponseCode::OperationFailed, res.c_str(), false);
+-            } else {
+-                cli->sendMsg(ResponseCode::CommandOkay,
+-                            "destination route delete succeeded", false);
+-            }
+-        } else {
+-            cli->sendMsg(ResponseCode::CommandSyntaxError,
+-                         "permitted operation for dst routes: <add|del>",
+-                         false);
+-        }
+-    } else {
+-        cli->sendMsg(ResponseCode::CommandParameterError,
+-                     "allowed route types: <src|dst|def>", false);
+-    }
+-    return 0;
+-}
+diff --git a/system/netd/CommandListener.h b/system/netd/CommandListener.h
+index c65fb31..23b8dd1 100644
+--- a/system/netd/CommandListener.h
++++ b/system/netd/CommandListener.h
+@@ -1,9 +1,6 @@
+ /*
+  * Copyright (C) 2008 The Android Open Source Project
+- * Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+  *
+- * Not a Contribution. Apache license notifications and license are
+- * retained for attribution purposes only.
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+@@ -35,7 +32,6 @@
+ #include "FirewallController.h"
+ #include "ClatdController.h"
+ #include "UidMarkMap.h"
+-#include "RouteController.h"
+ 
+ class CommandListener : public FrameworkListener {
+     static TetherController *sTetherCtrl;
+@@ -49,7 +45,6 @@ class CommandListener : public FrameworkListener {
+     static SecondaryTableController *sSecondaryTableCtrl;
+     static FirewallController *sFirewallCtrl;
+     static ClatdController *sClatdCtrl;
+-    static RouteController *sRouteCtrl;
+ 
+ public:
+     CommandListener(UidMarkMap *map);
+@@ -64,15 +59,6 @@ private:
+         int runCommand(SocketClient *c, int argc, char ** argv);
+     };
+ 
+-#ifdef QSAP_WLAN
+-    class QsoftapCmd : public SoftapCmd {
+-    public:
+-        QsoftapCmd();
+-        virtual ~QsoftapCmd() {}
+-        int runCommand(SocketClient *c, int argc, char ** argv);
+-    };
+-#endif
+-
+     class InterfaceCmd : public NetdCommand {
+     public:
+         InterfaceCmd();
+@@ -94,14 +80,6 @@ private:
+         int runCommand(SocketClient *c, int argc, char ** argv);
+     };
+ 
+-    class V6RtrAdvCmd: public NetdCommand {
+-    public:
+-        V6RtrAdvCmd();
+-        virtual ~V6RtrAdvCmd() {}
+-        int runCommand(SocketClient *c, int argc, char ** argv);
+-    };
+-
+-
+     class NatCmd : public NetdCommand {
+     public:
+         NatCmd();
+@@ -164,13 +142,6 @@ private:
+         virtual ~ClatdCmd() {}
+         int runCommand(SocketClient *c, int argc, char ** argv);
+     };
+-
+-    class RouteCmd : public NetdCommand {
+-    public:
+-        RouteCmd();
+-        virtual ~RouteCmd() {}
+-        int runCommand(SocketClient *c, int argc, char ** argv);
+-    };
+ };
+ 
+ #endif
+diff --git a/system/netd/NatController.cpp b/system/netd/NatController.cpp
+index 563ffa8..b2a0e64 100644
+--- a/system/netd/NatController.cpp
++++ b/system/netd/NatController.cpp
+@@ -112,6 +112,12 @@ int NatController::setDefaults() {
+         {{IPTABLES_PATH, "-F", LOCAL_FORWARD,}, 1},
+         {{IPTABLES_PATH, "-A", LOCAL_FORWARD, "-j", "DROP"}, 1},
+         {{IPTABLES_PATH, "-t", "nat", "-F", LOCAL_NAT_POSTROUTING}, 1},
++        {{IP_PATH, "rule", "flush"}, 0},
++        {{IP_PATH, "-6", "rule", "flush"}, 0},
++        {{IP_PATH, "rule", "add", "from", "all", "lookup", "default", "prio", "32767"}, 0},
++        {{IP_PATH, "rule", "add", "from", "all", "lookup", "main", "prio", "32766"}, 0},
++        {{IP_PATH, "-6", "rule", "add", "from", "all", "lookup", "default", "prio", "32767"}, 0},
++        {{IP_PATH, "-6", "rule", "add", "from", "all", "lookup", "main", "prio", "32766"}, 0},
+         {{IP_PATH, "route", "flush", "cache"}, 0},
+     };
+     for (unsigned int cmdNum = 0; cmdNum < ARRAY_SIZE(defaultCommands); cmdNum++) {
+diff --git a/system/netd/NetdConstants.cpp b/system/netd/NetdConstants.cpp
+index 233e673..c3c16eb 100644
+--- a/system/netd/NetdConstants.cpp
++++ b/system/netd/NetdConstants.cpp
+@@ -31,7 +31,6 @@ const char * const IP6TABLES_PATH = "/system/bin/ip6tables";
+ const char * const TC_PATH = "/system/bin/tc";
+ const char * const IP_PATH = "/system/bin/ip";
+ const char * const ADD = "add";
+-const char * const APPEND = "append";
+ const char * const DEL = "del";
+ 
+ static void logExecError(const char* argv[], int res, int status) {
+diff --git a/system/netd/NetdConstants.h b/system/netd/NetdConstants.h
+index 3d5ac4d..2508ea2 100644
+--- a/system/netd/NetdConstants.h
++++ b/system/netd/NetdConstants.h
+@@ -29,7 +29,6 @@ extern const char * const IP_PATH;
+ extern const char * const TC_PATH;
+ extern const char * const OEM_SCRIPT_PATH;
+ extern const char * const ADD;
+-extern const char * const APPEND;
+ extern const char * const DEL;
+ 
+ enum IptablesTarget { V4, V6, V4V6 };
+diff --git a/system/netd/QsoftapCmd.cpp b/system/netd/QsoftapCmd.cpp
+deleted file mode 100644
+index 97101db..0000000
+--- a/system/netd/QsoftapCmd.cpp
++++ /dev/null
+@@ -1,168 +0,0 @@
+-/*
+- * Copyright (c) 2013, The Linux Foundation. All rights reserved.
+- * Not a Contribution.
+- *
+- * Copyright (C) 2008 The Android Open Source Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-
+-#include <stdlib.h>
+-#include <string.h>
+-
+-#define LOG_TAG "QsoftapCmd"
+-#include <cutils/log.h>
+-
+-#include "CommandListener.h"
+-#include "ResponseCode.h"
+-
+-#include "qsap_api.h"
+-
+-#include <cutils/properties.h>
+-static char ath6kl_supported[PROPERTY_VALUE_MAX];
+-
+-CommandListener::QsoftapCmd::QsoftapCmd() :
+-  SoftapCmd::SoftapCmd() {
+-}
+-
+-int CommandListener::QsoftapCmd::runCommand(SocketClient *cli,
+-                                        int argc, char **argv) {
+-    int rc = 0, flag = 0;
+-    char *retbuf = NULL;
+-
+-    if (argc < 2) {
+-        cli->sendMsg(ResponseCode::CommandSyntaxError, "Softap Missing argument", false);
+-        return 0;
+-    }
+-
+-    if (!strcmp(argv[1], "qccmd")) {
+-#define MAX_CMD_SIZE 256
+-        char qcCmdBuf[MAX_CMD_SIZE], *pCmdBuf;
+-        int len = MAX_CMD_SIZE, i = 2, ret;
+-
+-        if ( argc < 4 ) {
+-            cli->sendMsg(ResponseCode::OperationFailed, "failure: invalid arguments", true);
+-            return 0;
+-        }
+-
+-        argc -= 2;
+-        pCmdBuf = qcCmdBuf;
+-#ifdef QSAP_STA_CONCURRENCY
+-        //SAP STA Concurrency Customization
+-        // Cmd Format Example "set sap_sta_concurrency=6" where 6 is STA Mode channel
+-        if (!strncmp(argv[3], "sap_sta_concurrency=",20) && !strcmp(argv[2], "set")) {
+-            //Extract STA Mode channel number from cmd
+-            int sta_channel = atoi(&argv[3][20]);
+-            int sap_channel;
+-            //Get SAP Mode channel from SoftAP SDK
+-            ret = snprintf(pCmdBuf, len, " get channel");
+-            len = MAX_CMD_SIZE;
+-            //Send cmd to SoftAP SDK
+-            qsap_hostd_exec_cmd(qcCmdBuf, qcCmdBuf, (u32*)&len);
+-            cli->sendMsg(qcCmdBuf);
+-
+-            sap_channel = atoi(&qcCmdBuf[16]);
+-            ALOGD("SAP STA Concurrency GET CHANNEL Rsp %s STA Channel %d SAP Channel %d",qcCmdBuf,sta_channel,sap_channel);
+-
+-            //StopSoftAP and exitAP if channels are different
+-            if(sta_channel != sap_channel) {
+-                rc = sSoftapCtrl->stopSoftap();
+-                if (!rc) {
+-                    cli->sendMsg(ResponseCode::CommandOkay, "Softap operation succeeded", false);
+-                } else {
+-                    cli->sendMsg(ResponseCode::OperationFailed, "Softap operation failed", true);
+-                }
+-                //Send exitAP cmd to SoftAP SDK
+-                len = MAX_CMD_SIZE;
+-                ret = snprintf(pCmdBuf, len, " set reset_ap=5");
+-                qsap_hostd_exec_cmd(qcCmdBuf, qcCmdBuf, (u32*)&len);
+-                cli->sendMsg(qcCmdBuf);
+-                ALOGD("SAP STA Concurrency result for exitAP %s",qcCmdBuf);
+-            }
+-
+-            return 0;
+-        }
+-        // Cmd Format Example "set sta_assoc_complete_ind"
+-        else if (!strcmp(argv[3], "sta_assoc_complete_ind") && !strcmp(argv[2], "set")) {
+-            //StartSoftAP and initAP if SoftAP is down
+-            if(!sSoftapCtrl->isSoftapStarted()) {
+-                //Send initAP cmd to SoftAP SDK
+-                len = MAX_CMD_SIZE;
+-                ret = snprintf(pCmdBuf, len, " set reset_ap=4");
+-                //Send cmd to SoftAP SDK
+-                qsap_hostd_exec_cmd(qcCmdBuf, qcCmdBuf, (u32*)&len);
+-                cli->sendMsg(qcCmdBuf);
+-                ALOGD("SAP STA Concurrency result for initAP %s",qcCmdBuf);
+-
+-                rc = sSoftapCtrl->startSoftap();
+-                if (!rc) {
+-                    cli->sendMsg(ResponseCode::CommandOkay, "Softap operation succeeded", false);
+-                } else {
+-                    cli->sendMsg(ResponseCode::OperationFailed, "Softap operation failed", true);
+-                }
+-            }
+-            return 0;
+-        } //SAP STA Concurrency Customization Ends
+-        else
+-#endif //QSAP_STA_CONCURRENCY
+-        {
+-
+-            while (argc--) {
+-                ret = snprintf(pCmdBuf, len, " %s", argv[i]);
+-                if ((ret < 0) || (ret >= len)) {
+-                    /* Error case */
+-                    /* TODO: Command too long send the error message */
+-                    *pCmdBuf = '\0';
+-                    break;
+-                }
+-                pCmdBuf += ret;
+-                len -= ret;
+-                i++;
+-            }
+-
+-            len = MAX_CMD_SIZE;
+-            qsap_hostd_exec_cmd(qcCmdBuf, qcCmdBuf, (u32*)&len);
+-            cli->sendMsg(ResponseCode::CommandOkay, qcCmdBuf, false);
+-            return 0;
+-        }
+-    } else if (!strcmp(argv[1], "set")) {
+-        /* When the WLAN is AR6004, use the Android native
+-           SoftapController command. */
+-        property_get("wlan.driver.ath", ath6kl_supported, 0);
+-        if (*ath6kl_supported == '2') {
+-            return SoftapCmd::runCommand(cli, argc, argv);
+-        }
+-
+-        /* override processing of the "softap set" command.  The
+-           default class will install a hostapd.conf which contains
+-           just the settings supported by the Android framework, and
+-           will do this every time Soft AP is enabled.  This will
+-           destroy the hostapd.conf used to store the settings used by
+-           the QSoftAP SDK */
+-        ALOGD("Got softap set command we are overriding");
+-        rc = qsapsetSoftap(argc, argv);
+-    } else {
+-        /* all other commands will be handed off to the native handler */
+-        ALOGD("Got softap %s command we are passing on", argv[1]);
+-        return SoftapCmd::runCommand(cli, argc, argv);
+-    }
+-
+-    if (!rc) {
+-        cli->sendMsg(ResponseCode::CommandOkay, "Softap operation succeeded", false);
+-    } else {
+-        cli->sendMsg(ResponseCode::OperationFailed, "Softap operation failed", true);
+-    }
+-
+-    return 0;
+-}
+diff --git a/system/netd/ResponseCode.h b/system/netd/ResponseCode.h
+index 1277117..46b842d 100644
+--- a/system/netd/ResponseCode.h
++++ b/system/netd/ResponseCode.h
+@@ -1,11 +1,6 @@
+ /*
+  * Copyright (C) 2008 The Android Open Source Project
+  *
+- * Copyright (c) 2013, The Linux Foundation. All rights reserved.
+- *
+- * Not a Contribution. Apache license notifications and license
+- * are retained for attribution purposes only.
+- *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+@@ -52,8 +47,6 @@ public:
+     static const int ClatdStatusResult         = 223;
+     static const int InterfaceGetMtuResult     = 224;
+     static const int GetMarkResult             = 225;
+-    static const int V6RtrAdvResult            = 226;
+-    static const int RouteConfigurationResult  = 227;
+ 
+     // 400 series - The command was accepted but the requested action
+     // did not take place.
+diff --git a/system/netd/RouteController.cpp b/system/netd/RouteController.cpp
+deleted file mode 100644
+index 255ca11..0000000
+--- a/system/netd/RouteController.cpp
++++ /dev/null
+@@ -1,303 +0,0 @@
+-/* Copyright (c) 2010-2014, The Linux Foundation. All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are
+- * met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above
+- *       copyright notice, this list of conditions and the following
+- *       disclaimer in the documentation and/or other materials provided
+- *       with the distribution.
+- *     * Neither the name of The Linux Foundation nor the names of its
+- *       contributors may be used to endorse or promote products derived
+- *       from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+- * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+- * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+- * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- */
+-
+-#define LOG_NDEBUG 0
+-#define LOG_NDDEBUG 0
+-#define LOG_NIDEBUG 0
+-
+-#include <stdlib.h>
+-#include <errno.h>
+-#include <fcntl.h>
+-
+-#include <sys/types.h>
+-
+-#include <cutils/log.h>
+-#include "RouteController.h"
+-
+-const char *TAG = "RouteController";
+-static char IP_PATH[] = "/system/bin/ip";
+-const char *RouteController::MAIN_TABLE = "254";
+-const char *RouteController::SOURCE_POLICY_RULE_PRIO = "150";
+-const int MAXSIZE = 256;
+-
+-
+-RouteController::RouteController() {
+-}
+-
+-RouteController::~RouteController() {
+-}
+-
+-std::string RouteController::_runIpCmd(const char * cmd) {
+-    FILE *fp = NULL;
+-    char line[MAXSIZE];
+-    std::string res, buffer;
+-
+-    if (strlen(cmd) > 255) {
+-        return std::string(strerror(E2BIG));
+-    }
+-
+-    buffer = IP_PATH;
+-    buffer += " ";
+-    buffer += cmd;
+-    buffer += " 2>&1"; //capture stderr
+-
+-    ALOGV(TAG,"%s", buffer.c_str());
+-
+-    if ((fp = popen(buffer.c_str(),"r")) == NULL) {
+-        ALOGE(TAG, "failed to popen: %s", strerror(errno));
+-        res = (strerror(errno));
+-    } else if (fgets(line, sizeof line, fp)) {
+-        ALOGV(TAG, "%s", line);
+-        res = cmd;
+-        res += ": ";
+-        res += line;
+-    }
+-    pclose(fp);
+-
+-    return res;
+-}
+-
+-std::string RouteController::repSrcRoute
+-(
+-    const char *iface,
+-    const char *srcPrefix,
+-    const char *gateway,
+-    const char *table,
+-    const char *ipver
+-)
+-{
+-    std::string res = _repDefRoute(iface, gateway, table, ipver);
+-    if (res.empty()) {
+-        _delRule(table, ipver);
+-        res = _addRule(srcPrefix, table, ipver);
+-        if (res.empty())
+-            res = _flushCache();
+-    }
+-
+-    return res;
+-}
+-
+-std::string RouteController::delSrcRoute
+-(
+-    const char *table,
+-    const char *ipver
+-)
+-{
+-    //if iface is down then route is probably purged; ignore the error.
+-    _delDefRoute(table, ipver);
+-    std::string res = _delRule(table, ipver);
+-    if (res.empty())
+-        res = _flushCache();
+-
+-    return res;
+-}
+-
+-std::string RouteController::addDstRoute
+-(
+-    const char *iface,
+-    const char *dstPrefix,
+-    const char *gateway,
+-    const int metric,
+-    const char *table
+-)
+-{
+-    char buffer[255];
+-
+-    if (gateway) {
+-        snprintf(buffer, sizeof buffer,
+-                 "route add %s via %s dev %s table %s metric %d",
+-                 dstPrefix, gateway, iface, table, metric);
+-    } else {
+-        snprintf(buffer, sizeof buffer,
+-                 "route add %s dev %s table %s metric %d",
+-                 dstPrefix, iface, table, metric);
+-    }
+-
+-    //blindly delete an indentical route if it exists.
+-    _delHostRoute(dstPrefix, table);
+-
+-    std::string res  = _runIpCmd(buffer);
+-    if (res.empty() || (res.find("exists") != std::string::npos))
+-        res = _flushCache();
+-
+-    return res;
+-}
+-
+-std::string RouteController::delDstRoute
+-(
+-    const char *dstPrefix,
+-    const char *table
+-)
+-{
+-    std::string res = _delHostRoute(dstPrefix, table);
+-    if (res.empty())
+-        res = _flushCache();
+-
+-    return res;
+-}
+-
+-std::string RouteController::_delHostRoute
+-(
+-    const char *dstPrefix,
+-    const char *table
+-)
+-{
+-    char buffer[255];
+-    snprintf(buffer, sizeof buffer, "route del %s table %s",
+-             dstPrefix, table);
+-
+-    return _runIpCmd(buffer);
+-}
+-
+-std::string RouteController::replaceDefRoute
+-(
+-    const char *iface,
+-    const char *gateway,
+-    const char *ipver
+-)
+-{
+-    std::string res = _repDefRoute(iface, gateway, MAIN_TABLE, ipver);
+-    if (res.empty())
+-        res = _flushCache();
+-
+-    return res;
+-}
+-
+-std::string RouteController::_repDefRoute
+-(
+-    const char *iface,
+-    const char *gateway,
+-    const char *table,
+-    const char *ipver
+-)
+-{
+-    char buffer[255];
+-
+-    if (gateway) {
+-        snprintf(buffer, sizeof buffer,
+-                 "%s route replace default via %s dev %s scope global table %s",
+-                 ipver, gateway, iface, table);
+-    } else {
+-        snprintf(buffer, sizeof buffer,
+-                 "%s route replace default dev %s table %s",
+-                 ipver, iface, table);
+-    }
+-
+-    return _runIpCmd(buffer);
+-}
+-
+-std::string RouteController::_delDefRoute
+-(
+-    const char *table,
+-    const char *ipver,
+-    const char *iface
+-)
+-{
+-    char buffer[255];
+-
+-    if (iface) {
+-        snprintf(buffer, sizeof buffer,
+-                "%s route del default dev %s table %s",
+-                ipver, iface, table);
+-    } else {
+-        snprintf(buffer, sizeof buffer,
+-                "%s route del default table %s", ipver, table);
+-    }
+-
+-    return _runIpCmd(buffer);
+-}
+-
+-std::string RouteController::addDefRoute
+-(
+-    const char *iface,
+-    const char *gateway,
+-    const char *ipver,
+-    const int metric,
+-    const char *table
+-)
+-{
+-    char buffer[255];
+-
+-    //remove existing def route for an iface before adding one with new metric
+-    _delDefRoute(table, ipver, iface);
+-
+-    if (gateway) {
+-        snprintf(buffer, sizeof buffer,
+-                 "%s route add default via %s dev %s table %s metric %d",
+-                 ipver, gateway, iface, table, metric);
+-    } else {
+-        snprintf(buffer, sizeof buffer,
+-                 "%s route add default dev %s table %s metric %d",
+-                 ipver, iface, table, metric);
+-    }
+-
+-    std::string res = _runIpCmd(buffer);
+-    if (res.empty())
+-        res = _flushCache();
+-
+-    return res;
+-}
+-
+-std::string RouteController::_flushCache() {
+-    char buffer[255];
+-
+-    snprintf(buffer, sizeof buffer, "route flush cached");
+-
+-    return _runIpCmd(buffer);
+-}
+-
+-std::string RouteController::_addRule
+-(
+-    const char *address,
+-    const char *table,
+-    const char *ipver
+-)
+-{
+-    char buffer[255];
+-
+-    snprintf(buffer, sizeof buffer,
+-            "%s rule add from %s lookup %s prio %s", ipver, address, table,
+-             SOURCE_POLICY_RULE_PRIO);
+-
+-    return _runIpCmd(buffer);
+-}
+-
+-std::string RouteController::_delRule
+-(
+-    const char *table,
+-    const char *ipver
+-)
+-{
+-    char buffer[255];
+-
+-    snprintf(buffer, sizeof buffer,
+-             "%s rule del table %s", ipver, table);
+-
+-    return _runIpCmd(buffer);
+-}
+diff --git a/system/netd/RouteController.h b/system/netd/RouteController.h
+deleted file mode 100644
+index fd880f0..0000000
+--- a/system/netd/RouteController.h
++++ /dev/null
+@@ -1,121 +0,0 @@
+-/* Copyright (c) 2010-2014, The Linux Foundation. All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are
+- * met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above
+- *       copyright notice, this list of conditions and the following
+- *       disclaimer in the documentation and/or other materials provided
+- *       with the distribution.
+- *     * Neither the name of The Linux Foundation nor the names of its
+- *       contributors may be used to endorse or promote products derived
+- *       from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+- * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+- * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+- * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- */
+-
+-#ifndef _ROUTE_CONTROLLER_H
+-#define _ROUTE_CONTROLLER_H
+-
+-#include <string.h>
+-#include <string>
+-
+-class RouteController {
+-public:
+-    RouteController();
+-    virtual ~RouteController();
+-
+-    std::string repSrcRoute
+-    (
+-        const char *iface,
+-        const char *srcPrefix,
+-        const char *gateway,
+-        const char *table,
+-        const char *ipver
+-    );
+-    std::string delSrcRoute
+-    (
+-        const char *table,
+-        const char *ipver
+-    );
+-    std::string addDstRoute
+-    (
+-        const char *iface,
+-        const char *dstPrefix,
+-        const char *gateway,
+-        const int metric,
+-        const char *table = MAIN_TABLE
+-    );
+-    std::string delDstRoute
+-    (
+-        const char *dstPrefix,
+-        const char *table = MAIN_TABLE
+-    );
+-    std::string replaceDefRoute
+-    (
+-        const char *iface,
+-        const char *gateway,
+-        const char *ipver
+-    );
+-    std::string addDefRoute
+-    (
+-        const char *iface,
+-        const char *gateway,
+-        const char *ipver,
+-        const int metric,
+-        const char *table = MAIN_TABLE
+-    );
+-
+-private:
+-    const static char *MAIN_TABLE;
+-    const static char *SOURCE_POLICY_RULE_PRIO;
+-    std::string _runIpCmd
+-    (
+-        const char *cmd
+-    );
+-    std::string _flushCache();
+-    std::string _repDefRoute
+-    (
+-        const char *iface,
+-        const char *gateway,
+-        const char *table,
+-        const char *ipver
+-    );
+-    std::string _delDefRoute
+-    (
+-        const char *table,
+-        const char *ipver,
+-        const char *iface = NULL
+-    );
+-    std::string _delHostRoute
+-    (
+-        const char *dstPrefix,
+-        const char *table = MAIN_TABLE
+-    );
+-    std::string _addRule
+-    (
+-        const char *address,
+-        const char *table,
+-        const char *ipver
+-    );
+-    std::string _delRule
+-    (
+-        const char *table,
+-        const char *ipver
+-    );
+-};
+-
+-#endif
+diff --git a/system/netd/SecondaryTableController.cpp b/system/netd/SecondaryTableController.cpp
+index cb1d29c..5750b41 100644
+--- a/system/netd/SecondaryTableController.cpp
++++ b/system/netd/SecondaryTableController.cpp
+@@ -261,14 +261,6 @@ int SecondaryTableController::modifyFromRule(int tableIndex, const char *action,
+ int SecondaryTableController::modifyLocalRoute(int tableIndex, const char *action,
+         const char *iface, const char *addr) {
+     char tableIndex_str[11];
+-    char action_local[IPARGSIZ];
+-    /* append ensures that routes are successfully added for
+-    the same address but with different interface names */
+-    if ( strcmp( action, ADD ) == 0 ) {
+-      strncpy(action_local, APPEND, strlen(APPEND)+1);
+-    } else {
+-      strncpy(action_local, action, IPARGSIZ);
+-    }
+ 
+     if (verifyTableIndex(tableIndex)) {
+         return -1;
+@@ -281,7 +273,7 @@ int SecondaryTableController::modifyLocalRoute(int tableIndex, const char *actio
+     const char *cmd[] = {
+             IP_PATH,
+             "route",
+-            action_local,
++            action,
+             addr,
+             "dev",
+             iface,
+diff --git a/system/netd/SecondaryTableController.h b/system/netd/SecondaryTableController.h
+index 9dd855f..e286075 100644
+--- a/system/netd/SecondaryTableController.h
++++ b/system/netd/SecondaryTableController.h
+@@ -27,11 +27,6 @@
+ #define IFNAMSIZ 16
+ #endif
+ 
+-#ifndef IPARGSIZ
+-#define IPARGSIZ 20
+-#endif
+-
+-static const unsigned int MAX_IFACE_LENGTH = 15;
+ static const int INTERFACES_TRACKED = 10;
+ static const int BASE_TABLE_NUMBER = 60;
+ static int MAX_TABLE_NUMBER = BASE_TABLE_NUMBER + INTERFACES_TRACKED;
+diff --git a/system/netd/TetherController.cpp b/system/netd/TetherController.cpp
+index 1ade2ca..743742c 100644
+--- a/system/netd/TetherController.cpp
++++ b/system/netd/TetherController.cpp
+@@ -23,33 +23,18 @@
+ #include <sys/stat.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
+-#include <linux/capability.h>
+ 
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+ 
+ #define LOG_TAG "TetherController"
+-#define LOG_NDEBUG 0
+-#define LOG_NDDEBUG 0
+-#define LOG_NIDEBUG 0
+ #include <cutils/log.h>
+ #include <cutils/properties.h>
+ 
+ #include "TetherController.h"
+ 
+-#include <private/android_filesystem_config.h>
+-#include <unistd.h>
+-
+-#define RTRADVDAEMON "/system/bin/radish"
+-#define IP4_CFG_IP_FORWARD          "/proc/sys/net/ipv4/ip_forward"
+-#define IP6_CFG_ALL_PROXY_NDP       "/proc/sys/net/ipv6/conf/all/proxy_ndp"
+-#define IP6_CFG_ALL_FORWARDING      "/proc/sys/net/ipv6/conf/all/forwarding"
+-#define IP6_IFACE_CFG_ACCEPT_RA     "/proc/sys/net/ipv6/conf/%s/accept_ra"
+-#define PROC_PATH_SIZE              255
+-
+ TetherController::TetherController() {
+     mInterfaces = new InterfaceCollection();
+-    mUpstreamInterfaces = new InterfaceCollection();
+     mDnsForwarders = new NetAddressCollection();
+     mDaemonFd = -1;
+     mDaemonPid = 0;
+@@ -63,32 +48,9 @@ TetherController::~TetherController() {
+     }
+     mInterfaces->clear();
+ 
+-    for (it = mUpstreamInterfaces->begin(); it != mUpstreamInterfaces->end(); ++it) {
+-        free(*it);
+-    }
+-    mUpstreamInterfaces->clear();
+-
+     mDnsForwarders->clear();
+ }
+ 
+-static int config_write_setting(const char *path, const char *value)
+-{
+-    int fd = open(path, O_WRONLY);
+-
+-    ALOGD("config_write_setting(%s, %s)", path, value);
+-    if (fd < 0) {
+-        ALOGE("Failed to open %s (%s)", path, strerror(errno));
+-        return -1;
+-    }
+-    if (write(fd, value, strlen(value)) != (int)strlen(value)) {
+-        ALOGE("Failed to write to %s (%s)", path, strerror(errno));
+-        close(fd);
+-        return -1;
+-    }
+-    close(fd);
+-    return 0;
+-}
+-
+ int TetherController::setIpFwdEnabled(bool enable) {
+ 
+     ALOGD("Setting IP forward enable = %d", enable);
+@@ -112,17 +74,6 @@ int TetherController::setIpFwdEnabled(bool enable) {
+         return -1;
+     }
+     close(fd);
+-    if (config_write_setting(
+-            IP6_CFG_ALL_PROXY_NDP, enable ? "2" : "0")) {
+-        ALOGE("Failed to write proxy_ndp (%s)", strerror(errno));
+-        return -1;
+-    }
+-    if (config_write_setting(
+-            IP6_CFG_ALL_FORWARDING, enable ? "2" : "0")) {
+-        ALOGE("Failed to write ip6 forwarding (%s)", strerror(errno));
+-        return -1;
+-    }
+-
+     return 0;
+ }
+ 
+@@ -145,19 +96,13 @@ bool TetherController::getIpFwdEnabled() {
+     return (enabled  == '1' ? true : false);
+ }
+ 
+-#define TETHER_START_CONST_ARG		8
+-int TetherController::startTethering(int num_addrs, struct in_addr* addrs, int lease_time) {
++int TetherController::startTethering(int num_addrs, struct in_addr* addrs) {
+     if (mDaemonPid != 0) {
+         ALOGE("Tethering already started");
+         errno = EBUSY;
+         return -1;
+     }
+ 
+-    if (lease_time <= 0) {
+-        ALOGE("Invalid lease time %d!\n", lease_time);
+-        return -1;
+-    }
+-
+     ALOGD("Starting tethering services");
+ 
+     pid_t pid;
+@@ -189,24 +134,23 @@ int TetherController::startTethering(int num_addrs, struct in_addr* addrs, int l
+             close(pipefd[0]);
+         }
+ 
+-        int num_processed_args = TETHER_START_CONST_ARG + (num_addrs/2) + 1; // 1 null for termination
++        int num_processed_args = 7 + (num_addrs/2) + 1; // 1 null for termination
+         char **args = (char **)malloc(sizeof(char *) * num_processed_args);
+         args[num_processed_args - 1] = NULL;
+         args[0] = (char *)"/system/bin/dnsmasq";
+         args[1] = (char *)"--keep-in-foreground";
+         args[2] = (char *)"--no-resolv";
+         args[3] = (char *)"--no-poll";
+-        args[4] = (char *)"--dhcp-authoritative";
+         // TODO: pipe through metered status from ConnService
+-        args[5] = (char *)"--dhcp-option-force=43,ANDROID_METERED";
+-        args[6] = (char *)"--pid-file";
+-        args[7] = (char *)"";
++        args[4] = (char *)"--dhcp-option-force=43,ANDROID_METERED";
++        args[5] = (char *)"--pid-file";
++        args[6] = (char *)"";
+ 
+-        int nextArg = TETHER_START_CONST_ARG;
++        int nextArg = 7;
+         for (int addrIndex=0; addrIndex < num_addrs;) {
+             char *start = strdup(inet_ntoa(addrs[addrIndex++]));
+             char *end = strdup(inet_ntoa(addrs[addrIndex++]));
+-            asprintf(&(args[nextArg++]),"--dhcp-range=%s,%s,%d", start, end, lease_time);
++            asprintf(&(args[nextArg++]),"--dhcp-range=%s,%s,1h", start, end);
+         }
+ 
+         if (execv(args[0], args)) {
+@@ -247,103 +191,6 @@ bool TetherController::isTetheringStarted() {
+     return (mDaemonPid == 0 ? false : true);
+ }
+ 
+-
+-int TetherController::startV6RtrAdv(int num_ifaces, char **ifaces) {
+-    int pid;
+-    int num_processed_args = 1;
+-    gid_t groups [] = { AID_NET_ADMIN, AID_NET_RAW, AID_INET };
+-
+-    if ((pid = fork()) < 0) {
+-        ALOGE("%s: fork failed (%s)", __func__, strerror(errno));
+-        return -1;
+-    }
+-    if (!pid) {
+-        char **args;
+-        const char *cmd = RTRADVDAEMON;
+-
+-        args = (char **)calloc(num_ifaces * 3 + 2, sizeof(char *));
+-
+-        args[0] = strdup(RTRADVDAEMON);
+-        for (int i=0; i < num_ifaces; i++) {
+-            int aidx = 3 * i + num_processed_args;
+-            args[aidx] = (char *)"-i";
+-            args[aidx + 1] = ifaces[i];
+-            args[aidx + 2] = (char *)"-x";
+-        }
+-
+-
+-        setgroups(sizeof(groups)/sizeof(groups[0]), groups);
+-        setresgid(AID_RADIO, AID_RADIO, AID_RADIO);
+-        setresuid(AID_RADIO, AID_RADIO, AID_RADIO);
+-
+-        if (execv(cmd, args)) {
+-            ALOGE("Unable to exec %s: (%s)" , cmd, strerror(errno));
+-        }
+-        free(args[0]);
+-        free(args);
+-        exit(0);
+-    } else {
+-        mRtrAdvPid = pid;
+-        ALOGD("Router advertisement daemon running");
+-    }
+-    return 0;
+-}
+-
+-int TetherController::stopV6RtrAdv() {
+-    if (!mRtrAdvPid) {
+-        ALOGD("Router advertisement daemon already stopped");
+-        return 0;
+-    }
+-
+-    kill(mRtrAdvPid, SIGTERM);
+-    waitpid(mRtrAdvPid, NULL, 0);
+-    mRtrAdvPid = 0;
+-    ALOGD("Router advertisement daemon stopped");
+-    return 0;
+-}
+-
+-int TetherController::addV6RtrAdvIface(const char *iface) {
+-    char **args;
+-    int i;
+-    int len;
+-    InterfaceCollection::iterator it;
+-    /* For now, just stop and start the daemon with the new interface list */
+-
+-    len = mInterfaces->size() + mUpstreamInterfaces->size();
+-    ALOGD("addV6RtrAdvIface: len = %d. Iface: %s\n", len, iface);
+-    args = (char **)calloc(len, sizeof(char *));
+-
+-    if (!args) {
+-        errno = ENOMEM;
+-        return -1;
+-    }
+-
+-    for (i = 0, it = mInterfaces->begin(); it != mInterfaces->end(); it++, i++) {
+-        args[i] = *it;
+-    }
+-
+-    for (it = mUpstreamInterfaces->begin(); i < len && it != mUpstreamInterfaces->end(); it++, i++) {
+-        args[i] = *it;
+-    }
+-
+-    stopV6RtrAdv();
+-    startV6RtrAdv(i, args);
+-
+-    free(args);
+-
+-    return 0;
+-}
+-
+-int TetherController::removeV6RtrAdvIface(const char *iface) {
+-    /* For now, just call addV6RtrAdvIface, since that will stop and
+-     * start the daemon with the updated interfaces
+-     */
+-    return addV6RtrAdvIface(iface);
+-}
+-bool TetherController::isV6RtrAdvStarted() {
+-    return (mRtrAdvPid == 0 ? false : true);
+-}
+-
+ #define MAX_CMD_SIZE 1024
+ 
+ int TetherController::setDnsForwarders(char **servers, int numServers) {
+@@ -422,55 +269,10 @@ int TetherController::applyDnsInterfaces() {
+     return 0;
+ }
+ 
+-int TetherController::addUpstreamInterface(char *iface)
+-{
+-    InterfaceCollection::iterator it;
+-    int fd;
+-
+-    ALOGD("addUpstreamInterface(%s)\n", iface);
+-
+-    if (!iface) {
+-        ALOGE("addUpstreamInterface: received null interface");
+-        return 0;
+-    }
+-    for (it = mUpstreamInterfaces->begin(); it != mUpstreamInterfaces->end(); ++it) {
+-        ALOGD(".");
+-        if (*it && !strcmp(iface, *it)) {
+-            ALOGD("addUpstreamInterface: interface %s already present", iface);
+-            return 0;
+-        }
+-    }
+-    mUpstreamInterfaces->push_back(strdup(iface));
+-
+-    return addV6RtrAdvIface(iface);
+-}
+-
+-int TetherController::removeUpstreamInterface(char *iface)
+-{
+-    InterfaceCollection::iterator it;
+-
+-    if (!iface) {
+-        ALOGE("removeUpstreamInterface: Null interface name received");
+-        return 0;
+-    }
+-    for (it = mUpstreamInterfaces->begin(); it != mUpstreamInterfaces->end(); ++it) {
+-        if (*it && !strcmp(iface, *it)) {
+-            free(*it);
+-            mUpstreamInterfaces->erase(it);
+-            return removeV6RtrAdvIface(iface);
+-        }
+-    }
+-
+-    ALOGW("Couldn't find interface %s to remove", iface);
+-    return 0;
+-}
+-
+ int TetherController::tetherInterface(const char *interface) {
+     ALOGD("tetherInterface(%s)", interface);
+     mInterfaces->push_back(strdup(interface));
+ 
+-    addV6RtrAdvIface(interface);
+-
+     if (applyDnsInterfaces()) {
+         InterfaceCollection::iterator it;
+         for (it = mInterfaces->begin(); it != mInterfaces->end(); ++it) {
+@@ -495,7 +297,7 @@ int TetherController::untetherInterface(const char *interface) {
+         if (!strcmp(interface, *it)) {
+             free(*it);
+             mInterfaces->erase(it);
+-            removeV6RtrAdvIface(NULL);
++
+             return applyDnsInterfaces();
+         }
+     }
+diff --git a/system/netd/TetherController.h b/system/netd/TetherController.h
+index 4065c5f..4da10b0 100644
+--- a/system/netd/TetherController.h
++++ b/system/netd/TetherController.h
+@@ -21,12 +21,6 @@
+ 
+ #include "List.h"
+ 
+-#define HOUR 3600
+-
+-/* Keep this in sync with packages/apps/Settings/res/values/arrays.xml's
+- * tethering_lease_time_entries/values */
+-#define DEFAULT_LEASE_TIME (1*HOUR)
+-
+ typedef android::netd::List<char *> InterfaceCollection;
+ typedef android::netd::List<struct in_addr> NetAddressCollection;
+ 
+@@ -35,8 +29,6 @@ class TetherController {
+     NetAddressCollection *mDnsForwarders;
+     pid_t                 mDaemonPid;
+     int                   mDaemonFd;
+-    pid_t                 mRtrAdvPid; // IPv6 support
+-    InterfaceCollection  *mUpstreamInterfaces;
+ 
+ public:
+     TetherController();
+@@ -45,7 +37,7 @@ public:
+     int setIpFwdEnabled(bool enable);
+     bool getIpFwdEnabled();
+ 
+-    int startTethering(int num_addrs, struct in_addr* addrs, int lease_time=DEFAULT_LEASE_TIME);
++    int startTethering(int num_addrs, struct in_addr* addrs);
+ 
+     int stopTethering();
+     bool isTetheringStarted();
+@@ -56,13 +48,6 @@ public:
+     int tetherInterface(const char *interface);
+     int untetherInterface(const char *interface);
+     InterfaceCollection *getTetheredInterfaceList();
+-    int startV6RtrAdv(int num_ifaces, char **ifaces);
+-    int stopV6RtrAdv();
+-    bool isV6RtrAdvStarted();
+-    int addV6RtrAdvIface(const char *iface);
+-    int removeV6RtrAdvIface(const char *iface);
+-    int addUpstreamInterface(char *iface);
+-    int removeUpstreamInterface(char *iface);
+ 
+ private:
+     int applyDnsInterfaces();

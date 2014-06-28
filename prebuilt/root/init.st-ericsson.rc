@@ -58,9 +58,6 @@ on fs
     # the block device belonging to /data.
     start cspsa
 
-    # Launch core services in case charging mode is entered
-    start watchdog-kicker
-
 on post-fs
 
     chown radio radio /modemfs
@@ -177,6 +174,9 @@ on early-boot
     # Start the offline charging
     exec /system/bin/chargemode
 
+    # Launch core services in case charging mode is entered
+    start watchdog-kicker
+
     # STE: Prepare modem
     class_start modem-u8500
     class_start modem-core
@@ -187,8 +187,8 @@ on early-boot
 on boot
 
     # STE cg2900 init
-    exec cg2900-channel_init.sh
-    start init_ste-cg2900
+    #exec cg2900-channel_init.sh
+    #start init_ste-cg2900
 
     # Set timeout value for rmnet stats.
     write /sys/devices/virtual/net/rmnet0/timeout_suspend 5000000
@@ -364,18 +364,18 @@ service iprenew_p2p /system/bin/dhcpcd -n
     disabled
     oneshot
 
-service dhcpcd_fix rm /data/misc/dhcp/*
-    user root
-    disabled
-    oneshot
+#service dhcpcd_fix rm /data/misc/dhcp/*
+#    user root
+#    disabled
+#    oneshot
 
 on property:init.svc.wpa_supplicant=stopped
     stop dhcpcd
-    start dhcpcd_fix
+#    start dhcpcd_fix
 
 on property:init.svc.dhcpcd=stopped
     stop dhcpcd
-    start dhcpcd_fix
+#    start dhcpcd_fix
 
 # STE, C&N service daemon
 service cn_server /system/bin/cn_server
@@ -442,12 +442,6 @@ service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard0
     class late_start
     disabled
 
-#service ste-cg29xx_ctrl /system/xbin/ste-cg29xx_ctrl -b 115200 -p 6 -l 23 -i /system/bin/cg2900-channel_init.sh /dev/ttyAMA0
-#    class main
-#    user root
-#    group bluetooth net_bt_admin misc root system
-#    oneshot
-
 service dbus /system/bin/logwrapper /system/bin/dbus-daemon --system --nofork
     class main
     socket dbus stream 660 bluetooth bluetooth
@@ -455,29 +449,42 @@ service dbus /system/bin/logwrapper /system/bin/dbus-daemon --system --nofork
     user bluetooth
     group bluetooth net_bt_admin dbus_access
 
+service pand /system/bin/logwrapper /system/bin/pand -s -n -M -A -E -r NAP -u /system/bin/blue-up.sh
+    class main
+    user root
+    group bluetooth net_bt_admin misc
+    disabled
+    oneshot
+
 service watchdog-kicker /system/xbin/watchdog-kicker -d /dev/watchdog -t 120
     class main
     oneshot
 
-service init_ste-cg2900 /system/bin/logwrapper /system/bin/hciattach -a 23 -n -s 115200 /dev/ttyAMA0 cg2900 115200 flow
-    user bluetooth
-    group bluetooth net_bt_admin system net_bt_stack
-    disabled
+service ste-cg29xx_ctrl /system/bin/logwrapper /system/xbin/ste-cg29xx_ctrl -b 115200 -p 6 -l 23 -i /system/bin/cg2900-channel_init.sh /dev/ttyAMA0
+    class main
+    user root
+    group bluetooth net_bt_admin misc root system
     oneshot
 
-on property:init.svc.bluetoothd=running
-    write /sys/class/rfkill/rfkill0/state 1
-    setprop bluetooth.status on
+#service init_ste-cg2900 /system/bin/logwrapper /system/bin/hciattach -a 23 -n -s 115200 /dev/ttyAMA0 cg2900 115200 flow
+#    user bluetooth
+#    group bluetooth net_bt_admin system net_bt_stack
+#    disabled
+#    oneshot
 
-on property:init.svc.bluetoothd=stopped
-    write /sys/class/rfkill/rfkill0/state 0
-    setprop bluetooth.status off
+#on property:init.svc.bluetoothd=running
+#    write /sys/class/rfkill/rfkill0/state 1
+#    setprop bluetooth.status on
+
+#on property:init.svc.bluetoothd=stopped
+#    write /sys/class/rfkill/rfkill0/state 0
+#    setprop bluetooth.status off
 
 # To prevent connection to channel 12, 13 in flight mode/no coverage/no sim case at startup.
-on property:wlan.driver.status=ok
-    write /sys/class/rfkill/rfkill0/state 1
+#on property:wlan.driver.status=ok
+#    write /sys/class/rfkill/rfkill0/state 1
 
 # power down wifi interface
-on property:wlan.driver.status=unloaded
-    write /sys/class/rfkill/rfkill0/state 0
+#on property:wlan.driver.status=unloaded
+#    write /sys/class/rfkill/rfkill0/state 0
 
